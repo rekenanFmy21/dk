@@ -12055,167 +12055,142 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 
-<script>
-
 <script id="rekenan-v20046-final-fix">
-/* [Rekenan BUILD] V200.46 FINAL FIX
-   ACC instant-hide + LOAN attachment local projection + photo icon hardening
-   + calculator full local history merge + startup console audit.
+/* [Rekenan BUILD] V200.46 PHOTO/ACC HOTFIX
+   Fix malformed script, Shopping image icon, Loan image button, and local attachment projection.
 */
 (function(){
   'use strict';
-  console.info('[Rekenan BUILD] V200.46 FINAL FIX LOADED');
-  console.info('[Rekenan FIX] ACC instant-hide / PHOTO ICON / LOAN PHOTO LOCAL LINK / CALC FULL HISTORY');
+  console.info('[Rekenan BUILD] V200.46 PHOTO/ACC HOTFIX LOADED');
 
-  /* LOAN attachments were uploaded successfully but rkApplyAttachmentLocal_
-     did not include LOAN in its local collection map. Therefore Admin/Pinjaman
-     could remain stuck on "Foto masih dikirim" although Drive was committed. */
-  try {
-    var oldApply = window.rkApplyAttachmentLocal_;
-    if (typeof oldApply === 'function' && !window.__rkV20046ApplyWrapped) {
-      window.__rkV20046ApplyWrapped = true;
-      window.rkApplyAttachmentLocal_ = function(dt,id,att){
-        try { oldApply.apply(this, arguments); } catch(e) { console.warn('[Rekenan V200.46] base attachment apply',e); }
+  function meta_(item){
+    item=item||{}; var a=null;
+    try{ if(typeof parseAttachmentMeta_==='function') a=parseAttachmentMeta_(item); }catch(_){ }
+    a=a||item.attachment||item.bukti||{};
+    var fid=String(a.fileId||a.FileId||a.AttachmentFileId||item.attachmentFileId||item.AttachmentFileId||item.fileId||'').trim();
+    var url=String(a.url||a.URL||a.viewUrl||a.fileUrl||a.AttachmentUrl||item.attachmentUrl||item.AttachmentUrl||item.photoUrl||'').trim();
+    if(!url&&fid) url='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';
+    return {fileId:fid,url:url,pending:!!(a.pending||item.attachmentPending)};
+  }
+  function open_(url){
+    url=String(url||'').trim(); if(!url) return false;
+    try{ if(typeof openAttachmentUrl_==='function'){openAttachmentUrl_(url);return true;} }catch(e){console.warn('[Rekenan V200.46] viewer failed',e);}
+    try{window.open(url,'_blank','noopener,noreferrer');return true;}catch(_){return false;}
+  }
+
+  /* When Drive commits an attachment, immediately project the final file link into Local. */
+  try{
+    var baseApply=window.rkApplyAttachmentLocal_;
+    if(typeof baseApply==='function'&&!window.__rkV20046ApplyWrapped){
+      window.__rkV20046ApplyWrapped=true;
+      window.rkApplyAttachmentLocal_=function(dt,id,att){
+        try{baseApply.apply(this,arguments);}catch(e){console.warn('[Rekenan V200.46] base attachment apply',e);}
         var key=String(dt||'').toUpperCase(), rid=String(id||'');
+        if(key!=='SHOPPING'&&key!=='LOAN') return;
+        var lists=[];
+        if(key==='SHOPPING'&&Array.isArray(window.shoppingItems)) lists.push(window.shoppingItems);
         if(key==='LOAN'){
-          var lists=[];
-          if(Array.isArray(window.embeddedAdminLoans)) lists.push(window.embeddedAdminLoans);
           if(Array.isArray(window.loansData)) lists.push(window.loansData);
-          var found=false;
-          lists.forEach(function(list){
-            var x=list.find(function(v){return String(v&&v.id||'')===rid;});
-            if(x){
-              x.attachment=Object.assign({},att||{}, {pending:false});
-              x.attachmentFileId=att&&att.fileId||'';
-              x.attachmentUrl=att&&att.url||'';
-              x.photoUrl=att&&att.url||'';
-              found=true;
-            }
-          });
-          if(found){
-            try { if(typeof window.renderEmbeddedAdmin==='function') window.renderEmbeddedAdmin(); } catch(_){}
-            try { if(typeof window.renderLoanList==='function') window.renderLoanList(); } catch(_){}
-          }
-          console.info('[Rekenan FIX] LOAN PHOTO LOCAL LINKED',rid);
+          if(Array.isArray(window.embeddedAdminLoans)) lists.push(window.embeddedAdminLoans);
         }
+        lists.forEach(function(list){
+          var x=list.find(function(v){return String(v&&v.id||'')===rid;});
+          if(!x)return;
+          var old=x.attachment&&typeof x.attachment==='object'?x.attachment:{};
+          x.attachment=Object.assign({},old,att||{}, {pending:false});
+          x.attachmentFileId=String((att&&att.fileId)||'');
+          x.attachmentUrl=String((att&&att.url)||'');
+          x.photoUrl=String((att&&att.url)||'');
+        });
+        try{secureSave(key==='SHOPPING'?'rekenan_shopping':'rekenan_loans', key==='SHOPPING'?window.shoppingItems:window.loansData);}catch(_){ }
+        try{if(key==='SHOPPING'&&typeof window.renderShoppingList==='function')window.renderShoppingList();}catch(_){ }
+        try{if(key==='LOAN'&&typeof window.renderLoanList==='function')window.renderLoanList();}catch(_){ }
+        console.info('[Rekenan FIX] ATTACHMENT LOCAL LINKED',key,rid);
       };
     }
-  } catch(e){console.warn('[Rekenan V200.46] attachment patch failed',e);}
+  }catch(e){console.warn('[Rekenan V200.46] local attachment patch failed',e);}
 
-  /* ACC must disappear from DOM immediately, independently of photo queue. */
-  try {
+  /* ACC disappears immediately; cloud verification continues in background. */
+  try{
     var oldVerify=window.verifyEmbeddedLoan;
-    if(typeof oldVerify==='function' && !window.__rkV20046VerifyWrapped){
+    if(typeof oldVerify==='function'&&!window.__rkV20046VerifyWrapped){
       window.__rkV20046VerifyWrapped=true;
       window.verifyEmbeddedLoan=async function(id,status,ev){
         var rid=String(id||'');
-        try{
-          document.querySelectorAll('[data-verify-loan-id]').forEach(function(b){
-            if(String(b.getAttribute('data-verify-loan-id'))===rid){
-              var wrap=b.parentElement;
-              b.remove();
-              if(wrap) wrap.querySelectorAll('button[onclick*="verifyEmbeddedLoan"]').forEach(function(x){
-                if(String(x.getAttribute('onclick')||'').includes("'Aktif'")) x.remove();
-              });
-            }
-          });
-        }catch(_){}
+        try{document.querySelectorAll('[data-verify-loan-id]').forEach(function(b){if(String(b.getAttribute('data-verify-loan-id'))===rid)b.remove();});}catch(_){ }
         console.info('[Rekenan FIX] ACC INSTANT HIDE',rid,status||'Aktif');
         return oldVerify.apply(this,arguments);
       };
     }
-  } catch(e){console.warn('[Rekenan V200.46] ACC patch failed',e);}
+  }catch(e){console.warn('[Rekenan V200.46] ACC patch failed',e);}
 
-  /* Calculator history: never limit the local list to the newest 30 and
-     recover persisted older rows if a legacy window array is incomplete. */
-  try {
-    var oldCalcArray = window.__rkV20046CalcArray;
-    if(!window.__rkV20046CalcArray){
-      window.__rkV20046CalcArray=function(){
-        var mem=Array.isArray(window.calcHistory)?window.calcHistory:[];
-        var disk=[];
-        try{disk=typeof secureLoad==='function'?secureLoad('rekenan_calc_history',[]):JSON.parse(localStorage.getItem('rekenan_calc_history')||'[]');}catch(_){}
-        var map=new Map();
-        [].concat(disk||[],mem||[]).forEach(function(x){if(x&&x.id) map.set(String(x.id),x);});
-        var out=Array.from(map.values());
-        out.sort(function(a,b){return String(b.updatedAt||b.date||b.createdAt||'').localeCompare(String(a.updatedAt||a.date||a.createdAt||''));});
-        return out;
-      };
-    }
-    /* Patch the existing renderer without recursion. */
-    var oldRender=window.renderV101CalcHistory;
-    if(typeof oldRender==='function' && !window.__rkV20046CalcRenderWrapped){
-      window.__rkV20046CalcRenderWrapped=true;
-      window.renderV101CalcHistory=function(){
-        try{
-          var arr=window.__rkV20046CalcArray();
-          if(!Array.isArray(arr)) arr=[];
-          if(Array.isArray(window.calcHistory)){
-            var map=new Map(arr.map(function(x){return [String(x.id),x];}));
-            window.calcHistory.forEach(function(x){if(x&&x.id)map.set(String(x.id),x);});
-            arr=Array.from(map.values());
-            arr.sort(function(a,b){return String(b.updatedAt||b.date||b.createdAt||'').localeCompare(String(a.updatedAt||a.date||a.createdAt||''));});
-          }
-          if(arr.length && Array.isArray(window.calcHistory) && window.calcHistory.length < arr.length){
-            window.calcHistory=arr;
-            try{secureSave('rekenan_calc_history',arr);}catch(_){}
-          }
-        }catch(e){console.warn('[Rekenan V200.46] calc history merge',e);}
-        return oldRender.apply(this,arguments);
-      };
-    }
-  } catch(e){console.warn('[Rekenan V200.46] calculator patch failed',e);}
-
-  /* Hard guarantee: if a rendered Shopping card has attachment data but no
-     image icon, inject the icon into its proof/action area. */
-  function hardenShoppingPhotoIcons_(){
-    try{
-      var list=Array.isArray(window.shoppingItems)?window.shoppingItems:[];
-      var cards=document.querySelectorAll('#shoppingCardList > div');
-      cards.forEach(function(card){
-        var input=card.querySelector('input[type="checkbox"][onchange*="toggleShoppingItemCheck"]');
-        if(!input) return;
-        var oc=input.getAttribute('onchange')||'', m=oc.match(/toggleShoppingItemCheck\('([^']+)'/);
-        if(!m)return;
-        var item=list.find(function(x){return String(x&&x.id||'')===String(m[1]);});
-        if(!item)return;
-        var a=null;
-        try{a=typeof parseAttachmentMeta_==='function'?parseAttachmentMeta_(item):item.attachment||null;}catch(_){}
-        var url=String(a&&a.url||'').trim(), fid=String(a&&a.fileId||'').trim();
-        if(!url&&fid)url='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';
-        if(!url)return;
-        var proof=card.querySelector('.v101-shopping-proof')||card.querySelector('.v108-shop-actions');
-        if(!proof)return;
-        if(proof.querySelector('.v20046-photo-view'))return;
-        var b=document.createElement('button');
-        b.type='button'; b.className='v188-photo-view v20046-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white';
-        b.title='Lihat gambar'; b.setAttribute('aria-label','Lihat gambar');
-        b.innerHTML='<i class="fa-solid fa-image"></i>';
-        b.onclick=function(e){e.preventDefault();e.stopPropagation();if(typeof openAttachmentUrl_==='function')openAttachmentUrl_(url);};
-        proof.insertBefore(b,proof.firstChild);
-      });
-    }catch(e){console.warn('[Rekenan V200.46] shopping photo hardening',e);}
+  /* SHOPPING: always show image icon when the item has a photo/fileId. */
+  function patchShopping_(){
+    document.querySelectorAll('#shoppingCardList > div').forEach(function(card){
+      var input=card.querySelector('input[type="file"][id^="shop_photo_"]');
+      var id=input?input.id.replace(/^shop_photo_/,''):'';
+      if(!id){
+        var cb=card.querySelector('input[type="checkbox"][onchange*="toggleShoppingItemCheck"]');
+        var m=cb&&String(cb.getAttribute('onchange')||'').match(/toggleShoppingItemCheck\(['"]([^'"]+)/);
+        id=m?m[1]:'';
+      }
+      if(!id)return;
+      var item=(window.shoppingItems||[]).find(function(x){return String(x&&x.id||'')===String(id);});
+      var a=meta_(item); if(!a.url)return;
+      var actions=card.querySelector('.v108-shop-actions,.v101-shopping-proof')||card;
+      var old=actions.querySelector('.rk-v20046-shop-photo'); if(old)old.remove();
+      var b=document.createElement('button'); b.type='button';
+      b.className='rk-v20046-shop-photo v108-icon-btn inline-flex items-center justify-center w-9 h-9 rounded-xl';
+      b.title='Lihat foto'; b.setAttribute('aria-label','Lihat foto');
+      b.innerHTML='<i class="fa-solid fa-image"></i>';
+      b.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();open_(a.url);},true);
+      actions.insertBefore(b,actions.firstChild);
+    });
   }
-  var oldShop=window.renderShoppingList;
-  if(typeof oldShop==='function' && !window.__rkV20046ShopWrapped){
-    window.__rkV20046ShopWrapped=true;
-    window.renderShoppingList=function(){var r=oldShop.apply(this,arguments);setTimeout(hardenShoppingPhotoIcons_,0);return r;};
-  }
-  setTimeout(hardenShoppingPhotoIcons_,200);
 
-  /* Console audit: expose a single deterministic health line for this build. */
+  /* LOAN: replace broken inline handler with a real listener and keep icon-only UI. */
+  function patchLoan_(){
+    document.querySelectorAll('#loanCardList .v106-photo-check').forEach(function(btn){
+      if(btn.classList.contains('v106-photo-empty'))return;
+      var inline=String(btn.getAttribute('onclick')||'');
+      var url='';
+      var m=inline.match(/decodeURIComponent\('([^']+)'\)/);
+      if(m){try{url=decodeURIComponent(m[1]);}catch(_){}}
+      if(!url){
+        var card=btn.closest('.v37-loan-card');
+        var name=String(card&&card.textContent||'');
+        var rows=Array.isArray(window.loansData)?window.loansData:[];
+        var item=rows.find(function(x){return name.includes(String(x&&x.nama||''))&&meta_(x).url;});
+        if(item)url=meta_(item).url;
+      }
+      if(!url)return;
+      var clone=btn.cloneNode(true);
+      clone.removeAttribute('onclick'); clone.disabled=false;
+      clone.innerHTML='<i class="fa-solid fa-image"></i>';
+      clone.title='Lihat foto'; clone.setAttribute('aria-label','Lihat foto');
+      clone.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();open_(url);},true);
+      btn.replaceWith(clone);
+    });
+  }
+
+  function rerenderPatches_(){setTimeout(patchShopping_,0);setTimeout(patchLoan_,0);}
+  try{
+    var rs=window.renderShoppingList;
+    if(typeof rs==='function'&&!window.__rkV20046ShopWrapped){window.__rkV20046ShopWrapped=true;window.renderShoppingList=function(){var r=rs.apply(this,arguments);rerenderPatches_();return r;};}
+    var rl=window.renderLoanList;
+    if(typeof rl==='function'&&!window.__rkV20046LoanWrapped){window.__rkV20046LoanWrapped=true;window.renderLoanList=function(){var r=rl.apply(this,arguments);rerenderPatches_();return r;};}
+  }catch(e){console.warn('[Rekenan V200.46] render wrappers failed',e);}
+  setTimeout(rerenderPatches_,100); setTimeout(rerenderPatches_,800);
+  if(window.MutationObserver){
+    var ob=new MutationObserver(function(){clearTimeout(window.__rkV20046PhotoTimer);window.__rkV20046PhotoTimer=setTimeout(rerenderPatches_,80);});
+    var root=document.getElementById('tab-belanja')||document.body; if(root)ob.observe(root,{childList:true,subtree:true});
+    var root2=document.getElementById('loanCardList'); if(root2)ob.observe(root2,{childList:true,subtree:true});
+  }
+
   window.rekenanV20046Audit=function(){
-    var r={
-      build:'V200.46',
-      acc:typeof window.verifyEmbeddedLoan==='function',
-      photoViewer:typeof window.openAttachmentUrl_==='function',
-      shoppingPhotoPatch:!!window.__rkV20046ShopWrapped,
-      loanPhotoPatch:!!window.__rkV20046ApplyWrapped,
-      calculatorHistory:typeof window.renderV101CalcHistory==='function'
-    };
-    console.info('[Rekenan AUDIT V200.46] FINAL',r);
-    return r;
+    var r={build:'V200.46',syntax:true,shoppingIcon:!!window.__rkV20046ShopWrapped,loanPhoto:!!window.__rkV20046LoanWrapped,viewer:typeof window.openAttachmentUrl_==='function'};
+    console.info('[Rekenan AUDIT V200.46] PHOTO FINAL',r);return r;
   };
-  setTimeout(function(){try{window.rekenanV20046Audit();}catch(_){}},800);
+  setTimeout(function(){try{window.rekenanV20046Audit();}catch(_){ }},1000);
 })();
 </script>
