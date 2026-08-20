@@ -6781,7 +6781,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                             </div>
                             <button onclick="deleteShoppingItem('${item.id}', this)" class="text-rose-400 hover:text-rose-300 p-2 shrink-0"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
-                        <div class="v101-shopping-proof flex items-center gap-2 flex-wrap">${(() => {const a = parseAttachmentMeta_(item); if (!(a?.url || a?.fileId)) return a?.pending ? '<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-700 text-zinc-300" title="Foto masih dikirim" aria-label="Foto masih dikirim" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>' : '<span class="text-[9px] text-zinc-500">Belum ada foto</span>'; const target = String(a.url || ('https://drive.google.com/file/d/' + a.fileId + '/view')); const safe = encodeURIComponent(target); return `<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black" title="Lihat foto belanja" aria-label="Lihat foto belanja" onclick="event.stopPropagation();openAttachmentUrl_(decodeURIComponent('${safe}'))"><i class="fa-solid fa-image"></i></button>`;})()}<label class="v101-upload-label cursor-pointer" title="Tambah / ganti foto belanja" aria-label="Tambah / ganti foto belanja"><i class="fa-solid fa-camera"></i><input id="shop_photo_${item.id}" type="file" accept="image/*" class="hidden" onchange="handleShoppingPhotoChangeV101('${item.id}',event)"></label>${parseAttachmentMeta_(item) ? '<span class="text-[9px] text-emerald-300 font-bold">Foto tersimpan</span>' : '<span class="text-[9px] text-zinc-500">Tambah foto</span>'}</div>
+                        <div class="v101-shopping-proof flex items-center gap-2 flex-wrap">${(() => {const a = parseAttachmentMeta_(item); if (!(a?.url || a?.fileId)) return a?.pending ? '<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-700 text-zinc-300" title="Foto masih dikirim" aria-label="Foto masih dikirim" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>' : '<span class="text-[9px] text-zinc-500">Belum ada foto</span>'; const target = String(a.url || ('https://drive.google.com/file/d/' + a.fileId + '/view')); return `<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black" title="Lihat foto belanja" aria-label="Lihat foto belanja" data-photo-url="${escapeHtmlGlobal_(target)}"><i class="fa-solid fa-image"></i></button>`;})()}<label class="v101-upload-label cursor-pointer" title="Tambah / ganti foto belanja" aria-label="Tambah / ganti foto belanja"><i class="fa-solid fa-camera"></i><input id="shop_photo_${item.id}" type="file" accept="image/*" class="hidden" onchange="handleShoppingPhotoChangeV101('${item.id}',event)"></label>${parseAttachmentMeta_(item) ? '<span class="text-[9px] text-emerald-300 font-bold">Foto tersimpan</span>' : '<span class="text-[9px] text-zinc-500">Tambah foto</span>'}</div>
                         <div class="grid grid-cols-3 gap-2">
                             <div class="col-span-1">
                                 <select onchange="updateShoppingItemField('${item.id}', 'category', this.value)"
@@ -7182,7 +7182,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                         ? `<button type="button" class="v106-photo-check v106-photo-empty" title="Foto masih dikirim" aria-label="Foto masih dikirim" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>`
                         : `<span class="v106-photo-check v106-photo-empty" title="Tidak ada foto/bukti"><i class="fa-regular fa-image"></i></span>`;
                 const loanId = esc(item?.id || '');
-                return `<div class="v37-loan-card p-4 rounded-3xl transition space-y-3">
+                return `<div class="v37-loan-card p-4 rounded-3xl transition space-y-3" data-loan-id="${loanId}">
                     <div class="flex justify-between gap-3">
                         <div class="min-w-0">
                             <div class="text-xs font-black text-white truncate flex items-center gap-1.5">${esc(item?.nama || activeBorrowerUser?.name || 'Peminjam')} ${photoButton}</div>
@@ -12172,9 +12172,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       if(m){try{url=decodeURIComponent(m[1]);}catch(_){}}
       if(!url){
         var card=btn.closest('.v37-loan-card');
-        var name=String(card&&card.textContent||'');
         var rows=Array.isArray(window.loansData)?window.loansData:[];
-        var item=rows.find(function(x){return name.includes(String(x&&x.nama||''))&&meta_(x).url;});
+        var lid=card&&card.getAttribute('data-loan-id');
+        var item=lid?rows.find(function(x){return String(x&&x.id||'')===String(lid);}):null;
+        if(!item){
+          var name=String(card&&card.textContent||'');
+          item=rows.find(function(x){return name.includes(String(x&&x.nama||''))&&meta_(x).url;});
+        }
         if(item)url=meta_(item).url;
       }
       if(!url)return;
@@ -12216,7 +12220,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       var root=document.getElementById(id); if(!root || root.__rkPhotoDelegate) return;
       root.__rkPhotoDelegate=true;
       root.addEventListener('click',function(e){
-        var btn=e.target.closest('button.v188-photo-view,button.v106-photo-check,button.rk-v20046-shop-photo,button.rk-v20013-shop-photo,button.v108-icon-btn');
+        var btn=e.target.closest('button.v188-photo-view,button.v106-photo-check,button.rk-v20046-shop-photo,button.rk-v20013-shop-photo,button.v188-photo-view');
         if(!btn || !root.contains(btn) || btn.disabled) return;
         var url=rkPhotoUrlFromButton_(btn);
         if(!url){
@@ -12226,8 +12230,12 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
           if(id2 && Array.isArray(window.shoppingItems)) item=window.shoppingItems.find(function(x){return String(x.id)===String(id2)});
           if(!item && root.id==='loanCardList'){
             var rows=Array.isArray(window.loansData)?window.loansData:[];
-            var loanName=String(card&&card.textContent||'').trim();
-            item=rows.find(function(x){return loanName.includes(String(x&&x.nama||'')) && meta_(x).url;});
+            var loanId=card && card.getAttribute('data-loan-id');
+            if(loanId) item=rows.find(function(x){return String(x&&x.id||'')===String(loanId);});
+            if(!item){
+              var loanName=String(card&&card.textContent||'').trim();
+              item=rows.find(function(x){return loanName.includes(String(x&&x.nama||'')) && meta_(x).url;});
+            }
           }
           if(item) url=meta_(item).url;
         }
@@ -12250,7 +12258,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     document.querySelectorAll('#loanCardList .v106-photo-check').forEach(function(btn){
       if(btn.classList.contains('v106-photo-empty')) return;
       var card=btn.closest('.v37-loan-card'); var rows=Array.isArray(window.loansData)?window.loansData:[];
-      var txt=String(card&&card.textContent||''); var item=rows.find(function(x){return txt.includes(String(x&&x.nama||'')) && meta_(x).url;});
+      var lid=card&&card.getAttribute('data-loan-id');
+      var item=lid?rows.find(function(x){return String(x&&x.id||'')===String(lid);}):null;
+      if(!item){var txt=String(card&&card.textContent||''); item=rows.find(function(x){return txt.includes(String(x&&x.nama||'')) && meta_(x).url;});}
       var a=meta_(item); if(!a.url) return;
       btn.disabled=false; btn.removeAttribute('disabled'); btn.removeAttribute('onclick'); btn.setAttribute('data-photo-url',a.url); btn.innerHTML='<i class="fa-solid fa-image"></i>'; btn.title='Lihat foto'; btn.setAttribute('aria-label','Lihat foto');
     });
@@ -12258,12 +12268,31 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){setTimeout(rkInstallPhotoDelegation_,50);setTimeout(rkForcePhotoButtons_,150);});
   else {setTimeout(rkInstallPhotoDelegation_,50);setTimeout(rkForcePhotoButtons_,150);}
   setInterval(rkForcePhotoButtons_,1000);
-  console.info('[Rekenan BUILD] V200.48 PHOTO CORE FIX LOADED');
+  console.info('[Rekenan BUILD] V200.49 PHOTO ICON CORE FIX LOADED');
   
   window.rekenanV20046Audit=function(){
-    var r={build:'V200.48',syntax:true,shoppingIcon:!!window.__rkV20046ShopWrapped,loanPhoto:!!window.__rkV20046LoanWrapped,viewer:typeof window.openAttachmentUrl_==='function'};
-    console.info('[Rekenan AUDIT V200.48] PHOTO FINAL',r);return r;
+    var r={build:'V200.49',syntax:true,shoppingIcon:!!window.__rkV20046ShopWrapped,loanPhoto:!!window.__rkV20046LoanWrapped,viewer:typeof window.openAttachmentUrl_==='function'};
+    console.info('[Rekenan AUDIT V200.49] PHOTO FINAL',r);return r;
   };
   setTimeout(function(){try{window.rekenanV20046Audit();}catch(_){ }},1000);
 })();
+
+  // V200.49 PHOTO BUTTON CORE: icon buttons are never disabled once a final URL exists.
+  function rkPhotoOpen_(url, ev){
+    url=String(url||'').trim();
+    if(!url) return;
+    if(ev){ev.preventDefault();ev.stopPropagation();}
+    if(typeof window.openAttachmentUrl_==='function') window.openAttachmentUrl_(url);
+    else if(typeof open_==='function') open_(url);
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest && e.target.closest('#shoppingCardList .v188-photo-view,#shoppingCardList .rk-v20046-shop-photo,#loanCardList .v106-photo-check');
+    if(!b) return;
+    var u=b.getAttribute('data-photo-url')||'';
+    if(!u){
+      var inline=b.getAttribute('onclick')||'', m=inline.match(/decodeURIComponent\('([^']+)'\)/);
+      if(m){try{u=decodeURIComponent(m[1]);}catch(_){}}
+    }
+    if(u) rkPhotoOpen_(u,e);
+  },true);
 </script>
