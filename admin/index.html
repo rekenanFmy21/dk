@@ -3696,7 +3696,7 @@ margin:0!important;
         // Menu entry must never be the first moment when Loan/Admin data are loaded.
         function rkWarmAllDomainsOnStartup_() {
             try {
-                console.info('[Rekenan STARTUP] WARM ALL DOMAINS — Local ready before menu entry'); console.info('[Rekenan BUILD] V200.44 | STARTUP PRELOAD + LOAN/DATA PRIORITY + PHOTO BACKGROUND + ADMIN LIVE FALLBACK + LOAN PHOTO NONBLOCKING');
+                console.info('[Rekenan STARTUP] WARM ALL DOMAINS — Local ready before menu entry'); console.info('[Rekenan BUILD] V200.45 | ACC NON-BLOCKING + PHOTO ICONS + CALC HISTORY MERGE + ADMIN LIVE FALLBACK');
                 // These arrays are already restored above via secureLoad(). Re-rendering
                 // is deferred so startup stays light; no Cloud request is required to
                 // make Local state available.
@@ -3737,7 +3737,7 @@ margin:0!important;
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
         const API_VERSION = 'V200.32-LOCAL-FIRST-CACHED';
         window.REKENAN_SERVER_BUILD = 'V200.32';
-        console.info('[Rekenan BUILD] CLIENT V200.44 / SERVER API COMPATIBLE');
+        console.info('[Rekenan BUILD] CLIENT V200.45 / SERVER API COMPATIBLE');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -4282,10 +4282,21 @@ margin:0!important;
             }
             if (data.calcHistory !== undefined) {
                 const incoming = Array.isArray(data.calcHistory) ? data.calcHistory : [];
-                if (incoming.length || authoritativeEmpty || !Array.isArray(calcHistory)) {
-                    calcHistory = incoming; if (persist) secureSave('rekenan_calc_history', calcHistory);
-                    if (persist) secureSave('rekenan_notes', notesData);
+                // V200.45: Cloud responses can be delta/partial snapshots. Never
+                // replace the complete Local calculator history with only the newest
+                // row. Merge by stable id and retain Local-only historical rows.
+                if (authoritativeEmpty) {
+                    calcHistory = [];
+                } else {
+                    const map = new Map((Array.isArray(calcHistory) ? calcHistory : []).map(x => [String(x?.id || ''), x]));
+                    for (const item of incoming) {
+                        const id = String(item?.id || '');
+                        if (!id) continue;
+                        map.set(id, Object.assign({}, map.get(id) || {}, item));
+                    }
+                    calcHistory = Array.from(map.values());
                 }
+                if (persist) secureSave('rekenan_calc_history', calcHistory);
             }
             if (data.notes !== undefined) {
                 const incoming = Array.isArray(data.notes) ? data.notes : [];
@@ -6756,7 +6767,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                             </div>
                             <button onclick="deleteShoppingItem('${item.id}', this)" class="text-rose-400 hover:text-rose-300 p-2 shrink-0"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
-                        <div class="v101-shopping-proof flex items-center gap-2 flex-wrap">${(() => {const a = parseAttachmentMeta_(item); if (!(a?.url || a?.fileId)) return '<span class="text-[9px] text-zinc-500">Belum ada foto</span>'; const target = String(a.url || ('https://drive.google.com/file/d/' + a.fileId + '/view')); const safe = encodeURIComponent(target); return `<button type="button" class="v188-photo-view inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 text-white text-[10px] font-black" title="Lihat foto belanja" aria-label="Lihat foto belanja" onclick="event.stopPropagation();openAttachmentUrl_(decodeURIComponent('${safe}'))"><i class="fa-solid fa-image"></i><span>Lihat Foto</span></button>`;})()}<label class="v101-upload-label cursor-pointer" title="Tambah / ganti foto belanja" aria-label="Tambah / ganti foto belanja"><i class="fa-solid fa-camera"></i><input id="shop_photo_${item.id}" type="file" accept="image/*" class="hidden" onchange="handleShoppingPhotoChangeV101('${item.id}',event)"></label>${parseAttachmentMeta_(item) ? '<span class="text-[9px] text-emerald-300 font-bold">Foto tersimpan</span>' : '<span class="text-[9px] text-zinc-500">Tambah foto</span>'}</div>
+                        <div class="v101-shopping-proof flex items-center gap-2 flex-wrap">${(() => {const a = parseAttachmentMeta_(item); if (!(a?.url || a?.fileId)) return a?.pending ? '<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-700 text-zinc-300" title="Foto masih dikirim" aria-label="Foto masih dikirim" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>' : '<span class="text-[9px] text-zinc-500">Belum ada foto</span>'; const target = String(a.url || ('https://drive.google.com/file/d/' + a.fileId + '/view')); const safe = encodeURIComponent(target); return `<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black" title="Lihat foto belanja" aria-label="Lihat foto belanja" onclick="event.stopPropagation();openAttachmentUrl_(decodeURIComponent('${safe}'))"><i class="fa-solid fa-image"></i></button>`;})()}<label class="v101-upload-label cursor-pointer" title="Tambah / ganti foto belanja" aria-label="Tambah / ganti foto belanja"><i class="fa-solid fa-camera"></i><input id="shop_photo_${item.id}" type="file" accept="image/*" class="hidden" onchange="handleShoppingPhotoChangeV101('${item.id}',event)"></label>${parseAttachmentMeta_(item) ? '<span class="text-[9px] text-emerald-300 font-bold">Foto tersimpan</span>' : '<span class="text-[9px] text-zinc-500">Tambah foto</span>'}</div>
                         <div class="grid grid-cols-3 gap-2">
                             <div class="col-span-1">
                                 <select onchange="updateShoppingItemField('${item.id}', 'category', this.value)"
@@ -7152,9 +7163,9 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 const loanFileId = String(loanAtt?.fileId || loanAtt?.AttachmentFileId || '').trim();
                 const loanPhotoUrl = String(loanAtt?.url || loanAtt?.AttachmentUrl || (loanFileId ? ('https://drive.google.com/file/d/' + loanFileId + '/view') : '')).trim();
                 const photoButton = loanPhotoUrl
-                    ? `<button type="button" class="v106-photo-check" title="Lihat foto/bukti pinjaman" aria-label="Lihat foto pinjaman" onclick="event.stopPropagation();openAttachmentUrl_(decodeURIComponent('${encodeURIComponent(loanPhotoUrl)}'))"><i class="fa-solid fa-image mr-1"></i><span>Lihat Foto</span></button>`
+                    ? `<button type="button" class="v106-photo-check" title="Lihat foto/bukti pinjaman" aria-label="Lihat foto pinjaman" onclick="event.stopPropagation();openAttachmentUrl_(decodeURIComponent('${encodeURIComponent(loanPhotoUrl)}'))"><i class="fa-solid fa-image"></i></button>`
                     : loanAtt?.pending
-                        ? `<span class="v106-photo-check v106-photo-empty" title="Foto menunggu Sync"><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></span>`
+                        ? `<button type="button" class="v106-photo-check v106-photo-empty" title="Foto masih dikirim" aria-label="Foto masih dikirim" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>`
                         : `<span class="v106-photo-check v106-photo-empty" title="Tidak ada foto/bukti"><i class="fa-regular fa-image"></i></span>`;
                 const loanId = esc(item?.id || '');
                 return `<div class="v37-loan-card p-4 rounded-3xl transition space-y-3">
@@ -7588,6 +7599,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     <div class="grid grid-cols-3 gap-1 pt-1 text-[10px]"><div class="bg-zinc-800 p-1.5 rounded-lg">50%: ${formatRupiah(h.needs)}</div><div class="bg-zinc-800 p-1.5 rounded-lg">30%: ${formatRupiah(h.wants)}</div><div class="bg-zinc-800 p-1.5 rounded-lg">20%: ${formatRupiah(h.savings)}</div></div>
                 </div>`;
             container.innerHTML = rkHistoryDropdownHtml_(calcHistory, renderCalcHistoryItem, 'Riwayat Kalkulator');
+            console.info('[Rekenan KALKULATOR] HISTORY READY', { total: Array.isArray(calcHistory) ? calcHistory.length : 0, newest: Array.isArray(calcHistory) && calcHistory[0] ? calcHistory[0].id : null });
         }
 
         function closeCalcHistoryModal() {
@@ -8488,6 +8500,11 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         const paymentVerifyInFlight_ = new Set();
         const rkAdminAccQueue_ = [];
         let rkAdminAccWorkerRunning_ = false;
+        // V200.45: stale Admin snapshots must never resurrect an ACC button
+        // after the user has already clicked it. These sets are cleared only
+        // when a verification fails or the record is deleted/reloaded authoritatively.
+        const rkAdminHiddenLoanAcc_ = new Set();
+        const rkAdminHiddenPaymentAcc_ = new Set();
 
         function rkAdminIsPending_(v) {
             const s = String(v || '').trim().toLowerCase();
@@ -8535,6 +8552,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             if (!confirm(question)) return;
 
             loanVerifyInFlight_.add(key);
+            rkAdminHiddenLoanAcc_.add(String(id));
             const originalLoan = JSON.parse(JSON.stringify(loan));
 
             // OPTIMISTIC UI: remove the ACC button immediately. This is the
@@ -8573,6 +8591,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     const i = (embeddedAdminLoans || []).findIndex(x => String(x?.id || '') === String(id));
                     if (i >= 0) embeddedAdminLoans[i] = originalLoan;
                     else embeddedAdminLoans.push(originalLoan);
+                    rkAdminHiddenLoanAcc_.delete(String(id));
                     try { renderEmbeddedAdmin(); } catch (_) {}
                     console.error('[Rekenan ADMIN] verifyEmbeddedLoan', e);
                     showToast(e?.message || 'Gagal terhubung ke Cloud. Pengajuan dikembalikan ke antrean.', 'error');
@@ -8597,6 +8616,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             if (!confirm(status === 'Terverifikasi' ? 'Setujui pembayaran/cicilan ini?' : 'Tolak pembayaran/cicilan ini?')) return;
 
             paymentVerifyInFlight_.add(key);
+            rkAdminHiddenPaymentAcc_.add(key);
             const originalPayment = JSON.parse(JSON.stringify(payment));
             embeddedAdminPayments[paymentIndex] = Object.assign({}, payment, {
                 status: status,
@@ -8627,6 +8647,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     const i = (embeddedAdminPayments || []).findIndex(x => String(x?.loanId || '') === String(loanId) && Number(x?.cicilanKe || 0) === Number(cicilanKe));
                     if (i >= 0) embeddedAdminPayments[i] = originalPayment;
                     else embeddedAdminPayments.push(originalPayment);
+                    rkAdminHiddenPaymentAcc_.delete(key);
                     try { renderEmbeddedAdmin(); } catch (_) {}
                     console.error('[Rekenan ADMIN] verifyEmbeddedPayment', e);
                     showToast(e?.message || 'Gagal terhubung ke Cloud. Cicilan dikembalikan.', 'error');
@@ -8792,8 +8813,8 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 const st = String(x?.status || '').trim().toLowerCase();
                 return st === 'menunggu verifikasi' || st === 'menunggu_verifikasi' || st === 'menunggu-verifikasi';
             };
-            const pendingLoans = embeddedAdminLoans.filter(isLoanPendingVerification_);
-            const pendingPayments = embeddedAdminPayments.filter(x => ['menunggu verifikasi', 'menunggu_verifikasi', 'menunggu-verifikasi'].includes(String(x?.statusPembayaran || x?.status || '').trim().toLowerCase()));
+            const pendingLoans = embeddedAdminLoans.filter(x => isLoanPendingVerification_(x) && !rkAdminHiddenLoanAcc_.has(String(x?.id || '')));
+            const pendingPayments = embeddedAdminPayments.filter(x => ['menunggu verifikasi', 'menunggu_verifikasi', 'menunggu-verifikasi'].includes(String(x?.statusPembayaran || x?.status || '').trim().toLowerCase()) && !rkAdminHiddenPaymentAcc_.has(`${String(x?.loanId || '')}|${Number(x?.cicilanKe || 0)}`));
             const pendingLoanCountEl = document.getElementById('adminPendingLoanCount');
             const pendingBreakdownEl = document.getElementById('adminPendingBreakdown');
             if (pendingLoanCountEl) pendingLoanCountEl.textContent = (!adminDataLoaded_ && !embeddedAdminLoans.length && !embeddedAdminPayments.length) ? '…' : (pendingLoans.length + pendingPayments.length);
@@ -8808,14 +8829,14 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             const esc = v => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
             document.getElementById('adminLoanList').innerHTML = loans.length ? loans.map(x => {
-                const pending = isLoanPendingVerification_(x);
+                const pending = isLoanPendingVerification_(x) && !rkAdminHiddenLoanAcc_.has(String(x?.id || ''));
                 const statusClass = String(x.status) === 'Lunas' ? 'text-emerald-300' : pending ? 'text-amber-300' : 'text-sky-300';
                 return `<div class="bg-[#171717] p-3 rounded-2xl border border-zinc-800 space-y-2">
                     <div class="flex justify-between gap-2">
                         <div class="min-w-0">
                             <div class="text-xs font-bold text-white truncate">${esc(x.nama)}</div>
                             <div class="text-[10px] text-zinc-400 truncate">${esc(x.id)} • ${esc(x.tenor)} • <span class="${statusClass}">${esc(x.status)}</span></div>
-                            <div class="text-[10px] text-zinc-300 mt-1">Total ${formatRupiah(x.jumlah)} • Dibayar ${formatRupiah(x.totalPaid || x.paidAmount || 0)} • Sisa ${formatRupiah(x.remaining || 0)}</div>${(() => { const att = parseAttachmentMeta_(x); const target = String(att?.url || '').trim(); if (!target) return '<div class="text-[9px] text-zinc-600 mt-2">Tidak ada foto pengajuan</div>'; const safe = encodeURIComponent(target); return `<div class="flex items-center gap-2 mt-2"><button type="button" onclick="openAttachmentUrl_(decodeURIComponent('${safe}'))" class="v98-proof-btn inline-flex items-center gap-1.5 px-2.5 py-1.5" title="Lihat foto pengajuan" aria-label="Lihat foto pengajuan"><i class="fa-solid fa-image"></i><span>Lihat Foto</span></button><span class="text-[9px] text-emerald-300">${esc(att.name || 'Bukti pengajuan')}</span></div>`; })()}
+                            <div class="text-[10px] text-zinc-300 mt-1">Total ${formatRupiah(x.jumlah)} • Dibayar ${formatRupiah(x.totalPaid || x.paidAmount || 0)} • Sisa ${formatRupiah(x.remaining || 0)}</div>${(() => { const att = parseAttachmentMeta_(x); const target = String(att?.url || (att?.fileId ? ('https://drive.google.com/file/d/' + att.fileId + '/view') : '')).trim(); if (!target) return att?.pending ? '<div class="flex items-center gap-2 mt-2"><button type="button" disabled class="v98-proof-btn inline-flex items-center justify-center w-9 h-9 rounded-xl opacity-70" title="Foto masih dikirim" aria-label="Foto masih dikirim"><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button></div>' : '<div class="text-[9px] text-zinc-600 mt-2">Tidak ada foto pengajuan</div>'; const safe = encodeURIComponent(target); return `<div class="flex items-center gap-2 mt-2"><button type="button" onclick="openAttachmentUrl_(decodeURIComponent('${safe}'))" class="v98-proof-btn inline-flex items-center justify-center w-9 h-9 rounded-xl" title="Lihat foto pengajuan" aria-label="Lihat foto pengajuan"><i class="fa-solid fa-image"></i></button><span class="text-[9px] text-emerald-300">${esc(att.name || 'Bukti pengajuan')}</span></div>`; })()}
                         </div>
                         <div class="flex gap-1 mt-2 shrink-0">
                             ${pending ? `<button onclick="verifyEmbeddedLoan('${esc(x.id)}','Aktif',event)" data-verify-loan-id="${esc(x.id)}" data-acc-independent-photo="1" title="Setujui" aria-label="Setujui" class="bg-emerald-600 hover:bg-emerald-500 text-white w-8 h-8 rounded-lg"><i class="fa-solid fa-check"></i></button><button onclick="verifyEmbeddedLoan('${esc(x.id)}','Ditolak',event)" title="Tolak" aria-label="Tolak" class="bg-amber-600 hover:bg-amber-500 text-white w-8 h-8 rounded-lg"><i class="fa-solid fa-xmark"></i></button>` : ''}
@@ -8829,7 +8850,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 
             document.getElementById('adminPaymentList').innerHTML = payments.length ? payments.map(x => {
                 const status = String(x.statusPembayaran || x.status || 'Menunggu Verifikasi');
-                const pending = ['menunggu verifikasi', 'menunggu_verifikasi', 'menunggu-verifikasi'].includes(status.toLowerCase());
+                const pending = ['menunggu verifikasi', 'menunggu_verifikasi', 'menunggu-verifikasi'].includes(status.toLowerCase()) && !rkAdminHiddenPaymentAcc_.has(`${String(x?.loanId || '')}|${Number(x?.cicilanKe || 0)}`);
                 const verified = status.toLowerCase() === 'terverifikasi';
                 const rejected = status.toLowerCase() === 'ditolak';
                 const statusClass = verified ? 'text-emerald-300' : rejected ? 'text-rose-300' : 'text-amber-300';
@@ -9883,9 +9904,9 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
       var target=a.url || ('https://drive.google.com/file/d/'+encodeURIComponent(a.fileId)+'/view');
       var btn=document.createElement('button');
       btn.type='button';
-      btn.className='rk-v20013-shop-photo inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 text-white text-[10px] font-black';
+      btn.className='rk-v20013-shop-photo inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black';
       btn.title='Lihat foto belanja'; btn.setAttribute('aria-label','Lihat foto belanja');
-      btn.innerHTML='<i class="fa-solid fa-image"></i><span>Lihat Foto</span>';
+      btn.innerHTML='<i class="fa-solid fa-image"></i>';
       btn.onclick=function(e){e.preventDefault();e.stopPropagation();rkOpen_(target);};
       var actions=input.closest('.v101-shopping-proof') || input.closest('.v108-shop-actions') || input.parentElement?.parentElement;
       if(actions) actions.insertBefore(btn, actions.firstChild);
@@ -9894,8 +9915,8 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
   function rkPatchLoan_(){
     document.querySelectorAll('#loanCardList .v106-photo-check').forEach(function(el){
       if(el.tagName!=='BUTTON') return;
-      el.innerHTML='<i class="fa-solid fa-image mr-1"></i><span>Lihat Foto</span>';
-      el.classList.add('inline-flex','items-center','gap-1.5','px-2.5','py-1.5','rounded-xl','bg-indigo-600','text-white','text-[10px]','font-black');
+      el.innerHTML='<i class="fa-solid fa-image"></i>';
+      el.classList.add('inline-flex','items-center','justify-center','w-9','h-9','rounded-xl','bg-indigo-600','text-white','text-[10px]','font-black');
       el.style.cursor='pointer';
     });
   }
@@ -10947,7 +10968,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
             const ui = 'V200.38';
-            console.info('[Rekenan BUILD] UI V200.44 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.44 / SERVER API COMPATIBLE');
+            console.info('[Rekenan BUILD] UI V200.45 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.45 / SERVER API COMPATIBLE');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -11750,7 +11771,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 window.REKENAN_BUILD_VERSION='V200.43';
 window.REKENAN_UI_BUILD='V200.38';
 window.REKENAN_SERVER_BUILD='V200.32';
-console.info('[Rekenan BUILD] FINAL CLIENT V200.44 / SERVER API COMPATIBLE');
+console.info('[Rekenan BUILD] FINAL CLIENT V200.45 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
 
 /* Calculator: one authoritative save path, then completely reset the calculator UI. */
@@ -11888,9 +11909,9 @@ window.rekenanV2008Health=function(){return {client:'V200.32',server:window.REKE
       var target=a.url || ('https://drive.google.com/file/d/'+encodeURIComponent(a.fileId)+'/view');
       var btn=document.createElement('button');
       btn.type='button';
-      btn.className='rk-v20013-shop-photo inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 text-white text-[10px] font-black';
+      btn.className='rk-v20013-shop-photo inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black';
       btn.title='Lihat foto belanja'; btn.setAttribute('aria-label','Lihat foto belanja');
-      btn.innerHTML='<i class="fa-solid fa-image"></i><span>Lihat Foto</span>';
+      btn.innerHTML='<i class="fa-solid fa-image"></i>';
       btn.onclick=function(e){e.preventDefault();e.stopPropagation();rkOpen_(target);};
       var actions=input.closest('.v101-shopping-proof') || input.closest('.v108-shop-actions') || input.parentElement?.parentElement;
       if(actions) actions.insertBefore(btn, actions.firstChild);
@@ -11899,8 +11920,8 @@ window.rekenanV2008Health=function(){return {client:'V200.32',server:window.REKE
   function rkPatchLoan_(){
     document.querySelectorAll('#loanCardList .v106-photo-check').forEach(function(el){
       if(el.tagName!=='BUTTON') return;
-      el.innerHTML='<i class="fa-solid fa-image mr-1"></i><span>Lihat Foto</span>';
-      el.classList.add('inline-flex','items-center','gap-1.5','px-2.5','py-1.5','rounded-xl','bg-indigo-600','text-white','text-[10px]','font-black');
+      el.innerHTML='<i class="fa-solid fa-image"></i>';
+      el.classList.add('inline-flex','items-center','justify-center','w-9','h-9','rounded-xl','bg-indigo-600','text-white','text-[10px]','font-black');
       el.style.cursor='pointer';
     });
   }
