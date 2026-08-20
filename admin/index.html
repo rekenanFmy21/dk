@@ -4,15 +4,15 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V200.42';
+        window.REKENAN_BUILD_VERSION = 'V200.52';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.42';
-        console.info('[Rekenan BUILD] UI V200.44');
+        window.REKENAN_UI_BUILD = 'V200.52';
+        console.info('[Rekenan BUILD] UI V200.52');
         console.info('[Rekenan BUILD] V200.42 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
-                const expected = 'V200.35';
+                const expected = 'V200.52';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.38">
+    <meta name="rekenan-build" content="V200.52">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -3737,7 +3737,7 @@ margin:0!important;
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
         const API_VERSION = 'V200.32-LOCAL-FIRST-CACHED';
         window.REKENAN_SERVER_BUILD = 'V200.32';
-        console.info('[Rekenan BUILD] CLIENT V200.45 / SERVER API COMPATIBLE');
+        console.info('[Rekenan BUILD] CLIENT V200.52 / SERVER API COMPATIBLE');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -10982,7 +10982,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
             const ui = 'V200.38';
-            console.info('[Rekenan BUILD] UI V200.46 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.46 / SERVER API COMPATIBLE');
+            console.info('[Rekenan BUILD] UI V200.52 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.52 / SERVER API COMPATIBLE');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -11785,7 +11785,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 window.REKENAN_BUILD_VERSION='V200.43';
 window.REKENAN_UI_BUILD='V200.38';
 window.REKENAN_SERVER_BUILD='V200.32';
-console.info('[Rekenan BUILD] FINAL CLIENT V200.46 / SERVER API COMPATIBLE');
+console.info('[Rekenan BUILD] FINAL CLIENT V200.52 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
 
 /* Calculator: one authoritative save path, then completely reset the calculator UI. */
@@ -12295,4 +12295,80 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
     if(u) rkPhotoOpen_(u,e);
   },true);
+</script>
+
+<script id="rekenan-v20052-shopping-photo-standard">
+/* [Rekenan BUILD] V200.52 SHOPPING PHOTO = LOAN PHOTO STANDARD
+   The loan photo button is the reference implementation.
+   Shopping now uses the same v106-photo-check icon, metadata resolution,
+   data-photo-url contract, and delegated viewer behavior. */
+(function(){
+  'use strict';
+  function rk52Meta_(item){
+    item=item||{}; var a=null;
+    try{if(typeof parseAttachmentMeta_==='function')a=parseAttachmentMeta_(item);}catch(_){ }
+    a=a||item.attachment||item.bukti||{};
+    var fid=String(a.fileId||a.FileId||a.AttachmentFileId||item.attachmentFileId||item.AttachmentFileId||item.fileId||'').trim();
+    var url=String(a.url||a.URL||a.viewUrl||a.fileUrl||a.AttachmentUrl||item.attachmentUrl||item.AttachmentUrl||item.photoUrl||'').trim();
+    if(!url&&fid)url='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';
+    return {url:url,fileId:fid,pending:!!(a.pending||item.attachmentPending)};
+  }
+  function rk52Open_(url){
+    url=String(url||'').trim(); if(!url)return;
+    try{if(typeof openAttachmentUrl_==='function'){openAttachmentUrl_(url);return;}}catch(e){console.warn('[Rekenan V200.52] photo viewer fallback',e);}
+    try{window.open(url,'_blank','noopener,noreferrer');}catch(_){ }
+  }
+  function rk52CardItem_(card){
+    if(!card)return null;
+    var input=card.querySelector('input[id^="shop_photo_"]');
+    var id=input?input.id.replace(/^shop_photo_/,''):'';
+    if(!id){
+      var cb=card.querySelector('input[type="checkbox"][onchange*="toggleShoppingItemCheck"]');
+      var m=cb&&String(cb.getAttribute('onchange')||'').match(/toggleShoppingItemCheck\(['"]([^'"]+)/);
+      id=m?m[1]:'';
+    }
+    var rows=Array.isArray(window.shoppingItems)?window.shoppingItems:[];
+    return id?rows.find(function(x){return String(x&&x.id||'')===String(id);})||null:null;
+  }
+  function rk52PatchShopping_(){
+    document.querySelectorAll('#shoppingCardList > *').forEach(function(card){
+      var item=rk52CardItem_(card); if(!item)return;
+      var a=rk52Meta_(item);
+      var actions=card.querySelector('.v108-shop-actions');
+      if(!actions){
+        var proof=card.querySelector('.v101-shopping-proof');
+        actions=proof||card.querySelector('.flex.items-center.gap-2.flex-wrap');
+      }
+      if(!actions)return;
+      actions.querySelectorAll('.v108-icon-btn:not(.edit):not(.delete),.v188-photo-view,.rk-v20046-shop-photo,.rk-v20013-shop-photo').forEach(function(x){x.remove();});
+      if(!a.url){
+        if(a.pending){
+          var pending=document.createElement('button'); pending.type='button'; pending.className='v106-photo-check v106-photo-empty'; pending.title='Foto masih dikirim'; pending.setAttribute('aria-label','Foto masih dikirim'); pending.disabled=true; pending.innerHTML='<i class="fa-solid fa-cloud-arrow-up animate-pulse"></i>'; actions.insertBefore(pending,actions.firstChild);
+        }
+        return;
+      }
+      var b=document.createElement('button');
+      b.type='button'; b.className='v106-photo-check'; b.title='Lihat foto'; b.setAttribute('aria-label','Lihat foto'); b.setAttribute('data-photo-url',a.url); b.innerHTML='<i class="fa-solid fa-image"></i>';
+      b.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();rk52Open_(b.getAttribute('data-photo-url'));},true);
+      actions.insertBefore(b,actions.firstChild);
+    });
+  }
+  var oldRender=window.renderShoppingList;
+  if(typeof oldRender==='function'&&!window.__rkV20052ShoppingWrapped){
+    window.__rkV20052ShoppingWrapped=true;
+    window.renderShoppingList=function(){var r=oldRender.apply(this,arguments);setTimeout(rk52PatchShopping_,0);setTimeout(rk52PatchShopping_,80);return r;};
+  }
+  function install(){setTimeout(rk52PatchShopping_,30);setTimeout(rk52PatchShopping_,300);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+  var root=document.getElementById('shoppingCardList');
+  if(root&&window.MutationObserver){var ob=new MutationObserver(function(){clearTimeout(window.__rk52ShopTimer);window.__rk52ShopTimer=setTimeout(rk52PatchShopping_,50);});ob.observe(root,{childList:true,subtree:true});}
+  window.rekenanV20052ShoppingPhotoAudit=function(){
+    var cards=document.querySelectorAll('#shoppingCardList > *'), icons=0, clickable=0;
+    cards.forEach(function(c){var b=c.querySelector('.v106-photo-check:not(.v106-photo-empty)');if(b){icons++;if(!b.disabled&&b.getAttribute('data-photo-url'))clickable++;}});
+    var r={build:'V200.52',shoppingCards:cards.length,photoIcons:icons,clickablePhotoIcons:clickable,loanStandardClass:'v106-photo-check',viewer:typeof window.openAttachmentUrl_==='function'};
+    console.info('[Rekenan AUDIT V200.52] SHOPPING PHOTO STANDARD',r);return r;
+  };
+  setTimeout(function(){try{window.rekenanV20052ShoppingPhotoAudit();}catch(_){ }},700);
+  console.info('[Rekenan BUILD] V200.52 SHOPPING PHOTO ICON = LOAN STANDARD');
+})();
 </script>
