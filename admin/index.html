@@ -8,7 +8,7 @@
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
         window.REKENAN_UI_BUILD = 'V200.93';
-        console.info('[Rekenan BUILD] UI V200.96');
+        console.info('[Rekenan BUILD] UI V200.98');
         console.info('[Rekenan BUILD] V200.90 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
@@ -4187,7 +4187,7 @@ nav.fixed.bottom-0 {
                 // is deferred so startup stays light; no Cloud request is required to
                 // make Local state available.
                 if (Array.isArray(loansData)) {
-                    try { renderLoanList(); renderRiwayatCicilanList(); updateBorrowerLimitUI(); updateBorrowerLoanActivityBadge_(); } catch (_) {}
+                    try { renderLoanList(true); renderRiwayatCicilanList(); updateBorrowerLimitUI(); updateBorrowerLoanActivityBadge_(); } catch (_) {}
                 }
                 if (sessionStorage.getItem('rekenan_admin_logged') === 'true' && sessionStorage.getItem('rekenan_admin_token')) {
                     try { initEmbeddedAdmin(); } catch (_) {}
@@ -4555,11 +4555,21 @@ nav.fixed.bottom-0 {
         let cloudToken = localStorage.getItem('rekenan_cloud_token') || '';
 
         function secureSave(key, data) {
+            // V200.98: undefined must never be serialized into an application cache.
+            // The previous path encoded `undefined` as dW5kZWZpbmVk, which later
+            // caused secureLoad(JSON.parse) errors and poisoned rekenan_loans.
+            if (typeof data === 'undefined' || typeof data === 'function') {
+                try { localStorage.removeItem(key); } catch (_) {}
+                return false;
+            }
             try {
-                const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
+                const json = JSON.stringify(data);
+                if (typeof json !== 'string') throw new Error('non-serializable');
+                const encoded = btoa(encodeURIComponent(json));
                 localStorage.setItem(key, encoded);
+                return true;
             } catch (e) {
-                localStorage.setItem(key, JSON.stringify(data));
+                try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch (_) { return false; }
             }
         }
 
@@ -4574,7 +4584,8 @@ nav.fixed.bottom-0 {
                     try {
                         return JSON.parse(val);
                     } catch (plainJsonError) {
-                        console.warn(`[Rekenan] Data lokal untuk "${key}" tidak valid; memakai nilai default.`, plainJsonError);
+                        console.warn(`[Rekenan] Data lokal untuk "${key}" tidak valid; cache dibersihkan.`, plainJsonError);
+                        try { localStorage.removeItem(key); } catch (_) {}
                         return defaultValue;
                     }
                 }
@@ -4619,6 +4630,10 @@ nav.fixed.bottom-0 {
 
         let loansData = secureLoad('rekenan_loans', []);
         let riwayatCicilanData = secureLoad('rekenan_riwayat_cicilan', []);
+        // V200.98: normalize loan caches once at boot. A corrupt/undefined cache
+        // must never become the authoritative source; Cloud reconciliation follows.
+        if (!Array.isArray(loansData)) { loansData = []; try { localStorage.removeItem('rekenan_loans'); } catch (_) {} }
+        if (!Array.isArray(riwayatCicilanData)) { riwayatCicilanData = []; try { localStorage.removeItem('rekenan_riwayat_cicilan'); } catch (_) {} }
         let activeBorrowerUser = secureLoad('rekenan_active_borrower', null);
 
         let currentDeviceId = localStorage.getItem('rekenan_device_id');
@@ -8096,7 +8111,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     mergedPayments: riwayatCicilanData.length,
                     borrower: activeCloudUser
                 });
-                renderLoanList(); renderRiwayatCicilanList(); updateBorrowerLoanActivityBadge_();
+                renderLoanList(true); renderRiwayatCicilanList(); updateBorrowerLoanActivityBadge_();
                 console.info('[Rekenan PINJAMAN] CLOUD MERGE COMPLETE', {cloudLoans:cloudLoans.length, localLoansBefore:beforeLoans, mergedLoans:loansData.length, cloudPayments:cloudPayments.length, mergedPayments:riwayatCicilanData.length, source});
                 return {loans:loansData.length,payments:riwayatCicilanData.length,source};
             };
@@ -8163,14 +8178,14 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             if (pr) pr.style.width = Math.min(100, baseLimit > 0 ? (used / baseLimit) * 100 : 0) + '%';
         }
 
-        function renderLoanList() {
+        function renderLoanListCore_() {
             const searchInput = document.getElementById('loanSearchInput');
             const keyword = String(searchInput?.value || '').trim().toLowerCase();
             const statusEl = document.getElementById('filterLoanStatus');
             const statusFilter = String(statusEl?.value || 'all');
             const source = Array.isArray(loansData) ? loansData : [];
             const norm = v => String(v ?? '').trim().toLowerCase();
-            // IMPORTANT V200.96: loansData is already server-scoped to the
+            // IMPORTANT V200.98: loansData is already server-scoped to the
             // authenticated borrower by loanSyncState/getBorrowerData. Re-filtering
             // it in the UI by borrowerId/name was the reason valid cards could vanish
             // while the console still reported cloudLoans > 0. Display the scoped
@@ -8247,6 +8262,32 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 </div>`;
             }).join('');
             updateBorrowerLoanActivityBadge_();
+        }
+
+        // V200.98: one authoritative loan render entry point. It reads the actual
+        // lexical loan arrays, never window.loansData, and coalesces bursty realtime
+        // callbacks without suppressing a genuinely changed snapshot.
+        let rkLoanRenderTimer_ = null;
+        let rkLoanLastPaintSig_ = '';
+        function rkLoanViewSig_() {
+            const q = String(document.getElementById('loanSearchInput')?.value || '');
+            const st = String(document.getElementById('filterLoanStatus')?.value || 'all');
+            const rows = Array.isArray(loansData) ? loansData : [];
+            const pays = Array.isArray(riwayatCicilanData) ? riwayatCicilanData : [];
+            const rowSig = a => a.map(x => [x?.id,x?.status,x?.jumlah,x?.amount,x?.remaining,x?.totalPaid,x?.updatedAt,x?.createdAt].join('~')).sort().join('|');
+            return q+'#'+st+'#'+rowSig(rows)+'#'+rowSig(pays);
+        }
+        function renderLoanList(immediate = false) {
+            const paint = () => {
+                rkLoanRenderTimer_ = null;
+                const sig = rkLoanViewSig_();
+                if (sig === rkLoanLastPaintSig_) return;
+                rkLoanLastPaintSig_ = sig;
+                try { renderLoanListCore_(); } catch (e) { console.warn('[Rekenan PINJAMAN] render failed', e); }
+            };
+            if (immediate && !rkLoanRenderTimer_) { paint(); return; }
+            if (rkLoanRenderTimer_) return;
+            rkLoanRenderTimer_ = setTimeout(paint, 32);
         }
 
         function renderRiwayatCicilanList() {
@@ -9838,7 +9879,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             // V200.90 CACHE-FIRST: paint local snapshot immediately.
             try {renderEmbeddedAdmin();} catch (_) { }
             const age = Date.now() - Number(adminLastFetchAt_ || 0);
-            // V200.96: the Admin menu is a reconciliation point. Paint the local
+            // V200.98: the Admin menu is a reconciliation point. Paint the local
             // snapshot first, then always perform one background authoritative read
             // when the menu is opened/explicitly refreshed. This prevents a fresh
             // loan from being hidden behind a 5-minute client freshness gate.
@@ -9938,7 +9979,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             await adminMutation({action: 'setBorrowerLimit', borrowerId, limitAmount: amount}, 'Limit peminjam berhasil diperbarui.');
         }
 
-        function renderEmbeddedAdmin() {
+        function renderEmbeddedAdminCore_() {
             const q = (document.getElementById('adminSearchInput')?.value || '').trim().toLowerCase();
             const match = v => String(v ?? '').toLowerCase().includes(q);
             const loans = rkSortPriority_(embeddedAdminLoans.filter(x => !q || [x.nama, x.id, x.status, x.phone, x.catatan, x.tenor].some(match)));
@@ -10061,6 +10102,28 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             }
             try { renderEmbeddedAdmin(); } catch (_) {}
         }
+        // V200.98: Admin gets the same single-render rule, without stale
+        // fingerprint suppression. The current embedded arrays are the source.
+        let rkAdminRenderTimer_ = null;
+        let rkAdminLastPaintSig_ = '';
+        function rkAdminViewSig_() {
+            const q = String(document.getElementById('adminSearchInput')?.value || '');
+            const sig = a => (Array.isArray(a)?a:[]).map(x => [x?.id,x?.status,x?.jumlah,x?.amount,x?.remaining,x?.updatedAt,x?.createdAt].join('~')).sort().join('|');
+            return q+'#'+sig(embeddedAdminBorrowers)+'#'+sig(embeddedAdminLoans)+'#'+sig(embeddedAdminPayments);
+        }
+        function renderEmbeddedAdmin(immediate = false) {
+            const paint = () => {
+                rkAdminRenderTimer_ = null;
+                const sig = rkAdminViewSig_();
+                if (sig === rkAdminLastPaintSig_) return;
+                rkAdminLastPaintSig_ = sig;
+                try { renderEmbeddedAdminCore_(); } catch (e) { console.warn('[Rekenan ADMIN] render failed', e); }
+            };
+            if (immediate && !rkAdminRenderTimer_) { paint(); return; }
+            if (rkAdminRenderTimer_) return;
+            rkAdminRenderTimer_ = setTimeout(paint, 32);
+        }
+
         async function rkDrainAdminMutationQueue_() {
             // V200.90: snapshot-drain WITHOUT overwriting mutations added while
             // the worker is processing. The previous implementation loaded q,
@@ -12798,9 +12861,9 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 <script>
 /* V200.90 PERFORMANCE + ADMIN ACC QUEUE + REALTIME PULSE PATCH */
 (function(){
- const RK_BUILD='V200.96';
+ const RK_BUILD='V200.98';
  window.REKENAN_BUILD=RK_BUILD;
- console.info('[Rekenan BUILD] V200.96 | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
+ console.info('[Rekenan BUILD] V200.98 | CONSOLIDATED LOAN STORE + ADMIN STABLE RENDER');
  window.rkBusinessNow=function(){ return new Date(); };
  window.rkBusinessDate=function(v){
    const d=v instanceof Date?v:new Date(v==null?Date.now():v);
@@ -12861,7 +12924,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
        try{localStorage.setItem('rekenan_loans_owner',String(activeCloudUser||''));}catch(_){}
        if(nextFp !== beforeFp){
          window.__rkLoanViewFingerprint = nextFp;
-         renderLoanList();renderRiwayatCicilanList();updateBorrowerLimitUI();updateBorrowerLoanActivityBadge_();
+         renderLoanList(true);renderRiwayatCicilanList();updateBorrowerLimitUI();updateBorrowerLoanActivityBadge_();
          console.info('[Rekenan PINJAMAN] REALTIME UPDATE', {version:v, loans:loansData.length, source:'loanSyncState-cache', rendered:true});
        } else {
          console.info('[Rekenan PINJAMAN] REALTIME UPDATE — data unchanged, paint skipped', {version:v, loans:loansData.length});
@@ -12895,7 +12958,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.97';
+window.REKENAN_UI_BUILD='V200.98';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan BUILD] FINAL CLIENT V200.90 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
@@ -13002,7 +13065,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V200.97';
+  window.REKENAN_UI_BUILD='V200.98';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -13037,7 +13100,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.97';
+window.REKENAN_UI_BUILD='V200.98';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13180,7 +13243,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   console.info('[Rekenan BUILD] V200.90 CALC SHEET READ + PDF HEADER LOGO + APP-SHELL');
-  window.__REKENAN_BUILD__='V200.97';
+  window.__REKENAN_BUILD__='V200.98';
 })();
 </script>
 
@@ -13188,8 +13251,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20065-calc-photo-audit-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.97';
-  window.REKENAN_UI_BUILD='V200.97';
+  window.__REKENAN_BUILD__='V200.98';
+  window.REKENAN_UI_BUILD='V200.98';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13388,8 +13451,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20067-calculator-hard-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.97';
-  window.REKENAN_UI_BUILD='V200.97';
+  window.__REKENAN_BUILD__='V200.98';
+  window.REKENAN_UI_BUILD='V200.98';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
@@ -13399,77 +13462,10 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <script>
 (function(){
-  window.__REKENAN_BUILD__='V200.97';
-  window.REKENAN_UI_BUILD='V200.97';
+  window.__REKENAN_BUILD__='V200.98';
+  window.REKENAN_UI_BUILD='V200.98';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
 
 
-<script id="rk-v20092-stable-render">
-(function(){
-  'use strict';
-  // V200.92: background sync must never visually replace the same UI twice.
-  // Local-first state remains immediate; only the DOM paint is coalesced/deduped.
-  const timers = Object.create(null);
-  const last = Object.create(null);
-  const pending = Object.create(null);
-  function sigList(arr, fields){
-    const a = Array.isArray(arr) ? arr : [];
-    return a.map(x => fields.map(k => String(x?.[k] ?? '')).join('~')).sort().join('|');
-  }
-  function signature(kind){
-    try{
-      if(kind==='loanList' || kind==='loanHistory'){
-        const q = document.getElementById('loanSearchInput')?.value || '';
-        const st = document.getElementById('filterLoanStatus')?.value || '';
-        const loanRows = (typeof loansData !== 'undefined' && Array.isArray(loansData)) ? loansData : (Array.isArray(window.loansData) ? window.loansData : []);
-        const paymentRows = (typeof riwayatCicilanData !== 'undefined' && Array.isArray(riwayatCicilanData)) ? riwayatCicilanData : (Array.isArray(window.riwayatCicilanData) ? window.riwayatCicilanData : []);
-        return q+'#'+st+'#'+sigList(loanRows,['id','status','jumlah','totalPinjaman','sisaHutang','remaining','updatedAt','createdAt'])+'#'+sigList(paymentRows,['id','loanId','cicilanKe','jumlah','amount','createdAt']);
-      }
-      if(kind==='admin'){
-        const q = document.getElementById('adminSearchInput')?.value || '';
-        const adminBorrowers = (typeof embeddedAdminBorrowers !== 'undefined' && Array.isArray(embeddedAdminBorrowers)) ? embeddedAdminBorrowers : (Array.isArray(window.embeddedAdminBorrowers) ? window.embeddedAdminBorrowers : []);
-        const adminLoans = (typeof embeddedAdminLoans !== 'undefined' && Array.isArray(embeddedAdminLoans)) ? embeddedAdminLoans : (Array.isArray(window.embeddedAdminLoans) ? window.embeddedAdminLoans : []);
-        const adminPayments = (typeof embeddedAdminPayments !== 'undefined' && Array.isArray(embeddedAdminPayments)) ? embeddedAdminPayments : (Array.isArray(window.embeddedAdminPayments) ? window.embeddedAdminPayments : []);
-        return q+'#'+sigList(adminBorrowers,['id','username','name','nama'])+'#'+sigList(adminLoans,['id','status','jumlah','totalPinjaman','sisaHutang','remaining','updatedAt','createdAt'])+'#'+sigList(adminPayments,['id','loanId','cicilanKe','jumlah','amount','createdAt']);
-      }
-    }catch(_){ }
-    return String(Date.now());
-  }
-  function wrap(name, kind, delay){
-    const original = window[name];
-    if(typeof original!=='function' || original.__rkStableWrapped) return;
-    function stable(){
-      const args=arguments;
-      pending[kind]=args;
-      clearTimeout(timers[kind]);
-      timers[kind]=setTimeout(function(){
-        const sig=signature(kind);
-        if(sig===last[kind]) return;
-        last[kind]=sig;
-        try{ original.apply(this,pending[kind]||[]); }catch(e){ console.warn('[Rekenan STABLE RENDER]',name,e); }
-      },delay);
-    }
-    stable.__rkStableWrapped=true;
-    stable.__rkOriginal=original;
-    window[name]=stable;
-  }
-  wrap('renderLoanList','loanList',40);
-  wrap('renderRiwayatCicilanList','loanHistory',40);
-  wrap('renderEmbeddedAdmin','admin',40);
-  // V200.97: top-level let bindings are not exposed on window. The old
-  // dedupe signature therefore saw an always-empty window.loansData and could
-  // suppress the first real paint after Cloud merge. Force one data-aware paint
-  // after the current event loop, without creating a visible flicker.
-  setTimeout(function(){
-    try { if (typeof renderLoanList === 'function') renderLoanList(); } catch(e) { console.warn('[Rekenan STABLE RENDER] loan safety paint', e); }
-    try { if (typeof renderRiwayatCicilanList === 'function') renderRiwayatCicilanList(); } catch(e) { console.warn('[Rekenan STABLE RENDER] payment safety paint', e); }
-    try { if (typeof renderEmbeddedAdmin === 'function') renderEmbeddedAdmin(); } catch(e) { console.warn('[Rekenan STABLE RENDER] admin safety paint', e); }
-  }, 0);
-  window.__rkV20092StableRender=true;
-  window.REKENAN_BUILD_VERSION='V200.97';
-  window.REKENAN_CLIENT_BUILD='V200.97 DATA DISPLAY FIX + STABLE RENDER SAFE';
-  console.info('[Rekenan BUILD] V200.97 DATA DISPLAY FIX + STABLE RENDER SAFE');
-})();
-</script>
