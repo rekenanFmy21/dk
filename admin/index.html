@@ -4,15 +4,15 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V200.9';
+        window.REKENAN_BUILD_VERSION = 'V200.11';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.9';
-        console.info('[Rekenan BUILD] UI V200.9');
-        console.info('[Rekenan BUILD] LOCAL-FIRST + AUTO-ONLINE QUEUE + DATA-FIRST PHOTO BACKGROUND + SINGLE WORKER + IDEMPOTENT RETRY + ATTACHMENT RESUME + IMPORT TRANSFER FIX + CLOUD DELTA + DELETE STATUS V200.1');
+        window.REKENAN_UI_BUILD = 'V200.11';
+        console.info('[Rekenan BUILD] UI V200.11');
+        console.info('[Rekenan BUILD] LOCAL-FIRST + AUTO-ONLINE QUEUE + DATA-FIRST PHOTO BACKGROUND + SINGLE WORKER + IDEMPOTENT RETRY + ATTACHMENT RESUME + IMPORT TRANSFER FIX + CLOUD DELTA + DELETE STATUS V200.11');
         (function () {
             try {
-                const expected = 'V200.9';
+                const expected = 'V200.11';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.9">
+    <meta name="rekenan-build" content="V200.11">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -3691,9 +3691,9 @@ margin:0!important;
         // Local file:// pages use JSONP because browser fetch cannot read a
         // normal cross-origin GAS response without CORS.
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
-        const API_VERSION = 'V200.9-LOCAL-FIRST-CACHED';
-        window.REKENAN_SERVER_BUILD = 'V200.9';
-        console.info('[Rekenan BUILD] CLIENT V200.9 / SERVER API V200.9');
+        const API_VERSION = 'V200.11-LOCAL-FIRST-CACHED';
+        window.REKENAN_SERVER_BUILD = 'V200.11';
+        console.info('[Rekenan BUILD] CLIENT V200.11 / SERVER API V200.11');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -4657,7 +4657,7 @@ margin:0!important;
         function registerRekenanPWA_() {
             try {
                 if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-                navigator.serviceWorker.register('./sw.js?v=2005', {scope: './', updateViaCache: 'none'})
+                navigator.serviceWorker.register('./sw.js?v=2011', {scope: './', updateViaCache: 'none'})
                     .then(function (registration) {
                         console.info('[Rekenan PWA] Local Service Worker registered:', registration.scope);
                         try {registration.update();} catch (_) { }
@@ -4746,8 +4746,8 @@ margin:0!important;
             console.groupCollapsed('[Rekenan STARTUP] BUILD / CACHE DIAGNOSTIC');
             console.info('Client UI build:', window.REKENAN_BUILD_VERSION);
             console.info('Client API build:', window.REKENAN_SERVER_BUILD);
-            console.info('Service Worker URL:', './sw.js?v=2005');
-            console.info('Expected deploy build:', 'V200.9');
+            console.info('Service Worker URL:', './sw.js?v=2011');
+            console.info('Expected deploy build:', 'V200.11');
             console.info('Current URL:', location.href);
             console.info('Local storage build:', localStorage.getItem('rekenan_expected_build'));
             console.info('SW controller:', navigator.serviceWorker?.controller?.scriptURL || 'none');
@@ -9368,116 +9368,8 @@ margin:0!important;
                     d.write('<style>@page{size:A4 portrait;margin:14mm 13mm 16mm 13mm}*{box-sizing:border-box}body{font-family:Arial,"Helvetica Neue",sans-serif;color:#111;background:#fff;margin:0;font-size:11px;line-height:1.45}.paper{width:100%;max-width:190mm;margin:0 auto}.kop{display:flex;align-items:flex-start;gap:12px;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:12px}.brand{width:42px;height:42px;border:1.8px solid #111;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px}.doc-ket{font-size:8.5px;color:#555;margin-top:2px}.section-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;border-left:3px solid #111;padding-left:7px;margin:12px 0 6px}.kop h1{font-size:16px;margin:0 0 2px;font-weight:800;letter-spacing:.4px}.kop p{margin:0;color:#444;font-size:9.5px}.doc-title{text-align:center;margin:12px 0 14px}.doc-title h2{font-size:15px;letter-spacing:.8px;margin:0 0 4px;text-transform:uppercase}.doc-title .sub{font-size:9.5px;color:#555}.meta{display:grid;grid-template-columns:110px 1fr 110px 1fr;gap:4px 8px;border:1px solid #bbb;padding:8px;margin-bottom:12px}.meta b{font-weight:700}.summary{display:flex;gap:8px;margin:0 0 12px}.summary .box{flex:1;border:1px solid #bbb;padding:7px 8px}.summary .label{font-size:8px;color:#666;text-transform:uppercase}.summary .value{font-size:12px;font-weight:800;margin-top:2px}.table-wrap{width:100%;overflow:visible}table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}tr{page-break-inside:avoid}th,td{border:1px solid #8a8a8a;padding:5px 6px;vertical-align:top;word-break:break-word}th{background:#eee;font-weight:800;text-align:center;font-size:9px}td{font-size:9.5px}td.num{text-align:right;white-space:nowrap}td.center{text-align:center}.total-row td{font-weight:800;background:#f5f5f5}.footer{margin-top:14px;padding-top:7px;border-top:1px solid #aaa;font-size:8.5px;color:#555;display:flex;justify-content:space-between;gap:12px}.signature{margin-top:22px;display:flex;justify-content:flex-end}.sig{width:180px;text-align:center}.sig .line{margin-top:42px;border-top:1px solid #111;padding-top:4px}.no-print{margin-top:14px;padding:9px;border:1px dashed #999;background:#fafafa;color:#444;font-size:10px}.print-actions{position:sticky;top:0;background:#fff;padding:10px 0;text-align:right;z-index:5}.print-actions button{border:0;border-radius:6px;background:#111;color:#fff;padding:8px 14px;font-weight:700;cursor:pointer}.muted{color:#666}@media print{.no-print,.print-actions{display:none!important}body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.paper{max-width:none}}@media screen{body{background:#e5e7eb;padding:18px}.paper{background:#fff;padding:18px;box-shadow:0 2px 18px rgba(0,0,0,.12)}} </style></head><body><div class="paper"><div class="print-actions no-print"><button onclick="window.print()">Cetak / Simpan PDF</button></div>');
                     d.write('<div class="kop"><div class="brand">R</div><div><h1>REKENAN</h1><p>Sistem Administrasi Keuangan</p><p class="muted">Dokumen laporan elektronik</p></div></div>');
                     d.write(String(html || ''));
-                    d.write('<div class="footer"><span>Dokumen dibuat secara elektronik melalui Rekenan.</span><span>Dicetak: ' + v106ReportDate_(new Date()) + '</span></div></div>
-<script id="rekenan-v2009-final-repair">
-(function(){
-'use strict';
-window.REKENAN_BUILD_VERSION='V200.9';
-window.REKENAN_UI_BUILD='V200.9';
-window.REKENAN_SERVER_BUILD='V200.9';
-console.info('[Rekenan BUILD] FINAL CLIENT V200.9 / SERVER API V200.9');
-console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
-
-/* Calculator: one authoritative save path, then completely reset the calculator UI. */
-function rkCalcReset2008_(){
-  try{
-    var e=document.getElementById('v101CalcExpr'), r=document.getElementById('v101CalcResult'), f=document.getElementById('v101CalcAttachment'), st=document.getElementById('v101CalcAttachmentStatus');
-    if(e){e.value=''; e.textContent='0'; e.innerHTML='0';}
-    if(r){r.value='0'; r.textContent='0';}
-    if(f) f.value='';
-    if(st) st.textContent='Opsional — boleh dikosongkan';
-    window.__rkCalcLastExpression1984='';
-    window.__rkCalcExpression='';
-    window.__rkCalcResult=0;
-    if(typeof window.v101CalcKey==='function'){
-      /* do not call it: older implementations mix input.value/textContent */
-    }
-  }catch(e){console.warn('[V200.9] calculator reset:',e);}
-}
-function rkCalcSavingAnim2008_(btn){
-  if(!btn) return;
-  btn.disabled=true; btn.classList.add('rk-save-busy');
-  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1"></i>Menyimpan...';
-}
-function rkCalcSavedAnim2008_(btn){
-  if(!btn) return;
-  btn.classList.remove('rk-save-busy'); btn.classList.add('rk-save-ok');
-  btn.innerHTML='<i class="fa-solid fa-check mr-1"></i>Tersimpan';
-  setTimeout(function(){if(btn.isConnected){btn.classList.remove('rk-save-ok');btn.disabled=false;btn.textContent='Simpan';}},900);
-}
-
-/* Shopping photo button: support both attachment.url and attachment.fileId. */
-window.rekenanShoppingPhotoIcon_=function(item){
-  try{
-    var a=(typeof window.v101GetAttachment==='function'?window.v101GetAttachment(item):(item&&item.attachment))||{};
-    var u=String(a.url||'').trim(), fid=String(a.fileId||a.AttachmentFileId||'').trim();
-    if(!u && fid) u='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';
-    if(!u) return '';
-    var safe=encodeURIComponent(u);
-    return '<button type="button" class="v188-photo-view" title="Lihat foto" aria-label="Lihat foto" onclick="event.stopPropagation();openAttachmentUrl_(decodeURIComponent(\''+safe+'\'))"><i class="fa-solid fa-image"></i></button>';
-  }catch(_){return '';}
-};
-function rkPatchShoppingPhotoButtons2008_(){
-  document.querySelectorAll('#tab-belanja .v108-shop-actions').forEach(function(actions){
-    var edit=actions.querySelector('.edit');
-    if(!edit || actions.querySelector('.v2009-shop-view')) return;
-    var input=edit.querySelector('input[type=file]'), id=input&&input.id?input.id.replace(/^shop_photo_/,''):'';
-    if(!id) return;
-    var item=(window.shoppingItems||[]).find(function(x){return String(x.id)===String(id)})||{};
-    var a=item.attachment||{}; var u=String(a.url||'').trim(), fid=String(a.fileId||a.AttachmentFileId||'').trim();
-    if(!u&&fid)u='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';
-    if(u){var b=document.createElement('button');b.type='button';b.className='v108-icon-btn v2009-shop-view';b.title='Lihat foto';b.setAttribute('aria-label','Lihat foto');b.innerHTML='<i class="fa-solid fa-image"></i>';b.onclick=function(e){e.preventDefault();e.stopPropagation();openAttachmentUrl_(u);};actions.insertBefore(b,edit);}
-  });
-}
-var oldRenderShop2008=window.renderShoppingList;
-if(typeof oldRenderShop2008==='function'){
-  window.renderShoppingList=function(){var r=oldRenderShop2008.apply(this,arguments);setTimeout(rkPatchShoppingPhotoButtons2008_,0);return r;};
-}
-
-/* Loan photo: normalize the button after every realtime render and accept fileId-only records. */
-function rkPatchLoanPhotoButtons2008_(){
- document.querySelectorAll('#loanCardList .v106-photo-check').forEach(function(btn){
-   if(btn.tagName==='BUTTON'){
-     btn.style.cursor='pointer';
-     btn.onclick=btn.onclick||function(e){e.stopPropagation();};
-   }
- });
-}
-var oldRenderLoan2008=window.renderLoanList;
-if(typeof oldRenderLoan2008==='function'){
- window.renderLoanList=function(){var r=oldRenderLoan2008.apply(this,arguments);setTimeout(rkPatchLoanPhotoButtons2008_,0);return r;};
-}
-
-/* Final calculator save wrapper: preserve existing data logic, but guarantee animation + reset. */
-var oldCalcSave2008=window.saveV101Calculator;
-if(typeof oldCalcSave2008==='function'){
- window.saveV101Calculator=async function(){
-   var btn=document.getElementById('v101CalcSaveBtn');
-   if(btn&&btn.dataset.rk2008Busy==='1') return;
-   if(btn) {btn.dataset.rk2008Busy='1'; rkCalcSavingAnim2008_(btn);}
-   try{
-     var r=await oldCalcSave2008.apply(this,arguments);
-     rkCalcReset2008_();
-     if(btn){delete btn.dataset.busy;delete btn.dataset.rk2008Busy;rkCalcSavedAnim2008_(btn);}
-     return r;
-   }catch(e){
-     if(btn){delete btn.dataset.rk2008Busy;btn.disabled=false;btn.classList.remove('rk-save-busy');btn.innerHTML='<i class="fa-solid fa-floppy-disk mr-1"></i>Simpan';}
-     throw e;
-   }
- };
-}
-
-setTimeout(function(){rkPatchShoppingPhotoButtons2008_();rkPatchLoanPhotoButtons2008_();},250);
-window.rekenanV2008Health=function(){return {client:'V200.9',server:window.REKENAN_SERVER_BUILD,calculator:true,shoppingPhoto:true,loanPhoto:true};};
-})();
-</script>
-<style id="rekenan-v2009-final-css">
-.rk-save-busy{opacity:.8;cursor:wait!important;transform:scale(.98);transition:all .18s ease}
-.rk-save-ok{box-shadow:0 0 0 2px rgba(16,185,129,.25),0 8px 24px rgba(16,185,129,.18)!important;transform:scale(1.02);transition:all .18s ease}
-.v2009-shop-view{order:-1!important}
-</style>
-
-</body></html>');
+                    d.write('<div class="footer"><span>Dokumen dibuat secara elektronik melalui Rekenan.</span><span>Dicetak: ' + v106ReportDate_(new Date()) + '</span></div></div>');
+                    d.write('</body></html>');
                     d.close();
                     setTimeout(function () {try {w.focus(); w.print();} catch (e) { } }, 500);
                     return w;
@@ -10501,8 +10393,8 @@ window.rekenanV2008Health=function(){return {client:'V200.9',server:window.REKEN
 
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
-            const ui = 'V200.7';
-            console.info('[Rekenan BUILD] UI V200.7 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.7 / SERVER V200.7');
+            const ui = 'V200.11';
+            console.info('[Rekenan BUILD] UI V200.11 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.11 / SERVER V200.11');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -10638,7 +10530,7 @@ window.rekenanV2008Health=function(){return {client:'V200.9',server:window.REKEN
     <script id="v1961-final-fixes">
         (function () {
             'use strict';
-            console.info('[Rekenan BUILD] V200.7 ARCHITECTURE LOADED');
+            console.info('[Rekenan BUILD] V200.11 ARCHITECTURE LOADED');
             window.rkNormalizePinError_ = function (err) {
                 const raw = String(err?.message || err || '');
                 return /pin/i.test(raw) && /(salah|wrong|invalid|tidak sesuai|incorrect)/i.test(raw) ? 'PIN salah.' : raw;
@@ -10961,7 +10853,7 @@ window.rekenanV2008Health=function(){return {client:'V200.9',server:window.REKEN
     <script id="rekenan-v1984-final-functional-fix">
         (function () {
             'use strict';
-            console.info('[Rekenan BUILD] V200.7 UNIVERSAL DELTA SYNC + ATOMIC ATTACHMENT + TRANSFER STATUS LOADED');
+            console.info('[Rekenan BUILD] V200.11 UNIVERSAL DELTA SYNC + ATOMIC ATTACHMENT + TRANSFER STATUS LOADED');
 
             /* ---------- stable calculator formatter ---------- */
             window.v109Fmt = function (v) {
@@ -11201,9 +11093,9 @@ window.rekenanV2008Health=function(){return {client:'V200.9',server:window.REKEN
 <script>
 /* V200.5 PERFORMANCE + ADMIN ACC QUEUE + REALTIME PULSE PATCH */
 (function(){
- const RK_BUILD='V200.7';
+ const RK_BUILD='V200.11';
  window.REKENAN_BUILD=RK_BUILD;
- console.info('[Rekenan BUILD] V200.7 | ADMIN ACC QUEUE + BORROWER REALTIME ACC');
+ console.info('[Rekenan BUILD] V200.11 | ADMIN ACC QUEUE + BORROWER REALTIME ACC');
  window.rkBusinessNow=function(){ return new Date(); };
  window.rkBusinessDate=function(v){
    const d=v instanceof Date?v:new Date(v==null?Date.now():v);
@@ -11298,13 +11190,15 @@ window.rekenanV2008Health=function(){return {client:'V200.9',server:window.REKEN
 
 
 
+
+
 <script id="rekenan-v2009-final-repair">
 (function(){
 'use strict';
-window.REKENAN_BUILD_VERSION='V200.9';
-window.REKENAN_UI_BUILD='V200.9';
-window.REKENAN_SERVER_BUILD='V200.9';
-console.info('[Rekenan BUILD] FINAL CLIENT V200.9 / SERVER API V200.9');
+window.REKENAN_BUILD_VERSION='V200.11';
+window.REKENAN_UI_BUILD='V200.11';
+window.REKENAN_SERVER_BUILD='V200.11';
+console.info('[Rekenan BUILD] FINAL CLIENT V200.11 / SERVER API V200.11');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
 
 /* Calculator: one authoritative save path, then completely reset the calculator UI. */
@@ -11321,7 +11215,7 @@ function rkCalcReset2008_(){
     if(typeof window.v101CalcKey==='function'){
       /* do not call it: older implementations mix input.value/textContent */
     }
-  }catch(e){console.warn('[V200.9] calculator reset:',e);}
+  }catch(e){console.warn('[V200.11] calculator reset:',e);}
 }
 function rkCalcSavingAnim2008_(btn){
   if(!btn) return;
@@ -11397,7 +11291,7 @@ if(typeof oldCalcSave2008==='function'){
 }
 
 setTimeout(function(){rkPatchShoppingPhotoButtons2008_();rkPatchLoanPhotoButtons2008_();},250);
-window.rekenanV2008Health=function(){return {client:'V200.9',server:window.REKENAN_SERVER_BUILD,calculator:true,shoppingPhoto:true,loanPhoto:true};};
+window.rekenanV2008Health=function(){return {client:'V200.11',server:window.REKENAN_SERVER_BUILD,calculator:true,shoppingPhoto:true,loanPhoto:true};};
 })();
 </script>
 <style id="rekenan-v2009-final-css">
@@ -11405,7 +11299,6 @@ window.rekenanV2008Health=function(){return {client:'V200.9',server:window.REKEN
 .rk-save-ok{box-shadow:0 0 0 2px rgba(16,185,129,.25),0 8px 24px rgba(16,185,129,.18)!important;transform:scale(1.02);transition:all .18s ease}
 .v2009-shop-view{order:-1!important}
 </style>
-
 </body>
 
 </html>
