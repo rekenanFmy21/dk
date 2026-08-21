@@ -1,8 +1,8 @@
 {
-  "id": "rekenan-v201.06",
-  "name": "Rekenan V201.06",
+  "id": "rekenan-v201.07",
+  "name": "Rekenan V201.07",
   "short_name": "Rekenan",
-  "description": "Rekenan V201.03 — keuangan, pinjaman, catatan, belanja dan administrasi",
+  "description": "Rekenan V201.07 — keuangan, pinjaman, catatan, belanja dan administrasi",
   "start_url": "./index.html?v=2106",
   "scope": "./",
   "display": "standalone",
@@ -33,7 +33,7 @@
     {
       "name": "Belanja",
       "short_name": "Belanja",
-      "url": "./#belanja?v=2103",
+      "url": "./#belanja?v=2107",
       "icons": [
         {
           "src": "./icons/rekenan-admin-192.png",
@@ -45,7 +45,7 @@
     {
       "name": "Catatan",
       "short_name": "Catatan",
-      "url": "./#catatan?v=2103",
+      "url": "./#catatan?v=2107",
       "icons": [
         {
           "src": "./icons/rekenan-admin-192.png",

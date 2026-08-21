@@ -3920,7 +3920,7 @@ nav.fixed.bottom-0 {
                         <div class="text-xs text-zinc-400 font-semibold">Kalkulator</div>
                         <div class="text-lg font-black text-white">Kalkulator Transaksi</div>
                     </div>
-                    <div class="rk-calc-route-badge"><i class="fa-solid fa-calculator"></i> V201.05</div>
+                    <div class="rk-calc-route-badge"><i class="fa-solid fa-calculator"></i> V201.07</div>
                 </div>
                 <div class="rk-calc-route-grid">
                     <section class="rk-calc-main-card">
@@ -3959,9 +3959,15 @@ nav.fixed.bottom-0 {
                             </div>
                         </div>
                         <div class="rk-calc-save-row">
-                            <div class="v101-proof">
-                                <label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v201CalcAttachment" type="file" accept="image/*" class="hidden"></label>
-                                <div class="v101-proof-meta"><b>Foto Bukti</b><small id="v201CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div>
+                            <div class="rk-calc-photo-tools" aria-label="Foto bukti kalkulator">
+                                <label class="rk-calc-photo-btn" title="Kamera / pilih gambar" aria-label="Kamera / pilih gambar">
+                                    <i class="fa-solid fa-camera"></i>
+                                    <input id="v201CalcAttachment" type="file" accept="image/*" capture="environment" class="hidden">
+                                </label>
+                                <button type="button" id="v201CalcPhotoViewBtn" class="rk-calc-photo-btn rk-calc-photo-view" title="Lihat gambar" aria-label="Lihat gambar" disabled>
+                                    <i class="fa-solid fa-image"></i>
+                                </button>
+                                <div class="v101-proof-meta"><b>Foto Bukti</b><small id="v201CalcAttachmentStatus">Opsional — kamera / galeri</small></div>
                             </div>
                             <button type="button" id="v201CalcSaveBtn" class="rk-calc-save-btn" onclick="saveV201Calculator()"><i class="fa-solid fa-floppy-disk"></i> Simpan</button>
                         </div>
@@ -13237,7 +13243,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V201.05';
+  window.REKENAN_UI_BUILD='V201.07';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -13272,7 +13278,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V201.05';
+window.REKENAN_UI_BUILD='V201.07';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13428,7 +13434,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.05';
+  window.REKENAN_UI_BUILD='V201.07';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13628,7 +13634,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.05';
+  window.REKENAN_UI_BUILD='V201.07';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
@@ -13639,7 +13645,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.05';
+  window.REKENAN_UI_BUILD='V201.07';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
@@ -13845,7 +13851,7 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20103-calculator-design-runtime">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V201.05';
+  window.REKENAN_UI_BUILD='V201.07';
   window.rkCalcQuickAmount_=function(amount){
     const i=document.getElementById('v101CalcExpr'); if(!i) return;
     let v=String(i.textContent||i.value||'').trim();
@@ -13872,7 +13878,7 @@ nav.fixed.bottom-0 {
 </script>
 
 <script id="rekenan-v20103-authoritative-build">
-window.REKENAN_UI_BUILD='V201.05';
+window.REKENAN_UI_BUILD='V201.07';
 window.REKENAN_CALCULATOR_BUILD='V201.04';
 console.info('[Rekenan BUILD] UI V201.04 | CALCULATOR V201.04 PRO | 000 KEPT | 00 REMOVED | DESKTOP 2-COLUMN | MOBILE SINGLE-COLUMN | LAYOUT FIX');
 </script>
