@@ -4,11 +4,11 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V200.5';
+        window.REKENAN_BUILD_VERSION = 'V200.1';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.5';
-        console.info('[Rekenan BUILD] UI V200.5');
+        window.REKENAN_UI_BUILD = 'V200.2';
+        console.info('[Rekenan BUILD] UI V200.2');
         console.info('[Rekenan BUILD] LOCAL-FIRST + AUTO-ONLINE QUEUE + DATA-FIRST PHOTO BACKGROUND + SINGLE WORKER + IDEMPOTENT RETRY + ATTACHMENT RESUME + IMPORT TRANSFER FIX + CLOUD DELTA + DELETE STATUS V200.1');
         (function () {
             try {
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.5">
+    <meta name="rekenan-build" content="V200.1">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -3691,9 +3691,9 @@ margin:0!important;
         // Local file:// pages use JSONP because browser fetch cannot read a
         // normal cross-origin GAS response without CORS.
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
-        const API_VERSION = 'V200.5-LOCAL-FIRST-CACHED';
-        window.REKENAN_SERVER_BUILD = 'V200.5';
-        console.info('[Rekenan BUILD] CLIENT V200.5 / SERVER API V200.5');
+        const API_VERSION = 'V200.1-LOCAL-FIRST-CACHED';
+        window.REKENAN_SERVER_BUILD = 'V200.1';
+        console.info('[Rekenan BUILD] CLIENT V200.1 / SERVER API V200.1');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -4657,7 +4657,7 @@ margin:0!important;
         function registerRekenanPWA_() {
             try {
                 if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-                navigator.serviceWorker.register('./sw.js?v=2005', {scope: './', updateViaCache: 'none'})
+                navigator.serviceWorker.register('./sw.js?v=2001', {scope: './', updateViaCache: 'none'})
                     .then(function (registration) {
                         console.info('[Rekenan PWA] Local Service Worker registered:', registration.scope);
                         try {registration.update();} catch (_) { }
@@ -4746,8 +4746,8 @@ margin:0!important;
             console.groupCollapsed('[Rekenan STARTUP] BUILD / CACHE DIAGNOSTIC');
             console.info('Client UI build:', window.REKENAN_BUILD_VERSION);
             console.info('Client API build:', window.REKENAN_SERVER_BUILD);
-            console.info('Service Worker URL:', './sw.js?v=2005');
-            console.info('Expected deploy build:', 'V200.5');
+            console.info('Service Worker URL:', './sw.js?v=2001');
+            console.info('Expected deploy build:', 'V200.1');
             console.info('Current URL:', location.href);
             console.info('Local storage build:', localStorage.getItem('rekenan_expected_build'));
             console.info('SW controller:', navigator.serviceWorker?.controller?.scriptURL || 'none');
@@ -10336,8 +10336,8 @@ margin:0!important;
 
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
-            const ui = 'V200.5';
-            console.info('[Rekenan BUILD] UI V200.5 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.5 / SERVER V200.5');
+            const ui = 'V200.1';
+            console.info('[Rekenan BUILD] UI', ui, 'READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.1 / SERVER V200.1');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -10473,7 +10473,7 @@ margin:0!important;
     <script id="v1961-final-fixes">
         (function () {
             'use strict';
-            console.info('[Rekenan BUILD] V200.5 ARCHITECTURE LOADED');
+            console.info('[Rekenan BUILD] V200.1 ARCHITECTURE LOADED');
             window.rkNormalizePinError_ = function (err) {
                 const raw = String(err?.message || err || '');
                 return /pin/i.test(raw) && /(salah|wrong|invalid|tidak sesuai|incorrect)/i.test(raw) ? 'PIN salah.' : raw;
@@ -10796,7 +10796,7 @@ margin:0!important;
     <script id="rekenan-v1984-final-functional-fix">
         (function () {
             'use strict';
-            console.info('[Rekenan BUILD] V200.5 UNIVERSAL DELTA SYNC + ATOMIC ATTACHMENT + TRANSFER STATUS LOADED');
+            console.info('[Rekenan BUILD] V200.1 UNIVERSAL DELTA SYNC + ATOMIC ATTACHMENT + TRANSFER STATUS LOADED');
 
             /* ---------- stable calculator formatter ---------- */
             window.v109Fmt = function (v) {
@@ -11034,11 +11034,11 @@ margin:0!important;
 
 
 <script>
-/* V200.5 PERFORMANCE + ADMIN ACC QUEUE + REALTIME PULSE PATCH */
+/* V200.3 PERFORMANCE + ADMIN ACC QUEUE + REALTIME PULSE PATCH */
 (function(){
- const RK_BUILD='V200.5';
+ const RK_BUILD='V200.3';
  window.REKENAN_BUILD=RK_BUILD;
- console.info('[Rekenan BUILD] V200.5 | ADMIN ACC QUEUE + BORROWER REALTIME ACC');
+ console.info('[Rekenan BUILD] V200.3 | ADMIN ACC QUEUE + REALTIME VERSION PULSE');
  window.rkBusinessNow=function(){ return new Date(); };
  window.rkBusinessDate=function(v){
    const d=v instanceof Date?v:new Date(v==null?Date.now():v);
@@ -11055,72 +11055,19 @@ margin:0!important;
  window.rkPutMenuSnapshot=function(key,data){try{secureSave(key,{at:Date.now(),data:data})}catch(e){}};
  const oldAdmin=window.loadAdminPanel;
  if(typeof oldAdmin==='function') window.loadAdminPanel=async function(force){
-   const c=window.rkGetMenuSnapshot('rekenan_admin_index_v2005');
+   const c=window.rkGetMenuSnapshot('rekenan_admin_index_v2001');
    if(!force&&c&&c.data){ const p=c.data; embeddedAdminBorrowers=p.borrowers||[];embeddedAdminLoans=p.loans||[];embeddedAdminPayments=p.riwayatCicilan||[]; renderEmbeddedAdmin(); }
    return oldAdmin.call(this,!!force);
  };
  const oldBorrow=window.fetchLoansFromCloud;
  if(typeof oldBorrow==='function') window.fetchLoansFromCloud=async function(force){
    const owner=String(activeCloudUser||'').trim();
-   const key='rekenan_borrower_index_v2005_'+owner;
-   const c=window.rkGetMenuSnapshot(key);
-   if(!force&&c&&c.data){
-     loansData=Array.isArray(c.data.loans)?c.data.loans:[];
-     riwayatCicilanData=Array.isArray(c.data.payments)?c.data.payments:[];
-     if(c.data.user)activeBorrowerUser=c.data.user;
-     renderLoanList();renderRiwayatCicilanList();updateBorrowerLimitUI();updateBorrowerLoanActivityBadge_();
-     // Do not await Cloud when opening the menu. A background refresh may run
-     // independently and can fail/timeout without locking the borrower UI.
-     if(!force) setTimeout(()=>oldBorrow.call(this,false).then(()=>{
-       try{window.rkPutMenuSnapshot(key,{loans:loansData,payments:riwayatCicilanData,user:activeBorrowerUser});}catch(e){}
-     }).catch(()=>{}),0);
-     return {status:'success',cacheFirst:true,background:true};
-   }
+   const c=window.rkGetMenuSnapshot('rekenan_borrower_index_v2001_'+owner);
+   if(!force&&c&&c.data){ loansData=c.data.loans||[];riwayatCicilanData=c.data.payments||[];if(c.data.user)activeBorrowerUser=c.data.user; renderLoanList();renderRiwayatCicilanList();updateBorrowerLimitUI(); }
    const out=await oldBorrow.call(this,!!force);
-   try{window.rkPutMenuSnapshot(key,{loans:loansData,payments:riwayatCicilanData,user:activeBorrowerUser});}catch(e){}
+   try{window.rkPutMenuSnapshot('rekenan_borrower_index_v2001_'+owner,{loans:loansData,payments:riwayatCicilanData,user:activeBorrowerUser});}catch(e){}
    return out;
  };
-
- // V200.5: borrower realtime ACC pulse. When Admin approves a loan, the
- // backend version changes. We fetch only the authenticated user's compact
- // loan snapshot and apply it immediately, so the Bayar/Cicil button unlocks
- // without waiting for a full menu refresh.
- let rkBorrowerPulseTimer_=null, rkBorrowerPulseFlight_=false, rkBorrowerPulseVersion_=Number(sessionStorage.getItem('rekenan_borrower_loan_sync_version')||0);
- async function rkBorrowerPulse_(){
-   if(rkBorrowerPulseFlight_ || !navigator.onLine || !activeCloudUser || !cloudToken) return;
-   rkBorrowerPulseFlight_=true;
-   try{
-     const d=await cloudRequest({action:'loanSyncState',token:cloudToken,username:activeCloudUser,deviceId:currentDeviceId},2500);
-     if(d?.status==='SESSION_EXPIRED'){rkBorrowerPulseVersion_=0;return;}
-     const p=d?.data||d||{}, v=Number(p.version||0);
-     if(!v || (rkBorrowerPulseVersion_ && v===rkBorrowerPulseVersion_)) return;
-     rkBorrowerPulseVersion_=v;
-     sessionStorage.setItem('rekenan_borrower_loan_sync_version',String(v));
-     // The endpoint returns the compact borrower snapshot from server cache.
-     // Never block the UI on a full getBorrowerData call here.
-     if(Array.isArray(p.loans)){
-       loansData=p.loans;
-       riwayatCicilanData=Array.isArray(p.payments)?p.payments:riwayatCicilanData;
-       if(p.user) activeBorrowerUser=p.user;
-       secureSave('rekenan_loans',loansData);
-       secureSave('rekenan_riwayat_cicilan',riwayatCicilanData);
-       try{localStorage.setItem('rekenan_loans_owner',String(activeCloudUser||''));}catch(_){}
-       renderLoanList();renderRiwayatCicilanList();updateBorrowerLimitUI();updateBorrowerLoanActivityBadge_();
-       console.info('[Rekenan PINJAMAN] REALTIME UPDATE', {version:v, loans:loansData.length, source:'loanSyncState-cache'});
-     } else {
-       // Defensive fallback: if a legacy server only returns the version,
-       // queue one background borrower refresh without locking the UI.
-       setTimeout(()=>oldBorrow.call(this,true).catch(()=>{}),0);
-     }
-   }catch(e){}
-   finally{rkBorrowerPulseFlight_=false;}
- }
- function startBorrowerRealtimePulse_(){
-   if(rkBorrowerPulseTimer_) clearInterval(rkBorrowerPulseTimer_);
-   rkBorrowerPulseTimer_=setInterval(()=>{if(currentActiveTab==='peminjam')rkBorrowerPulse_();},1500);
-   rkBorrowerPulse_();
- }
- startBorrowerRealtimePulse_();
  window.rkRenderIncremental=function(items,render,batch){
    items=Array.isArray(items)?items:[]; batch=batch||80; let i=0;
    return new Promise(resolve=>{function step(){const end=Math.min(i+batch,items.length);for(;i<end;i++)render(items[i],i);if(i<items.length)requestAnimationFrame(step);else resolve()}step()});
