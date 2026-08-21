@@ -8,7 +8,7 @@
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
         window.REKENAN_UI_BUILD = 'V200.52';
-        console.info('[Rekenan BUILD] UI V200.52');
+        console.info('[Rekenan BUILD] UI V200.57');
         console.info('[Rekenan BUILD] V200.42 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
@@ -5746,7 +5746,13 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         async function rkQueueAttachmentFile_(file, folderKind, recordId, dataType, recordSnapshot = null) {
             if (!file) return null;
             const compressed = await rekenanCompressImageV178_(file);
-            const q = rkLoadAttachmentQueue_();
+            let q = rkLoadAttachmentQueue_();
+            // SHOPPING: replacing a photo must replace only an older, still-pending
+            // upload for the same row. Already-uploaded queue entries are retained
+            // so a metadata retry can finish safely without creating another Drive file.
+            const sameRecord = String(recordId);
+            const sameType = String(dataType || 'TRANSACTION').toUpperCase();
+            q = q.filter(x => !(String(x?.recordId || '') === sameRecord && String(x?.dataType || '').toUpperCase() === sameType && !x?.uploadedFileId));
             const queueId = 'att_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
             q.push({queueId, folderKind, recordId: String(recordId), dataType: String(dataType || 'TRANSACTION').toUpperCase(), fileName: compressed.name, mimeType: compressed.mimeType, dataUrl: compressed.dataUrl, recordSnapshot: recordSnapshot && typeof recordSnapshot === 'object' ? JSON.parse(JSON.stringify(recordSnapshot)) : null, createdAt: new Date().toISOString()});
             rkSaveAttachmentQueue_(q); rkMarkSyncPending_();
@@ -5913,7 +5919,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         }
         function rkApplyAttachmentLocal_(dt,id,att){
             const key=String(dt||'').toUpperCase(); const list=key==='TRANSACTION'?transactions:key==='SHOPPING'?shoppingItems:key==='NOTE'?notesData:key==='SAVINGS'?savingsList:key==='CALC_HISTORY'?calcHistory:key==='PAYMENT'?riwayatCicilanData:key==='LOAN'?loansData:null; const storageKey=key==='TRANSACTION'?'rekenan_transactions':key==='SHOPPING'?'rekenan_shopping':key==='NOTE'?'rekenan_notes':key==='SAVINGS'?'rekenan_savings':key==='CALC_HISTORY'?'rekenan_calc_history':key==='PAYMENT'?'rekenan_riwayat_cicilan':key==='LOAN'?'rekenan_loans':'';
-            const target=Array.isArray(list)?list.find(x=>String(x?.id)===String(id)):null; if(target){target.attachment=att;target.attachmentFileId=att.fileId;target.attachmentUrl=att.url;target.photoUrl=att.url;if(storageKey)secureSave(storageKey,list);}
+            const target=Array.isArray(list)?list.find(x=>String(x?.id)===String(id)):null; if(target){target.attachment=att;target.attachmentFileId=att.fileId;target.attachmentUrl=att.url;target.photoUrl=att.url;target.attachmentPending=false;if(storageKey)secureSave(storageKey,list);}
         }
 
         let rkAttachmentDrainInFlight_ = false;
@@ -6209,8 +6215,12 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 if (!url && fileId) {
                     url = 'https://drive.google.com/file/d/' + encodeURIComponent(fileId) + '/view';
                 }
-                if (!url && !fileId) return null;
-                return { fileId, url, name };
+                const pending = !!(a.pending || item.attachmentPending || item.photoPending);
+                // A queued local photo is a real attachment state even before Drive
+                // returns a fileId/url. Keep it visible so renderers do not regress
+                // to 'Belum ada foto' while Local -> Queue -> Cloud is working.
+                if (!url && !fileId && !pending) return null;
+                return { fileId, url, name, pending };
             } catch (_) {
                 return null;
             }
@@ -6764,6 +6774,8 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="bg-[#1e1e1e] p-6 rounded-3xl border border-zinc-800 text-center text-zinc-400 text-xs italic">Belum ada barang belanjaan. Silakan klik tombol (+) Tambah di atas.</div>`;
+                const master = document.getElementById('selectAllShoppingCheckbox');
+                if (master) { master.checked = false; master.indeterminate = false; }
                 updateCheckoutTotal();
                 return;
             }
@@ -6781,7 +6793,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                             </div>
                             <button onclick="deleteShoppingItem('${item.id}', this)" class="text-rose-400 hover:text-rose-300 p-2 shrink-0"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
-                        <div class="v101-shopping-proof flex items-center gap-2 flex-wrap">${(() => {const a = parseAttachmentMeta_(item); if (!(a?.url || a?.fileId)) return a?.pending ? '<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-700 text-zinc-300" title="Foto masih dikirim" aria-label="Foto masih dikirim" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>' : '<span class="text-[9px] text-zinc-500">Belum ada foto</span>'; const target = String(a.url || ('https://drive.google.com/file/d/' + a.fileId + '/view')); return `<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black" title="Lihat foto belanja" aria-label="Lihat foto belanja" data-photo-url="${escapeHtmlGlobal_(target)}"><i class="fa-solid fa-image"></i></button>`;})()}<label class="v101-upload-label cursor-pointer" title="Tambah / ganti foto belanja" aria-label="Tambah / ganti foto belanja"><i class="fa-solid fa-camera"></i><input id="shop_photo_${item.id}" type="file" accept="image/*" class="hidden" onchange="handleShoppingPhotoChangeV101('${item.id}',event)"></label>${parseAttachmentMeta_(item) ? '<span class="text-[9px] text-emerald-300 font-bold">Foto tersimpan</span>' : '<span class="text-[9px] text-zinc-500">Tambah foto</span>'}</div>
+                        <div class="v101-shopping-proof flex items-center gap-2 flex-wrap">${(() => {const a = parseAttachmentMeta_(item); if (!(a?.url || a?.fileId)) return a?.pending ? '<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-700 text-zinc-300" title="Foto masih dikirim" aria-label="Foto masih dikirim" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>' : '<span class="text-[9px] text-zinc-500">Belum ada foto</span>'; const target = String(a.url || ('https://drive.google.com/file/d/' + a.fileId + '/view')); return `<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black" title="Lihat foto belanja" aria-label="Lihat foto belanja" data-photo-url="${escapeHtmlGlobal_(target)}"><i class="fa-solid fa-image"></i></button>`;})()}<label class="v101-upload-label cursor-pointer" title="Tambah / ganti foto belanja" aria-label="Tambah / ganti foto belanja"><i class="fa-solid fa-camera"></i><input id="shop_photo_${item.id}" type="file" accept="image/*" class="hidden" onchange="handleShoppingPhotoChangeV101('${item.id}',event)"></label>${(() => { const a = parseAttachmentMeta_(item); return a?.pending && !(a?.url || a?.fileId) ? '<span class="text-[9px] text-amber-300 font-bold">Foto menunggu sinkronisasi</span>' : (a?.url || a?.fileId) ? '<span class="text-[9px] text-emerald-300 font-bold">Foto tersimpan</span>' : '<span class="text-[9px] text-zinc-500">Tambah foto</span>'; })()}</div>
                         <div class="grid grid-cols-3 gap-2">
                             <div class="col-span-1">
                                 <select onchange="updateShoppingItemField('${item.id}', 'category', this.value)"
@@ -6803,6 +6815,13 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 `;
             });
             container.innerHTML = html;
+            const master = document.getElementById('selectAllShoppingCheckbox');
+            if (master) {
+                const visibleIds = new Set(filtered.map(x => String(x?.id || '')));
+                const visibleItems = shoppingItems.filter(x => visibleIds.has(String(x?.id || '')));
+                master.checked = visibleItems.length > 0 && visibleItems.every(x => !!x.checked);
+                master.indeterminate = visibleItems.some(x => !!x.checked) && !master.checked;
+            }
             updateCheckoutTotal();
         }
 
@@ -6813,6 +6832,13 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 item.checked = !item.checked;
                 secureSave('rekenan_shopping', shoppingItems);
                 scheduleShoppingSync();
+                const master = document.getElementById('selectAllShoppingCheckbox');
+                if (master) {
+                    const visibleIds = new Set((shoppingItems || []).map(x => String(x?.id || '')));
+                    const visibleItems = (shoppingItems || []).filter(x => visibleIds.has(String(x?.id || '')));
+                    master.checked = visibleItems.length > 0 && visibleItems.every(x => !!x.checked);
+                    master.indeterminate = visibleItems.some(x => !!x.checked) && !master.checked;
+                }
                 updateCheckoutTotal();
             }
         }
@@ -6915,6 +6941,10 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     note: JSON.stringify({source: 'Belanja', checkoutId, total, items: checkoutItems})
                 };
                 transactions.unshift(newTx);
+                // Checkout is a local two-collection mutation: create the
+                // transaction and tombstone the SHOPPING rows in the same local
+                // commit so Cloud cannot resurrect checked items later.
+                checkedItems.forEach(item => rkMarkShoppingDeleted_(item.id));
                 shoppingItems = shoppingItems.filter(x => !x.checked);
                 secureSave('rekenan_transactions', transactions);
                 secureSave('rekenan_shopping', shoppingItems);
@@ -9846,7 +9876,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             window.openV101BudgetModal = function () {const m = makeModal('v101BudgetModal', '<i class="fa-solid fa-chart-pie text-violet-300 mr-2"></i>Budget 50/30/20', `<label class="text-[10px] text-zinc-400">Total pemasukan</label><input id="v101BudgetIncome" class="v101-input mt-1" inputmode="numeric" placeholder="Rp 0" oninput="v101BudgetPreview()"><input id="v101BudgetNote" class="v101-input mt-2" placeholder="Keterangan budget (opsional)"><div class="grid grid-cols-3 gap-2 mt-3"><div class="bg-zinc-900 p-3 rounded-xl text-center"><div class="text-[9px] text-emerald-300">50% Kebutuhan</div><b id="v101Need" class="text-xs text-white">Rp 0</b></div><div class="bg-zinc-900 p-3 rounded-xl text-center"><div class="text-[9px] text-amber-300">30% Keinginan</div><b id="v101Want" class="text-xs text-white">Rp 0</b></div><div class="bg-zinc-900 p-3 rounded-xl text-center"><div class="text-[9px] text-sky-300">20% Tabungan</div><b id="v101Save" class="text-xs text-white">Rp 0</b></div></div><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto Budget"><i class="fa-solid fa-camera"></i><input id="v101BudgetAttachment" type="file" accept="image/*" class="hidden"></label><div class="v101-proof-meta"><b>Foto Bukti Budget</b><small>Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" class="flex-1 bg-zinc-800 text-zinc-300 py-3 rounded-xl text-xs font-bold" onclick="closeV101Modal('v101BudgetModal')">Tutup</button><button type="button" id="v101BudgetSaveBtn" class="flex-1 bg-violet-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Budget()">Simpan Budget</button></div><div class="mt-4 pt-3 border-t border-zinc-800"><div class="text-[10px] font-black text-zinc-300 mb-2">Riwayat Budget</div><div id="v101BudgetHistory" class="space-y-2 max-h-48 overflow-y-auto"></div></div>`); m.classList.add('show'); v101BudgetPreview(); if (typeof renderV101BudgetHistory === 'function') renderV101BudgetHistory()};
             window.renderV101BudgetHistory = function () {const el = document.getElementById('v101BudgetHistory'); if (!el) return; const rows = (Array.isArray(calcHistory) ? calcHistory.filter(x => x && x.type === 'budget') : []).slice(0, 50); const renderBudgetRow = x => '<div class="v198-calc-history-row"><b class="text-xs text-white block">' + esc(x.note || 'Budget 50/30/20') + '</b><div class="text-[10px] text-zinc-400">' + esc(String(x.date || x.createdAt || '').replace('T', ' ').slice(0, 19)) + '</div><div class="text-xs text-violet-300 font-black">' + formatRupiah(x.income || 0) + '</div></div>'; el.innerHTML = rows.length ? rkHistoryDropdownHtml_(rows, renderBudgetRow, 'Riwayat Budget') : '<div class="text-[10px] text-zinc-500">Belum ada riwayat budget.</div>';}; window.v101BudgetPreview = function () {const n = parseRupiah(document.getElementById('v101BudgetIncome')?.value || '0'); if (document.getElementById('v101Need')) document.getElementById('v101Need').textContent = formatRupiah(n * .5); if (document.getElementById('v101Want')) document.getElementById('v101Want').textContent = formatRupiah(n * .3); if (document.getElementById('v101Save')) document.getElementById('v101Save').textContent = formatRupiah(n * .2)};
             window.saveV101Budget = async function () {const btn=document.getElementById('v101BudgetSaveBtn'); if(btn?.dataset.busy==='1')return; const n=parseRupiah(document.getElementById('v101BudgetIncome')?.value||'0'),note=(document.getElementById('v101BudgetNote')?.value||'').trim()||'Alokasi 50/30/20'; if(n<=0)return showToast('Masukkan pemasukan terlebih dahulu.','error'); if(btn)btn.dataset.busy='1'; try {const id='budget_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),file=document.getElementById('v101BudgetAttachment')?.files?.[0]; const d=localDateYMD_(new Date()),ts=new Date().toISOString(),needs=Math.round(n*.5),wants=Math.round(n*.3),sav=Math.round(n*.2); const budget={id,type:'budget',income:n,needs,wants,savings:sav,note,date:d,createdAt:ts}; const txBase='tx_budget_'+id; const txNeed={id:txBase+'_need',type:'pemasukan',category:'Budget Kebutuhan',amount:needs,desc:note+' (50% Kebutuhan)',date:d,budgetId:id}; const txWant={id:txBase+'_want',type:'pemasukan',category:'Budget Keinginan',amount:wants,desc:note+' (30% Keinginan)',date:d,budgetId:id}; const txSaving={id:txBase+'_saving',type:'pengeluaran',category:'Tabungan',amount:sav,desc:note+' (20% Tabungan)',date:d,budgetId:id}; calcHistory.unshift(budget); transactions.unshift(txNeed,txWant,txSaving); secureSave('rekenan_calc_history',calcHistory); secureSave('rekenan_transactions',transactions); if(file){const attachment=await rkQueueAttachmentFile_(file,'Budget',id,'CALC_HISTORY',budget); if(attachment){budget.attachment=attachment; const q=rkLoadAttachmentQueue_(),qi=q.findIndex(x=>String(x?.queueId)===String(attachment.queueId)); if(qi>=0){q[qi]=Object.assign({},q[qi],{linkedRecords:[{dataType:'TRANSACTION',recordId:txNeed.id,recordSnapshot:txNeed},{dataType:'TRANSACTION',recordId:txWant.id,recordSnapshot:txWant},{dataType:'TRANSACTION',recordId:txSaving.id,recordSnapshot:txSaving}]}); rkSaveAttachmentQueue_(q); console.info('[Rekenan BUDGET] SINGLE PHOTO LINKED',{budgetId:id,linkedRecordIds:[txNeed.id,txWant.id,txSaving.id]});} secureSave('rekenan_calc_history',calcHistory);}} if(typeof renderCatatanList==='function')renderCatatanList(); if(typeof initDashboard==='function')initDashboard(); rkMarkSyncPending_(); showToast('Budget tersimpan. Satu foto akan dipakai untuk semua record Budget terkait.','success'); closeV101Modal('v101BudgetModal')}catch(e){showToast(e?.message||'Budget gagal disimpan.','error')}finally{if(btn){delete btn.dataset.busy;btn.textContent='Simpan Budget'}}};
-            window.handleShoppingPhotoChangeV101 = async function (id, ev) {const file = ev?.target?.files?.[0]; if (!file) return; const item = shoppingItems.find(x => String(x.id) === String(id)); if (!item) return; try {const att = await rkQueueAttachmentFile_(file, 'Belanja', id, 'SHOPPING'); if (!att) throw new Error('Foto belum dipilih.'); item.attachment = att; item.attachmentFileId = ''; item.attachmentUrl = ''; item.photoUrl = ''; item.note = JSON.stringify({...item, attachment: att, attachmentFileId: '', attachmentUrl: ''}); secureSave('rekenan_shopping', shoppingItems); renderShoppingList(); showToast('Foto belanja masuk antrean. Sinkronisasi otomatis berjalan saat internet tersedia.', 'success');} catch (e) {showToast(e?.message || 'Foto belanja gagal dimasukkan ke antrean.', 'error');} finally {if (ev?.target) ev.target.value = '';} };
+            window.handleShoppingPhotoChangeV101 = async function (id, ev) {const file = ev?.target?.files?.[0]; if (!file) return; const item = shoppingItems.find(x => String(x.id) === String(id)); if (!item) return; try {const att = await rkQueueAttachmentFile_(file, 'Belanja', id, 'SHOPPING'); if (!att) throw new Error('Foto belum dipilih.'); item.attachment = att; item.attachmentPending = true; item.attachmentFileId = ''; item.attachmentUrl = ''; item.photoUrl = ''; item.note = JSON.stringify({...item, attachment: att, attachmentPending: true, attachmentFileId: '', attachmentUrl: ''}); secureSave('rekenan_shopping', shoppingItems); renderShoppingList(); showToast('Foto belanja masuk antrean. Sinkronisasi otomatis berjalan saat internet tersedia.', 'success');} catch (e) {showToast(e?.message || 'Foto belanja gagal dimasukkan ke antrean.', 'error');} finally {if (ev?.target) ev.target.value = '';} };
             let catAddBusy = false, shopAddBusy = false; window.openTransactionModalOnce = function () {if (catAddBusy) return; catAddBusy = true; try {openTransactionModal()} finally {setTimeout(() => {catAddBusy = false}, 900)} }; window.addOneShoppingItem_ = function () {
                 if (shopAddBusy) return;
                 shopAddBusy = true;
