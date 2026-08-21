@@ -8,7 +8,7 @@
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
         window.REKENAN_UI_BUILD = 'V201.13';
-        console.info('[Rekenan BUILD] UI V201.00');
+        console.info('[Rekenan BUILD] UI V201.14');
         console.info('[Rekenan BUILD] V200.90 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
@@ -58,6 +58,8 @@
         body.rk-app-ready #authView{display:none!important;}
         body.rk-app-ready #appView{display:block!important;}
         #authName,#authPin{font-size:16px;}
+        /* V201.14: never reveal the app before utility CSS is ready; prevents first-paint layout scramble. */
+        #appView.rk-awaiting-css{visibility:hidden!important;}
     </style>
     <style>
         /* REKENAN CANONICAL DARK LAYOUT */
@@ -3040,14 +3042,39 @@ nav.fixed.bottom-0 {
   'use strict';
   window.REKENAN_UI_BUILD='V201.13';
   window.__RK_LOGIN_PAINTED_AT__=performance.now();
-  console.info('[Rekenan STARTUP] V201.13 FAST LOGIN — vendor scripts deferred; app boot waits for authentication');
-  function markReady(){ try{ document.body.classList.add('rk-app-ready'); }catch(_){} }
+  console.info('[Rekenan STARTUP] V201.14 FAST LOGIN + STYLE-GATED APP REVEAL — no layout flash / no global photo observers');
+  function utilitiesReady_(){
+    try{
+      const probe=document.createElement('div'); probe.className='hidden'; probe.style.position='absolute'; probe.style.pointerEvents='none';
+      document.body.appendChild(probe);
+      const ready=getComputedStyle(probe).display==='none'; probe.remove(); return ready;
+    }catch(_){ return false; }
+  }
+  function revealApp_(){
+    try{ document.body.classList.add('rk-app-ready'); const app=document.getElementById('appView'); if(app) app.classList.remove('rk-awaiting-css'); }catch(_){}
+  }
+  function markReady(){
+    try{ const app=document.getElementById('appView'); if(app) app.classList.add('rk-awaiting-css'); document.body.classList.add('rk-app-ready');
+      const started=performance.now();
+      (function wait_(){
+        if(utilitiesReady_() || performance.now()-started>1400){ revealApp_(); return; }
+        requestAnimationFrame(wait_);
+      })();
+    }catch(_){ revealApp_(); }
+  }
   window.__rkMarkAppReady_=markReady;
 })();
 </script>
+<style id="rekenan-v20114-stability">
+/* V201.14: structural stability while Tailwind hydrates. */
+html,body{min-height:100%;}
+#appView{min-width:0;}
+#tab-belanja,#tab-kalkulator,#tab-peminjam,#tab-admin,#tab-catatan,#tab-dashboard{min-width:0;}
+</style>
 </head>
 
 <body class="bg-black text-gray-100 flex justify-center min-h-screen">
+<script>console.info('[Rekenan BUILD] V201.14 | FAST LOGIN | STYLE-GATED APP | BASE PHOTO CONTROLS ONLY');</script>
     <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] hidden items-center justify-center p-6"
         id="globalLoadingOverlay">
         <div class="bg-[#1e1e1e] border border-zinc-700 rounded-3xl px-6 py-5 text-center shadow-2xl min-w-[220px]">
@@ -11503,63 +11530,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
     if(typeof openAttachmentUrl_==='function') openAttachmentUrl_(url);
     else window.open(url,'_blank','noopener,noreferrer');
   }
-  function rkPatchShopping_(){
-    document.querySelectorAll('#shoppingCardList > div').forEach(function(card){
-      var input=card.querySelector('input[type="file"][id^="shop_photo_"]');
-      if(!input) return;
-      var id=input.id.replace(/^shop_photo_/,'');
-      var item=(window.shoppingItems||[]).find(function(x){return String(x.id)===String(id)});
-      var a=rkPhotoMeta_(item);
-      var old=card.querySelector('.rk-v20013-shop-photo');
-      if(old) old.remove();
-      if(!a) return;
-      var target=a.url || ('https://drive.google.com/file/d/'+encodeURIComponent(a.fileId)+'/view');
-      var btn=document.createElement('button');
-      btn.type='button';
-      btn.className='rk-v20013-shop-photo inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black';
-      btn.title='Lihat foto belanja'; btn.setAttribute('aria-label','Lihat foto belanja');
-      btn.innerHTML='<i class="fa-solid fa-image"></i>';
-      btn.onclick=function(e){e.preventDefault();e.stopPropagation();rkOpen_(target);};
-      var actions=input.closest('.v101-shopping-proof') || input.closest('.v108-shop-actions') || input.parentElement?.parentElement;
-      if(actions) actions.insertBefore(btn, actions.firstChild);
-    });
-  }
-  function rkPatchLoan_(){
-    document.querySelectorAll('#loanCardList .v106-photo-check').forEach(function(el){
-      if(el.tagName!=='BUTTON') return;
-      el.innerHTML='<i class="fa-solid fa-image"></i>';
-      el.classList.add('inline-flex','items-center','justify-center','w-9','h-9','rounded-xl','bg-indigo-600','text-white','text-[10px]','font-black');
-      el.style.cursor='pointer';
-    });
-  }
-  var oldShop=window.renderShoppingList;
-  if(typeof oldShop==='function'){
-    window.renderShoppingList=function(){
-      var r=oldShop.apply(this,arguments);
-      setTimeout(rkPatchShopping_,0);
-      return r;
-    };
-  }
-  var oldLoan=window.renderLoanList;
-  if(typeof oldLoan==='function'){
-    window.renderLoanList=function(){
-      var r=oldLoan.apply(this,arguments);
-      setTimeout(rkPatchLoan_,0);
-      return r;
-    };
-  }
-  setTimeout(function(){rkPatchShopping_();rkPatchLoan_();},100);
-  setTimeout(function(){rkPatchShopping_();rkPatchLoan_();},700);
-  if(window.MutationObserver){
-    var obs=new MutationObserver(function(){
-      clearTimeout(window.__rkPhotoObsTimer);
-      window.__rkPhotoObsTimer=setTimeout(function(){rkPatchShopping_();rkPatchLoan_();},60);
-    });
-    var root=document.body;
-    if(root) obs.observe(root,{childList:true,subtree:true});
-  }
-  console.info('[Rekenan BUILD] PHOTO V200.90 ADMIN OK / BELANJA OK / PINJAMAN OK');
-})();
+  // V201.14: legacy global shopping/loan photo patch removed. Base render owns photo controls.
 
             let v106PdfBusyState_ = false;
             function v106PdfBusy_(label) {
@@ -13788,13 +13759,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function bindAll_(){bindLoanPhotoButtons_();bindCalcPhotoButtons_();}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){setTimeout(bindAll_,100);setTimeout(bindAll_,800);},{once:true});
   else {setTimeout(bindAll_,100);setTimeout(bindAll_,800);}
-  if(window.MutationObserver){
-    const obs=new MutationObserver(function(){
-      clearTimeout(window.__rk65PhotoTimer);
-      window.__rk65PhotoTimer=setTimeout(bindAll_,80);
-    });
-    if(document.body) obs.observe(document.body,{childList:true,subtree:true});
-  }
+  // V201.14: global photo MutationObserver removed to prevent startup/render churn.
+
   window.rekenanPhotoCalcAuditV20065=function(){
     const loanBtns=document.querySelectorAll('#loanCardList .v106-photo-check');
     const calcBtns=document.querySelectorAll('#v101CalcHistory [data-v146-photo],#v101CalcHistory [data-rk65-photo]');
@@ -14141,10 +14107,7 @@ console.info('[Rekenan BUILD] UI V201.04 | CALCULATOR V201.04 PRO | 000 KEPT | 0
     var hit=e.target.closest && e.target.closest('[data-cat-tool="calculator"],#nav-kalkulator');
     if(hit){ setTimeout(function(){removeLegacyCalculator_();audit_();},0); }
   },true);
-  var obs=new MutationObserver(function(){
-    if(document.getElementById('v101CalculatorModal')) removeLegacyCalculator_();
-  });
-  obs.observe(document.body,{childList:true,subtree:true});
+  // V201.14: no global legacy-calculator observer; single-route open function is authoritative.
   console.info('[Rekenan BUILD] V201.13 | SINGLE CALCULATOR ROUTE | 1 CAMERA + 1 IMAGE | LEGACY MODAL REMOVED');
 })();
 </script>
