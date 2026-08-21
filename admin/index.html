@@ -8,7 +8,7 @@
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
         window.REKENAN_UI_BUILD = 'V200.63';
-        console.info('[Rekenan BUILD] UI V200.62');
+        console.info('[Rekenan BUILD] UI V200.64');
         console.info('[Rekenan BUILD] V200.42 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
@@ -3741,7 +3741,7 @@ margin:0!important;
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
         const API_VERSION = 'V200.32-LOCAL-FIRST-CACHED';
         window.REKENAN_SERVER_BUILD = 'V200.32';
-        console.info('[Rekenan BUILD] CLIENT V200.63 / SERVER API COMPATIBLE');
+        console.info('[Rekenan BUILD] CLIENT V200.64 / SERVER API COMPATIBLE');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -4351,10 +4351,30 @@ margin:0!important;
                     action: 'getData',
                     username: activeCloudUser,
                     token: cloudToken,
-                    forceRefresh: !!force
+                    forceRefresh: true,
+                    noCache: true,
+                    __clientBuild: 'V200.64'
                 }, force ? 12000 : 9000);
                 const payload = r?.data || r;
-                if (!(r?.success || r?.status === 'success') || !Array.isArray(payload?.calcHistory)) return false;
+                if (!(r?.success || r?.status === 'success')) {
+                    console.warn('[Rekenan CALC] SHEET READ FAILED', {
+                        code: r?.code || '',
+                        message: r?.message || r?.error || 'API gagal',
+                        serverBuild: r?.serverBuild || r?.build || ''
+                    });
+                    return false;
+                }
+                if (!Array.isArray(payload?.calcHistory)) {
+                    console.warn('[Rekenan CALC] SHEET READ INVALID — calcHistory bukan array', {
+                        serverBuild: r?.serverBuild || r?.build || '',
+                        keys: payload && typeof payload === 'object' ? Object.keys(payload) : []
+                    });
+                    return false;
+                }
+                console.info('[Rekenan CALC] SHEET READ OK', {
+                    serverBuild: r?.serverBuild || r?.build || 'unknown',
+                    rows: payload.calcHistory.length
+                });
                 const map = new Map((Array.isArray(calcHistory) ? calcHistory : []).map(x => [String(x?.id || ''), x]));
                 let added = 0;
                 for (const item of payload.calcHistory) {
@@ -10042,8 +10062,8 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 try {
                     var d = w.document; d.open();
                     d.write('<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + v106EscapeReport_(title || 'Laporan Rekenan') + '</title>');
-                    d.write('<style>@page{size:A4 portrait;margin:14mm 13mm 16mm 13mm}*{box-sizing:border-box}body{font-family:Arial,"Helvetica Neue",sans-serif;color:#111;background:#fff;margin:0;font-size:11px;line-height:1.45}.paper{width:100%;max-width:190mm;margin:0 auto}.kop{display:flex;align-items:flex-start;gap:12px;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:12px}.brand{width:42px;height:42px;border:1.8px solid #111;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px}.doc-ket{font-size:8.5px;color:#555;margin-top:2px}.section-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;border-left:3px solid #111;padding-left:7px;margin:12px 0 6px}.kop h1{font-size:16px;margin:0 0 2px;font-weight:800;letter-spacing:.4px}.kop p{margin:0;color:#444;font-size:9.5px}.doc-title{text-align:center;margin:12px 0 14px}.doc-title h2{font-size:15px;letter-spacing:.8px;margin:0 0 4px;text-transform:uppercase}.doc-title .sub{font-size:9.5px;color:#555}.meta{display:grid;grid-template-columns:110px 1fr 110px 1fr;gap:4px 8px;border:1px solid #bbb;padding:8px;margin-bottom:12px}.meta b{font-weight:700}.summary{display:flex;gap:8px;margin:0 0 12px}.summary .box{flex:1;border:1px solid #bbb;padding:7px 8px}.summary .label{font-size:8px;color:#666;text-transform:uppercase}.summary .value{font-size:12px;font-weight:800;margin-top:2px}.table-wrap{width:100%;overflow:visible}table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}tr{page-break-inside:avoid}th,td{border:1px solid #8a8a8a;padding:5px 6px;vertical-align:top;word-break:break-word}th{background:#eee;font-weight:800;text-align:center;font-size:9px}td{font-size:9.5px}td.num{text-align:right;white-space:nowrap}td.center{text-align:center}.total-row td{font-weight:800;background:#f5f5f5}.footer{margin-top:14px;padding-top:7px;border-top:1px solid #aaa;font-size:8.5px;color:#555;display:flex;justify-content:space-between;gap:12px}.signature{margin-top:22px;display:flex;justify-content:flex-end}.sig{width:180px;text-align:center}.sig .line{margin-top:42px;border-top:1px solid #111;padding-top:4px}.no-print{margin-top:14px;padding:9px;border:1px dashed #999;background:#fafafa;color:#444;font-size:10px}.print-actions{position:sticky;top:0;background:#fff;padding:10px 0;text-align:right;z-index:5}.print-actions button{border:0;border-radius:6px;background:#111;color:#fff;padding:8px 14px;font-weight:700;cursor:pointer}.muted{color:#666}@media print{.no-print,.print-actions{display:none!important}body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.paper{max-width:none}}@media screen{body{background:#e5e7eb;padding:18px}.paper{background:#fff;padding:18px;box-shadow:0 2px 18px rgba(0,0,0,.12)}} </style></head><body><div class="paper"><div class="print-actions no-print"><button onclick="window.print()">Cetak / Simpan PDF</button></div>');
-                    d.write('<div class="kop"><div class="brand">R</div><div><h1>REKENAN</h1><p>Sistem Administrasi Keuangan</p><p class="muted">Dokumen laporan elektronik</p></div></div>');
+                    d.write('<style>@page{size:A4 portrait;margin:14mm 13mm 16mm 13mm}*{box-sizing:border-box}body{font-family:Arial,"Helvetica Neue",sans-serif;color:#111;background:#fff;margin:0;font-size:11px;line-height:1.45}.paper{width:100%;max-width:190mm;margin:0 auto}.kop{display:flex;align-items:flex-start;gap:12px;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:12px}.brand{position:relative;width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font:900 22px/1 system-ui,sans-serif;color:#fff;letter-spacing:-2px;box-shadow:0 8px 22px rgba(99,102,241,.22);overflow:hidden}.brand:before{content:"";position:absolute;width:31px;height:31px;border:1px solid rgba(255,255,255,.24);border-radius:10px;transform:rotate(10deg)}.brand span{position:relative;z-index:1}.brand i{position:absolute;width:12px;height:3px;border-radius:99px;background:#fff;right:6px;bottom:9px;opacity:.92;transform:rotate(-38deg);z-index:2}.doc-ket{font-size:8.5px;color:#555;margin-top:2px}.section-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;border-left:3px solid #111;padding-left:7px;margin:12px 0 6px}.kop h1{font-size:16px;margin:0 0 2px;font-weight:800;letter-spacing:.4px}.kop p{margin:0;color:#444;font-size:9.5px}.doc-title{text-align:center;margin:12px 0 14px}.doc-title h2{font-size:15px;letter-spacing:.8px;margin:0 0 4px;text-transform:uppercase}.doc-title .sub{font-size:9.5px;color:#555}.meta{display:grid;grid-template-columns:110px 1fr 110px 1fr;gap:4px 8px;border:1px solid #bbb;padding:8px;margin-bottom:12px}.meta b{font-weight:700}.summary{display:flex;gap:8px;margin:0 0 12px}.summary .box{flex:1;border:1px solid #bbb;padding:7px 8px}.summary .label{font-size:8px;color:#666;text-transform:uppercase}.summary .value{font-size:12px;font-weight:800;margin-top:2px}.table-wrap{width:100%;overflow:visible}table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}tr{page-break-inside:avoid}th,td{border:1px solid #8a8a8a;padding:5px 6px;vertical-align:top;word-break:break-word}th{background:#eee;font-weight:800;text-align:center;font-size:9px}td{font-size:9.5px}td.num{text-align:right;white-space:nowrap}td.center{text-align:center}.total-row td{font-weight:800;background:#f5f5f5}.footer{margin-top:14px;padding-top:7px;border-top:1px solid #aaa;font-size:8.5px;color:#555;display:flex;justify-content:space-between;gap:12px}.signature{margin-top:22px;display:flex;justify-content:flex-end}.sig{width:180px;text-align:center}.sig .line{margin-top:42px;border-top:1px solid #111;padding-top:4px}.no-print{margin-top:14px;padding:9px;border:1px dashed #999;background:#fafafa;color:#444;font-size:10px}.print-actions{position:sticky;top:0;background:#fff;padding:10px 0;text-align:right;z-index:5}.print-actions button{border:0;border-radius:6px;background:#111;color:#fff;padding:8px 14px;font-weight:700;cursor:pointer}.muted{color:#666}@media print{.no-print,.print-actions{display:none!important}body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.paper{max-width:none}}@media screen{body{background:#e5e7eb;padding:18px}.paper{background:#fff;padding:18px;box-shadow:0 2px 18px rgba(0,0,0,.12)}} </style></head><body><div class="paper"><div class="print-actions no-print"><button onclick="window.print()">Cetak / Simpan PDF</button></div>');
+                    d.write('<div class="kop"><div class="brand"><span>R</span><i></i></div><div><h1>REKENAN</h1><p>Sistem Administrasi Keuangan</p><p class="muted">Dokumen laporan elektronik</p></div></div>');
                     d.write(String(html || ''));
                     d.write('<div class="footer"><span>Dokumen dibuat secara elektronik melalui Rekenan.</span><span>Dicetak: ' + v106ReportDate_(new Date()) + '</span></div></div>');
                     d.close();
@@ -11080,7 +11100,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
             const ui = 'V200.63';
-            console.info('[Rekenan BUILD] UI V200.63 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.63 / SERVER API COMPATIBLE');
+            console.info('[Rekenan BUILD] UI V200.63 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.64 / SERVER API COMPATIBLE');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -11883,7 +11903,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 window.REKENAN_BUILD_VERSION='V200.63';
 window.REKENAN_UI_BUILD='V200.63';
 window.REKENAN_SERVER_BUILD='V200.32';
-console.info('[Rekenan BUILD] FINAL CLIENT V200.63 / SERVER API COMPATIBLE');
+console.info('[Rekenan BUILD] FINAL CLIENT V200.64 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
 
 /* Calculator: one authoritative save path, then completely reset the calculator UI. */
@@ -12152,7 +12172,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
   }catch(e){console.warn('[Rekenan V200.46] ACC patch failed',e);}
 
-  console.info('[Rekenan BUILD] V200.62 PHOTO VIEWER + CALC CLOUD RECONCILE + ADMIN PULSE THROTTLE + STARTUP NO-RELOAD');
+  console.info('[Rekenan BUILD] V200.64 CALC SHEET READ + PDF HEADER LOGO + STARTUP NO-RELOAD');
 })();
 </script>
 <style id="rk-v20057-shopping-photo-fix-css">
@@ -12162,3 +12182,10 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #tab-belanja .rk57-shop-photo-btn.pending{color:#fcd34d;opacity:.85;cursor:default}
 #tab-belanja .rk57-shop-photo-btn input{display:none!important}
 </style>
+
+<script>
+(function(){
+  console.info('[Rekenan BUILD] V200.64 CALC SHEET READ + PDF HEADER LOGO');
+  window.__REKENAN_BUILD__='V200.64';
+})();
+</script>
