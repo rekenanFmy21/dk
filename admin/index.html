@@ -4,15 +4,15 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V200.52';
+        window.REKENAN_BUILD_VERSION = 'V200.63';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.62';
+        window.REKENAN_UI_BUILD = 'V200.63';
         console.info('[Rekenan BUILD] UI V200.62');
         console.info('[Rekenan BUILD] V200.42 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
-                const expected = 'V200.62';
+                const expected = 'V200.63';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.62">
+    <meta name="rekenan-build" content="V200.63">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -3711,9 +3711,9 @@ margin:0!important;
                     setTimeout(() => { try { loadAdminPanel(false).catch(() => {}); } catch (_) {} }, 50);
                 }
                 if (activeCloudUser && cloudToken) {
-                    if (!Array.isArray(calcHistory) || !calcHistory.length) {
-                        setTimeout(() => { try { rkReconcileCalculatorFromCloud_(false).catch(() => {}); } catch (_) {} }, 900);
-                    }
+                    // V200.63: one non-blocking CALC_HISTORY reconciliation after the
+                    // first paint. It never blocks login/menu entry.
+                    setTimeout(() => { try { rkReconcileCalculatorFromCloud_(false).catch(() => {}); } catch (_) {} }, 900);
                     // Loan realtime/version pulse runs even when the user has not opened
                     // Pinjaman. This keeps Local loan/cicilan current at app entry.
                     try { startBorrowerRealtimePulse_(); } catch (_) {}
@@ -3741,7 +3741,7 @@ margin:0!important;
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
         const API_VERSION = 'V200.32-LOCAL-FIRST-CACHED';
         window.REKENAN_SERVER_BUILD = 'V200.32';
-        console.info('[Rekenan BUILD] CLIENT V200.52 / SERVER API COMPATIBLE');
+        console.info('[Rekenan BUILD] CLIENT V200.63 / SERVER API COMPATIBLE');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -4336,9 +4336,15 @@ margin:0!important;
         async function rkReconcileCalculatorFromCloud_(force = false) {
             if (rkCalcCloudReadInFlight_ || !activeCloudUser || !cloudToken) return false;
             const localRows = Array.isArray(calcHistory) ? calcHistory : [];
-            // If Local already has data, normal Local-first rendering stays immediate.
-            // A forced/manual refresh can still reconcile missing rows from Sheet.
-            if (!force && localRows.length) return false;
+            // V200.63: Local remains the immediate source of truth, but the first
+            // authenticated startup MUST reconcile CALC_HISTORY once even when Local
+            // already contains rows. The old guard returned early when localRows.length
+            // was non-zero, which made existing-but-incomplete local history impossible
+            // to reconcile from the Sheet.
+            const reconcileKey = 'rekenan_calc_cloud_reconciled_' + String(activeCloudUser || '');
+            if (!force) {
+                try { if (sessionStorage.getItem(reconcileKey) === '1') return false; } catch (_) {}
+            }
             rkCalcCloudReadInFlight_ = true;
             try {
                 const r = await cloudRequest({
@@ -4357,7 +4363,7 @@ margin:0!important;
                     if (!map.has(id)) { map.set(id, item); added++; }
                     else map.set(id, Object.assign({}, map.get(id), item));
                 }
-                if (added || force) {
+                if (added || force || payload.calcHistory.length) {
                     calcHistory = Array.from(map.values());
                     secureSave('rekenan_calc_history', calcHistory);
                     try { if (typeof renderV101CalcHistory === 'function') renderV101CalcHistory(); } catch (_) {}
@@ -4368,6 +4374,7 @@ margin:0!important;
                         totalLocal: calcHistory.length
                     });
                 }
+                try { if (!force) sessionStorage.setItem(reconcileKey, '1'); } catch (_) {}
                 return true;
             } catch (e) {
                 console.warn('[Rekenan CALC] Cloud read failed; Local retained:', e?.message || e);
@@ -4797,7 +4804,7 @@ margin:0!important;
         function registerRekenanPWA_() {
             try {
                 if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-                navigator.serviceWorker.register('./sw.js?v=2043', {scope: './', updateViaCache: 'none'})
+                navigator.serviceWorker.register('./sw.js?v=2063', {scope: './', updateViaCache: 'none'})
                     .then(function (registration) {
                         console.info('[Rekenan PWA] Local Service Worker registered:', registration.scope);
                         try {registration.update();} catch (_) { }
@@ -4807,9 +4814,10 @@ margin:0!important;
                         console.warn('[Rekenan PWA] Local Service Worker registration failed:', err && err.message ? err.message : err);
                     });
                 navigator.serviceWorker.addEventListener('controllerchange', function () {
-                    if (sessionStorage.getItem('rekenan_sw168_reloaded') === '1') return;
-                    sessionStorage.setItem('rekenan_sw168_reloaded', '1');
-                    location.reload();
+                    // V200.63: never reload the visible login/app shell when a new
+                    // Service Worker takes control. The previous implementation caused
+                    // a visible login flash/reload several seconds after first paint.
+                    console.info('[Rekenan PWA] controller changed — no forced reload (V200.63)');
                 }, {once: true});
             } catch (err) {
                 console.warn('[Rekenan PWA] Registration skipped:', err);
@@ -11071,8 +11079,8 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
-            const ui = 'V200.38';
-            console.info('[Rekenan BUILD] UI V200.52 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.52 / SERVER API COMPATIBLE');
+            const ui = 'V200.63';
+            console.info('[Rekenan BUILD] UI V200.63 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.63 / SERVER API COMPATIBLE');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -11872,10 +11880,10 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 <script id="rekenan-v2009-final-repair">
 (function(){
 'use strict';
-window.REKENAN_BUILD_VERSION='V200.43';
-window.REKENAN_UI_BUILD='V200.38';
+window.REKENAN_BUILD_VERSION='V200.63';
+window.REKENAN_UI_BUILD='V200.63';
 window.REKENAN_SERVER_BUILD='V200.32';
-console.info('[Rekenan BUILD] FINAL CLIENT V200.52 / SERVER API COMPATIBLE');
+console.info('[Rekenan BUILD] FINAL CLIENT V200.63 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
 
 /* Calculator: one authoritative save path, then completely reset the calculator UI. */
@@ -11980,7 +11988,7 @@ window.rekenanV2008Health=function(){return {client:'V200.32',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.38';
-  window.REKENAN_UI_BUILD='V200.38';
+  window.REKENAN_UI_BUILD='V200.63';
   window.REKENAN_SERVER_BUILD='V200.32';
   console.info('[Rekenan BUILD] V200.35 TRANSACTION HISTORY SAFE RENDER');
 
@@ -12015,7 +12023,7 @@ window.rekenanV2008Health=function(){return {client:'V200.32',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.38';
-window.REKENAN_UI_BUILD='V200.38';
+window.REKENAN_UI_BUILD='V200.63';
 window.REKENAN_SERVER_BUILD='V200.30';
 console.info('[Rekenan AUDIT V200.40] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.40 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -12144,7 +12152,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
   }catch(e){console.warn('[Rekenan V200.46] ACC patch failed',e);}
 
-  console.info('[Rekenan BUILD] V200.62 PHOTO VIEWER + CALC CLOUD RECONCILE + ADMIN PULSE THROTTLE');
+  console.info('[Rekenan BUILD] V200.62 PHOTO VIEWER + CALC CLOUD RECONCILE + ADMIN PULSE THROTTLE + STARTUP NO-RELOAD');
 })();
 </script>
 <style id="rk-v20057-shopping-photo-fix-css">
