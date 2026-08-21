@@ -7,12 +7,12 @@
         window.REKENAN_BUILD_VERSION = 'V200.52';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.52';
-        console.info('[Rekenan BUILD] UI V200.57');
+        window.REKENAN_UI_BUILD = 'V200.59';
+        console.info('[Rekenan BUILD] UI V200.59');
         console.info('[Rekenan BUILD] V200.42 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
-                const expected = 'V200.52';
+                const expected = 'V200.59';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.52">
+    <meta name="rekenan-build" content="V200.59">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -2337,6 +2337,7 @@ margin:0!important;
 }
 #tab-belanja #shoppingCardList > * *{transform:none!important}
 </style>
+<link rel="manifest" href="./manifest.json">
 </head>
 
 <body class="bg-black text-gray-100 flex justify-center min-h-screen">
@@ -6752,6 +6753,20 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             shoppingSyncTimer = setTimeout(() => rkMarkSyncPending_(), 150);
         }
 
+        function rk59OpenShoppingPhoto_(id) {
+            try {
+                const item = (Array.isArray(window.shoppingItems) ? window.shoppingItems : []).find(x => String(x?.id || '') === String(id || ''));
+                if (!item) return;
+                let a = {};
+                try { a = typeof parseAttachmentMeta_ === 'function' ? (parseAttachmentMeta_(item) || {}) : (item.attachment || {}); } catch (_) { a = item.attachment || {}; }
+                const raw = item.attachment && typeof item.attachment === 'object' ? item.attachment : {};
+                const url = String(a.url || a.viewUrl || a.fileUrl || a.AttachmentUrl || raw.url || raw.viewUrl || item.attachmentUrl || item.photoUrl || '').trim();
+                const fid = String(a.fileId || a.FileId || a.AttachmentFileId || raw.fileId || item.attachmentFileId || item.fileId || '').trim();
+                const target = url || (fid ? 'https://drive.google.com/file/d/' + encodeURIComponent(fid) + '/view' : '');
+                if (target && typeof window.openAttachmentUrl_ === 'function') window.openAttachmentUrl_(target);
+            } catch (e) { console.warn('[Rekenan V200.59] SHOPPING PHOTO OPEN FAILED', e); }
+        }
+
         function renderShoppingList() {
             const searchInput = document.getElementById('shoppingSearchInput');
             const keyword = searchInput ? String(searchInput.value || '').toLowerCase() : '';
@@ -6793,8 +6808,26 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                             </div>
                             <button onclick="deleteShoppingItem('${item.id}', this)" class="text-rose-400 hover:text-rose-300 p-2 shrink-0"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
-                        <div class="v101-shopping-proof flex items-center gap-2 flex-wrap">${(() => {const a = parseAttachmentMeta_(item); if (!(a?.url || a?.fileId)) return a?.pending ? '<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-700 text-zinc-300" title="Foto masih dikirim" aria-label="Foto masih dikirim" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>' : '<span class="text-[9px] text-zinc-500">Belum ada foto</span>'; const target = String(a.url || ('https://drive.google.com/file/d/' + a.fileId + '/view')); return `<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black" title="Lihat foto belanja" aria-label="Lihat foto belanja" data-photo-url="${escapeHtmlGlobal_(target)}"><i class="fa-solid fa-image"></i></button>`;})()}<label class="v101-upload-label cursor-pointer" title="Tambah / ganti foto belanja" aria-label="Tambah / ganti foto belanja"><i class="fa-solid fa-camera"></i><input id="shop_photo_${item.id}" type="file" accept="image/*" class="hidden" onchange="handleShoppingPhotoChangeV101('${item.id}',event)"></label>${(() => { const a = parseAttachmentMeta_(item); return a?.pending && !(a?.url || a?.fileId) ? '<span class="text-[9px] text-amber-300 font-bold">Foto menunggu sinkronisasi</span>' : (a?.url || a?.fileId) ? '<span class="text-[9px] text-emerald-300 font-bold">Foto tersimpan</span>' : '<span class="text-[9px] text-zinc-500">Tambah foto</span>'; })()}</div>
-                        <div class="grid grid-cols-3 gap-2">
+                        <div class="rk59-shopping-photo-actions flex items-center gap-2 flex-wrap">
+                            ${(() => {
+                                const a = parseAttachmentMeta_(item) || {};
+                                const raw = item.attachment && typeof item.attachment === 'object' ? item.attachment : {};
+                                const url = String(a.url || a.viewUrl || a.fileUrl || a.AttachmentUrl || raw.url || raw.viewUrl || item.attachmentUrl || item.photoUrl || '').trim();
+                                const fid = String(a.fileId || a.FileId || a.AttachmentFileId || raw.fileId || item.attachmentFileId || item.fileId || '').trim();
+                                const pending = !!(a.pending || raw.pending || item.attachmentPending);
+                                const hasPhoto = !!(url || fid);
+                                const target = url || (fid ? 'https://drive.google.com/file/d/' + encodeURIComponent(fid) + '/view' : '');
+                                const view = hasPhoto ? `<button type="button" class="rk59-photo-btn view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white" title="Lihat foto belanja" aria-label="Lihat foto belanja" onclick="event.preventDefault();event.stopPropagation();rk59OpenShoppingPhoto_('${String(item.id).replace(/'/g, "\'")}')"><i class="fa-solid fa-image"></i></button>` : '';
+                                const pendingBtn = pending && !hasPhoto ? '<button type="button" class="rk59-photo-btn pending inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-700 text-zinc-300" title="Foto masih menunggu sinkronisasi" aria-label="Foto masih menunggu sinkronisasi" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>' : '';
+                                const status = pending && !hasPhoto ? '<span class="text-[9px] text-amber-300 font-bold">Foto menunggu sinkronisasi</span>' : hasPhoto ? '<span class="text-[9px] text-emerald-300 font-bold">Foto tersimpan</span>' : '<span class="text-[9px] text-zinc-500">Tambah foto</span>';
+                                return view + pendingBtn + status;
+                            })()}
+                            <label class="rk59-photo-btn camera inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-800 text-zinc-300 cursor-pointer" title="Kamera / galeri — tambah atau ganti foto" aria-label="Kamera / galeri — tambah atau ganti foto">
+                                <i class="fa-solid fa-camera"></i>
+                                <input id="shop_photo_${item.id}" type="file" accept="image/*" capture="environment" class="hidden" onchange="handleShoppingPhotoChangeV101('${item.id}',event)">
+                            </label>
+                        </div>
+<div class="grid grid-cols-3 gap-2">
                             <div class="col-span-1">
                                 <select onchange="updateShoppingItemField('${item.id}', 'category', this.value)"
                                     class="w-full bg-[#171717] text-[10px] text-zinc-300 px-2.5 py-2.5 rounded-xl border border-zinc-700 outline-none truncate">
@@ -10152,52 +10185,6 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 return id ? 'https://drive.google.com/file/d/' + encodeURIComponent(id) + '/view' : '';
             }
 
-            function v187InstallShoppingPhotoButtons_() {
-                document.querySelectorAll('#tab-belanja .v101-shopping-proof').forEach(function (proof) {
-                    var card = proof.closest('.bg-\\[\\#1e1e1e\\]') || proof.parentElement?.parentElement;
-                    if (!card) return;
-                    var input = proof.querySelector('input[type=file]');
-                    var itemId = input?.id?.replace(/^shop_photo_/, '');
-                    if (!itemId) return;
-                    var item = (window.shoppingItems || []).find(function (x) {return String(x.id) === String(itemId);}) || {};
-                    var old = card.querySelector('.v187-shopping-actions'); if (old) old.remove();
-
-                    var actions = document.createElement('div'); actions.className = 'v187-shopping-actions v187-shop-actions';
-                    var att = v187GetAttachment_(item), url = v187GetUrl_(att);
-
-                    if (url) {
-                        var view = document.createElement('button');
-                        view.type = 'button'; view.className = 'v187-shop-btn'; view.title = 'Lihat gambar'; view.setAttribute('aria-label', 'Lihat gambar');
-                        view.innerHTML = '<i class="fa-solid fa-image"></i>';
-                        view.onclick = function (e) {e.preventDefault(); e.stopPropagation(); openAttachmentUrl_(url);};
-                        actions.appendChild(view);
-                    }
-
-                    var edit = document.createElement('label'); edit.className = 'v187-shop-btn edit'; edit.title = 'Tambah / ganti gambar';
-                    edit.innerHTML = '<i class="fa-solid fa-camera"></i>';
-                    input.className = 'hidden';
-                    input.onchange = function (ev) {if (typeof handleShoppingPhotoChangeV101 === 'function') handleShoppingPhotoChangeV101(itemId, ev);};
-                    edit.appendChild(input); actions.appendChild(edit);
-
-                    var top = card.querySelector('.flex.justify-between.items-center');
-                    var del = top?.querySelector('button[onclick*="deleteShoppingItem"]');
-                    if (top) {
-                        if (del) {
-                            del.classList.add('v187-shop-btn', 'delete'); del.classList.remove('p-2');
-                            del.innerHTML = '<i class="fa-solid fa-trash text-xs"></i>';
-                            var wrap = document.createElement('div'); wrap.className = 'v187-shop-actions';
-                            wrap.appendChild(actions); wrap.appendChild(del); top.appendChild(wrap);
-                        } else top.appendChild(actions);
-                    }
-                    proof.remove();
-                });
-            }
-            var v187ShoppingBase = window.renderShoppingList;
-            window.renderShoppingList = function () {
-                if (typeof v187ShoppingBase === 'function') v187ShoppingBase.apply(this, arguments);
-                setTimeout(v187InstallShoppingPhotoButtons_, 0);
-            };
-
             function v187EnsureNoteSearch_() {
                 var modal = document.getElementById('v101NoteModal'), list = document.getElementById('v101NoteList');
                 if (!modal || !list) return;
@@ -10291,32 +10278,6 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 var input = e.target.closest && e.target.closest('input[id^="shop_price_"]');
                 if (input) {e.preventDefault(); window.v108OpenPriceKeypad(input.id.replace(/^shop_price_/, ''));}
             }, true);
-
-            /* ================= COMPACT SHOPPING PHOTO ACTIONS ================= */
-            function v108CompactShoppingPhotos_() {
-                document.querySelectorAll('#tab-belanja .v101-shopping-proof').forEach(function (proof) {
-                    var card = proof.closest('.bg-\\[\\#1e1e1e\\]') || proof.parentElement?.parentElement;
-                    if (!card) return;
-                    if (card.querySelector('.v108-shop-actions')) {proof.remove(); return;}
-                    var input = proof.querySelector('input[type="file"]');
-                    var itemId = input?.id?.replace(/^shop_photo_/, '');
-                    if (!itemId) return;
-                    var item = (window.shoppingItems || []).find(function (x) {return String(x.id) === String(itemId);}) || {};
-                    var actions = document.createElement('div'); actions.className = 'v108-shop-actions';
-                    if (hasAttachment_(item)) {
-                        var view = document.createElement('button'); view.type = 'button'; view.className = 'v108-icon-btn'; view.title = 'Lihat foto'; view.innerHTML = '<i class="fa-solid fa-image"></i>'; view.onclick = function () {if (typeof openAttachmentUrl_ === 'function') openAttachmentUrl_(attachmentUrl_(item));}; actions.appendChild(view);
-                    }
-                    var edit = document.createElement('label'); edit.className = 'v108-icon-btn edit'; edit.title = 'Kamera / aplikasi kamera / galeri — tambah atau ganti foto'; edit.innerHTML = '<i class="fa-solid fa-camera"></i>';
-                    edit.appendChild(input); input.className = 'hidden'; input.onchange = function (ev) {if (typeof handleShoppingPhotoChangeV101 === 'function') handleShoppingPhotoChangeV101(itemId, ev);};
-                    actions.appendChild(edit);
-                    var top = card.querySelector('.flex.justify-between.items-center');
-                    var del = top?.querySelector('button[onclick*="deleteShoppingItem"]');
-                    if (top) {if (del) {del.classList.add('v108-icon-btn', 'delete'); del.classList.remove('p-2'); del.innerHTML = '<i class="fa-solid fa-trash text-xs"></i>'; var wrap = document.createElement('div'); wrap.className = 'v108-shop-actions'; wrap.appendChild(actions); wrap.appendChild(del); top.appendChild(wrap);} else top.appendChild(actions);}
-                    proof.remove();
-                });
-            }
-            var v108OldRenderShopping = window.renderShoppingList;
-            window.renderShoppingList = function () {if (typeof v108OldRenderShopping === 'function') v108OldRenderShopping.apply(this, arguments); setTimeout(v108CompactShoppingPhotos_, 0);};
 
             /* ================= LOAN PHOTO POSITION ================= */
             function v108MoveLoanPhotoIcons_() {
@@ -11916,90 +11877,6 @@ window.rekenanV2008Health=function(){return {client:'V200.32',server:window.REKE
 .rk-save-ok{box-shadow:0 0 0 2px rgba(16,185,129,.25),0 8px 24px rgba(16,185,129,.18)!important;transform:scale(1.02);transition:all .18s ease}
 .v2009-shop-view{order:-1!important}
 </style>
-
-<script id="rekenan-v20013-photo-final">
-(function(){
-  'use strict';
-  function rkPhotoMeta_(item){
-    try {
-      if (typeof parseAttachmentMeta_ === 'function') {
-        var a=parseAttachmentMeta_(item);
-        if(a && (a.url||a.fileId)) return a;
-      }
-    } catch(e){}
-    item=item||{};
-    var a=(item.attachment&&typeof item.attachment==='object')?item.attachment:{};
-    var fid=String(a.fileId||a.FileId||a.AttachmentFileId||item.attachmentFileId||item.AttachmentFileId||item.fileId||'').trim();
-    var url=String(a.url||a.URL||a.viewUrl||a.fileUrl||a.AttachmentUrl||item.attachmentUrl||item.AttachmentUrl||item.photoUrl||'').trim();
-    if(!url && fid) url='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';
-    return (url||fid)?{fileId:fid,url:url}:null;
-  }
-  function rkOpen_(url){
-    url=String(url||'').trim();
-    if(!url) return;
-    if(typeof openAttachmentUrl_==='function') openAttachmentUrl_(url);
-    else window.open(url,'_blank','noopener,noreferrer');
-  }
-  function rkPatchShopping_(){
-    document.querySelectorAll('#shoppingCardList > div').forEach(function(card){
-      var input=card.querySelector('input[type="file"][id^="shop_photo_"]');
-      if(!input) return;
-      var id=input.id.replace(/^shop_photo_/,'');
-      var item=(window.shoppingItems||[]).find(function(x){return String(x.id)===String(id)});
-      var a=rkPhotoMeta_(item);
-      var old=card.querySelector('.rk-v20013-shop-photo');
-      if(old) old.remove();
-      if(!a) return;
-      var target=a.url || ('https://drive.google.com/file/d/'+encodeURIComponent(a.fileId)+'/view');
-      var btn=document.createElement('button');
-      btn.type='button';
-      btn.className='rk-v20013-shop-photo inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black';
-      btn.title='Lihat foto belanja'; btn.setAttribute('aria-label','Lihat foto belanja');
-      btn.innerHTML='<i class="fa-solid fa-image"></i>';
-      btn.onclick=function(e){e.preventDefault();e.stopPropagation();rkOpen_(target);};
-      var actions=input.closest('.v101-shopping-proof') || input.closest('.v108-shop-actions') || input.parentElement?.parentElement;
-      if(actions) actions.insertBefore(btn, actions.firstChild);
-    });
-  }
-  function rkPatchLoan_(){
-    document.querySelectorAll('#loanCardList .v106-photo-check').forEach(function(el){
-      if(el.tagName!=='BUTTON') return;
-      el.innerHTML='<i class="fa-solid fa-image"></i>';
-      el.classList.add('inline-flex','items-center','justify-center','w-9','h-9','rounded-xl','bg-indigo-600','text-white','text-[10px]','font-black');
-      el.style.cursor='pointer';
-    });
-  }
-  var oldShop=window.renderShoppingList;
-  if(typeof oldShop==='function'){
-    window.renderShoppingList=function(){
-      var r=oldShop.apply(this,arguments);
-      setTimeout(rkPatchShopping_,0);
-      return r;
-    };
-  }
-  var oldLoan=window.renderLoanList;
-  if(typeof oldLoan==='function'){
-    window.renderLoanList=function(){
-      var r=oldLoan.apply(this,arguments);
-      setTimeout(rkPatchLoan_,0);
-      return r;
-    };
-  }
-  setTimeout(function(){rkPatchShopping_();rkPatchLoan_();},100);
-  setTimeout(function(){rkPatchShopping_();rkPatchLoan_();},700);
-  if(window.MutationObserver){
-    var obs=new MutationObserver(function(){
-      clearTimeout(window.__rkPhotoObsTimer);
-      window.__rkPhotoObsTimer=setTimeout(function(){rkPatchShopping_();rkPatchLoan_();},60);
-    });
-    var root=document.body;
-    if(root) obs.observe(root,{childList:true,subtree:true});
-  }
-  console.info('[Rekenan BUILD] PHOTO V200.32 ADMIN OK / BELANJA OK / PINJAMAN OK');
-})();
-</script>
-
-
 <script id="rekenan-v20018-transaction-history-fix">
 (function(){
   'use strict';
@@ -12168,286 +12045,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
   }catch(e){console.warn('[Rekenan V200.46] ACC patch failed',e);}
 
-  /* V200.53 PHOTO CORE
-     Pinjaman is the reference implementation.
-     Shopping uses the exact same icon, URL contract and viewer path.
-     One delegated click handler per list; no clone, no interval, no duplicate document handler.
-  */
-  function rk53PhotoMeta_(item){
-    item=item||{};
-    var a=null;
-    try{if(typeof parseAttachmentMeta_==='function') a=parseAttachmentMeta_(item);}catch(_){}
-    a=a||item.attachment||item.bukti||{};
-    var fid=String(a.fileId||a.FileId||a.AttachmentFileId||item.attachmentFileId||item.AttachmentFileId||item.fileId||'').trim();
-    var url=String(a.url||a.URL||a.viewUrl||a.fileUrl||a.AttachmentUrl||item.attachmentUrl||item.AttachmentUrl||item.photoUrl||'').trim();
-    if(!url&&fid) url='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';
-    return {url:url,fileId:fid,pending:!!(a.pending||item.attachmentPending)};
-  }
-
-  function rk53OpenPhoto_(url,ev){
-    url=String(url||'').trim();
-    if(!url)return;
-    if(ev){ev.preventDefault();ev.stopPropagation();}
-    try{
-      if(typeof window.openAttachmentUrl_==='function'){
-        window.openAttachmentUrl_(url);
-        return;
-      }
-      if(typeof window.open_==='function'){
-        window.open_(url);
-        return;
-      }
-      window.open(url,'_blank','noopener,noreferrer');
-    }catch(e){console.warn('[Rekenan V200.53] PHOTO OPEN FAILED',e);}
-  }
-
-  function rk53ShoppingItem_(card){
-    if(!card)return null;
-    var id='';
-    var input=card.querySelector('input[id^="shop_photo_"]');
-    if(input) id=input.id.replace(/^shop_photo_/,'');
-    if(!id){
-      var cb=card.querySelector('input[type="checkbox"][onchange*="toggleShoppingItemCheck"]');
-      var m=cb&&String(cb.getAttribute('onchange')||'').match(/toggleShoppingItemCheck\(['"]([^'"]+)/);
-      if(m)id=m[1];
-    }
-    var rows=Array.isArray(window.shoppingItems)?window.shoppingItems:[];
-    return id?rows.find(function(x){return String(x&&x.id||'')===String(id);})||null:null;
-  }
-
-  function rk53LoanItem_(card){
-    if(!card)return null;
-    var id=card.getAttribute('data-loan-id')||'';
-    var rows=Array.isArray(window.loansData)?window.loansData:[];
-    var item=id?rows.find(function(x){return String(x&&x.id||'')===String(id);})||null:null;
-    if(item)return item;
-    var name=String(card.textContent||'');
-    return rows.find(function(x){return name.includes(String(x&&x.nama||''))&&rk53PhotoMeta_(x).url;})||null;
-  }
-
-  function rk53InstallListHandler_(root,id){
-    if(!root||root.__rkV20053PhotoHandler)return;
-    root.__rkV20053PhotoHandler=true;
-    root.addEventListener('click',function(ev){
-      var btn=ev.target&&ev.target.closest?ev.target.closest('button.v106-photo-check'):null;
-      if(!btn||!root.contains(btn)||btn.disabled||btn.classList.contains('v106-photo-empty'))return;
-      var url=String(btn.getAttribute('data-photo-url')||'').trim();
-      if(!url){
-        var card=btn.closest(id==='loan' ? '.v37-loan-card' : '#shoppingCardList > *');
-        var item=id==='loan'?rk53LoanItem_(card):rk53ShoppingItem_(card);
-        url=rk53PhotoMeta_(item).url;
-      }
-      if(url)rk53OpenPhoto_(url,ev);
-    },false);
-  }
-
-  function rk53MakePhotoButton_(url,pending){
-    var b=document.createElement('button');
-    b.type='button';
-    b.className='v106-photo-check'+(pending?' v106-photo-empty':'');
-    b.title=pending?'Foto masih dikirim':'Lihat foto';
-    b.setAttribute('aria-label',pending?'Foto masih dikirim':'Lihat foto');
-    b.setAttribute('data-photo-url',url||'');
-    b.disabled=!url;
-    b.innerHTML=pending
-      ? '<i class="fa-solid fa-cloud-arrow-up animate-pulse"></i>'
-      : '<i class="fa-solid fa-image"></i>';
-    return b;
-  }
-
-  function rk53PatchShopping_(){
-    var root=document.getElementById('shoppingCardList');
-    if(!root)return;
-    root.querySelectorAll(':scope > *').forEach(function(card){
-      var item=rk53ShoppingItem_(card);
-      if(!item)return;
-      var meta=rk53PhotoMeta_(item);
-      var actions=card.querySelector('.v108-shop-actions,.v101-shopping-proof')||card.querySelector('.flex.items-center.gap-2.flex-wrap')||card;
-      actions.querySelectorAll('.v106-photo-check,.rk-v20046-shop-photo,.rk-v20013-shop-photo,.v188-photo-view').forEach(function(x){x.remove();});
-      if(!meta.url&&!meta.pending)return;
-      actions.insertBefore(rk53MakePhotoButton_(meta.url,meta.pending),actions.firstChild);
-    });
-  }
-
-  function rk53PatchLoan_(){
-    var root=document.getElementById('loanCardList');
-    if(!root)return;
-    root.querySelectorAll('.v106-photo-check').forEach(function(btn){
-      if(btn.classList.contains('v106-photo-empty'))return;
-      var card=btn.closest('.v37-loan-card');
-      var meta=rk53PhotoMeta_(rk53LoanItem_(card));
-      if(!meta.url)return;
-      btn.removeAttribute('onclick');
-      btn.removeAttribute('disabled');
-      btn.disabled=false;
-      btn.setAttribute('data-photo-url',meta.url);
-      btn.title='Lihat foto';
-      btn.setAttribute('aria-label','Lihat foto');
-      btn.innerHTML='<i class="fa-solid fa-image"></i>';
-    });
-  }
-
-  function rk53PatchAllPhotos_(){
-    rk53PatchShopping_();
-    rk53PatchLoan_();
-  }
-
-  try{
-    var rs53=window.renderShoppingList;
-    if(typeof rs53==='function'&&!window.__rkV20053ShopWrapped){
-      window.__rkV20053ShopWrapped=true;
-      window.renderShoppingList=function(){
-        var r=rs53.apply(this,arguments);
-        setTimeout(rk53PatchShopping_,0);
-        return r;
-      };
-    }
-    var rl53=window.renderLoanList;
-    if(typeof rl53==='function'&&!window.__rkV20053LoanWrapped){
-      window.__rkV20053LoanWrapped=true;
-      window.renderLoanList=function(){
-        var r=rl53.apply(this,arguments);
-        setTimeout(rk53PatchLoan_,0);
-        return r;
-      };
-    }
-  }catch(e){console.warn('[Rekenan V200.53] render wrappers',e);}
-
-  function rk53InstallObservers_(){
-    var shop=document.getElementById('shoppingCardList');
-    var loan=document.getElementById('loanCardList');
-    rk53InstallListHandler_(shop,'shopping');
-    rk53InstallListHandler_(loan,'loan');
-    if(window.MutationObserver){
-      if(shop&&!shop.__rkV20053Observer){
-        shop.__rkV20053Observer=true;
-        var os=new MutationObserver(function(){clearTimeout(window.__rkV20053ShopTimer);window.__rkV20053ShopTimer=setTimeout(rk53PatchShopping_,30);});
-        os.observe(shop,{childList:true,subtree:true});
-      }
-      if(loan&&!loan.__rkV20053Observer){
-        loan.__rkV20053Observer=true;
-        var ol=new MutationObserver(function(){clearTimeout(window.__rkV20053LoanTimer);window.__rkV20053LoanTimer=setTimeout(rk53PatchLoan_,30);});
-        ol.observe(loan,{childList:true,subtree:true});
-      }
-    }
-    rk53PatchAllPhotos_();
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(rk53InstallObservers_,50);});
-  else setTimeout(rk53InstallObservers_,50);
-
-  window.rekenanV20053PhotoAudit=function(){
-    var shop=document.querySelectorAll('#shoppingCardList .v106-photo-check:not(.v106-photo-empty)');
-    var loan=document.querySelectorAll('#loanCardList .v106-photo-check:not(.v106-photo-empty)');
-    var result={
-      build:'V200.53',
-      shoppingPhotoButtons:shop.length,
-      shoppingClickable:Array.from(shop).filter(function(b){return !b.disabled&&!!b.getAttribute('data-photo-url');}).length,
-      loanPhotoButtons:loan.length,
-      loanClickable:Array.from(loan).filter(function(b){return !b.disabled&&!!b.getAttribute('data-photo-url');}).length,
-      sameClass:true,
-      viewer:typeof window.openAttachmentUrl_==='function',
-      duplicateIntervalRemoved:true,
-      duplicateDocumentPhotoHandlerRemoved:true
-    };
-    console.info('[Rekenan AUDIT V200.53] LOAN PHOTO STANDARD -> SHOPPING',result);
-    return result;
-  };
-  setTimeout(function(){try{window.rekenanV20053PhotoAudit();}catch(_){}},700);
-  console.info('[Rekenan BUILD] V200.54 PHOTO FLOW FINAL | LOAN STANDARD -> SHOPPING');
+  console.info('[Rekenan BUILD] V200.59 PHOTO CORE CONSOLIDATED INTO SHOPPING RENDER');
 })();
 </script>
-
-<script id="v20054-photo-flow-final">
-/* V200.54 PHOTO FLOW FINAL
-   Pinjaman is the reference. One capture-stage click path for both Pinjaman and Belanja.
-   Legacy inline/delegated photo openers are neutralized at render time.
-*/
-(function(){
-  function rk54Meta_(item){
-    item=item||{}; var a=null;
-    try{ if(typeof parseAttachmentMeta_==='function') a=parseAttachmentMeta_(item); }catch(_){ }
-    a=a||item.attachment||item.bukti||{};
-    var fid=String(a.fileId||a.FileId||a.AttachmentFileId||item.attachmentFileId||item.AttachmentFileId||item.fileId||'').trim();
-    var url=String(a.url||a.URL||a.viewUrl||a.fileUrl||a.AttachmentUrl||item.attachmentUrl||item.AttachmentUrl||item.photoUrl||'').trim();
-    if(!url&&fid) url='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';
-    return {url:url,pending:!!(a.pending||item.attachmentPending)};
-  }
-  function rk54Open_(url,e){
-    url=String(url||'').trim(); if(!url)return;
-    if(e){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();}
-    try{ if(typeof window.openAttachmentUrl_==='function') window.openAttachmentUrl_(url); }
-    catch(err){console.warn('[Rekenan V200.54] PHOTO OPEN FAILED',err);}
-  }
-  function rk54ShopItem_(card){
-    if(!card)return null; var id='';
-    var input=card.querySelector('input[id^="shop_photo_"]');
-    if(input) id=input.id.replace(/^shop_photo_/,'');
-    if(!id){var cb=card.querySelector('input[type="checkbox"][onchange*="toggleShoppingItemCheck"]');var m=cb&&String(cb.getAttribute('onchange')||'').match(/toggleShoppingItemCheck\(['"]([^'"]+)/);if(m)id=m[1];}
-    return id?(Array.isArray(window.shoppingItems)?window.shoppingItems:[]).find(function(x){return String(x&&x.id||'')===String(id);})||null:null;
-  }
-  function rk54Button_(url,pending){
-    var b=document.createElement('button'); b.type='button'; b.className='v106-photo-check'+(pending?' v106-photo-empty':'');
-    b.title=pending?'Foto masih dikirim':'Lihat foto'; b.setAttribute('aria-label',b.title); b.setAttribute('data-photo-url',url||''); b.disabled=!url;
-    b.innerHTML=pending?'<i class="fa-solid fa-cloud-arrow-up animate-pulse"></i>':'<i class="fa-solid fa-image"></i>';
-    return b;
-  }
-  function rk54CleanShopping_(){
-    var root=document.getElementById('shoppingCardList')||document.querySelector('#tab-belanja #shoppingCardList'); if(!root)return;
-    root.querySelectorAll('.v108-icon-btn.v2009-shop-view,.v187-shop-btn,.v188-photo-view,.rk-v20046-shop-photo,.rk-v20013-shop-photo').forEach(function(x){x.remove();});
-    root.querySelectorAll('.v108-shop-actions button[title*="Lihat"],.v108-shop-actions button[aria-label*="Lihat"]').forEach(function(x){if(!x.classList.contains('v106-photo-check'))x.remove();});
-    root.querySelectorAll(':scope > *').forEach(function(card){
-      var item=rk54ShopItem_(card); if(!item)return; var meta=rk54Meta_(item);
-      var actions=card.querySelector('.v108-shop-actions')||card.querySelector('.flex.items-center.gap-2.flex-wrap')||card;
-      var btn=actions.querySelector('.v106-photo-check');
-      if(btn){btn.removeAttribute('onclick');btn.removeAttribute('onmousedown');btn.setAttribute('data-photo-url',meta.url||'');btn.disabled=!meta.url;btn.classList.toggle('v106-photo-empty',!!meta.pending&&!meta.url);btn.innerHTML=meta.pending&&!meta.url?'<i class="fa-solid fa-cloud-arrow-up animate-pulse"></i>':'<i class="fa-solid fa-image"></i>';}
-      else if(meta.url||meta.pending) actions.insertBefore(rk54Button_(meta.url,meta.pending),actions.firstChild);
-    });
-  }
-  function rk54CleanLoan_(){
-    var root=document.getElementById('loanCardList'); if(!root)return;
-    root.querySelectorAll('.v106-photo-check').forEach(function(btn){
-      var card=btn.closest('.v37-loan-card'); var item=null;
-      if(card){var id=card.getAttribute('data-loan-id')||''; item=(Array.isArray(window.loansData)?window.loansData:[]).find(function(x){return String(x&&x.id||'')===String(id);})||null;}
-      var meta=rk54Meta_(item); btn.removeAttribute('onclick');btn.removeAttribute('onmousedown');
-      if(meta.url){btn.setAttribute('data-photo-url',meta.url);btn.disabled=false;btn.classList.remove('v106-photo-empty');btn.innerHTML='<i class="fa-solid fa-image"></i>';}
-    });
-  }
-  function rk54CleanAll_(){rk54CleanShopping_();rk54CleanLoan_();}
-
-  /* Capture phase is the single source of truth. It runs before target/bubble handlers. */
-  document.addEventListener('click',function(e){
-    var b=e.target&&e.target.closest?e.target.closest('button.v106-photo-check'):null;
-    if(!b||!b.isConnected)return;
-    var url=String(b.getAttribute('data-photo-url')||'').trim();
-    if(!url||b.disabled||b.classList.contains('v106-photo-empty'))return;
-    rk54Open_(url,e);
-  },true);
-
-  function rk54Schedule_(){clearTimeout(window.__rk54Timer);window.__rk54Timer=setTimeout(rk54CleanAll_,20);}
-  try{
-    var s=window.renderShoppingList;
-    if(typeof s==='function'&&!window.__rk54ShopWrap){window.__rk54ShopWrap=true;window.renderShoppingList=function(){var r=s.apply(this,arguments);rk54Schedule_();return r;};}
-    var l=window.renderLoanList;
-    if(typeof l==='function'&&!window.__rk54LoanWrap){window.__rk54LoanWrap=true;window.renderLoanList=function(){var r=l.apply(this,arguments);rk54Schedule_();return r;};}
-  }catch(_){ }
-  if(window.MutationObserver){
-    var mo=new MutationObserver(function(){rk54Schedule_();});
-    function start(){var a=document.getElementById('shoppingCardList'),b=document.getElementById('loanCardList');if(a)mo.observe(a,{childList:true,subtree:true});if(b)mo.observe(b,{childList:true,subtree:true});rk54Schedule_();}
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(start,80);});else setTimeout(start,80);
-  }else setTimeout(rk54CleanAll_,100);
-
-  window.rekenanV20054PhotoAudit=function(){
-    var sh=Array.from(document.querySelectorAll('#shoppingCardList .v106-photo-check')).filter(function(x){return !x.classList.contains('v106-photo-empty');});
-    var lo=Array.from(document.querySelectorAll('#loanCardList .v106-photo-check')).filter(function(x){return !x.classList.contains('v106-photo-empty');});
-    var r={build:'V200.54',shoppingButtons:sh.length,shoppingClickable:sh.filter(function(x){return !x.disabled&&!!x.getAttribute('data-photo-url');}).length,loanButtons:lo.length,loanClickable:lo.filter(function(x){return !x.disabled&&!!x.getAttribute('data-photo-url');}).length,viewer:typeof window.openAttachmentUrl_==='function',singleCapturePath:true};
-    console.info('[Rekenan AUDIT V200.54] PHOTO FLOW PINJAMAN -> BELANJA',r); return r;
-  };
-  setTimeout(function(){try{rk54CleanAll_();window.rekenanV20054PhotoAudit();}catch(_){ }},500);
-  console.info('[Rekenan BUILD] V200.54 PHOTO FLOW FINAL | LOAN STANDARD -> SHOPPING');
-})();
-</script>
-
 <style id="rk-v20057-shopping-photo-fix-css">
 #tab-belanja .rk57-shop-photo-actions{display:flex!important;align-items:center;gap:6px;flex-wrap:wrap}
 #tab-belanja .rk57-shop-photo-btn{width:34px;height:34px;border-radius:10px;border:1px solid #3f3f46;background:#27272a;display:inline-flex;align-items:center;justify-content:center;color:#93c5fd;cursor:pointer;flex:0 0 auto}
@@ -12455,19 +12055,3 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #tab-belanja .rk57-shop-photo-btn.pending{color:#fcd34d;opacity:.85;cursor:default}
 #tab-belanja .rk57-shop-photo-btn input{display:none!important}
 </style>
-<script id="rk-v20057-shopping-photo-fix">
-(function(){
-'use strict';
-console.info('[Rekenan BUILD] V200.57 SHOPPING PHOTO/CAMERA FINAL FIX');
-function meta_(item){item=item||{};var a={};try{if(typeof parseAttachmentMeta_==='function')a=parseAttachmentMeta_(item)||{};}catch(_){}a=(a&&typeof a==='object')?a:{};var raw=(item.attachment&&typeof item.attachment==='object')?item.attachment:{};var fid=String(a.fileId||a.FileId||a.AttachmentFileId||raw.fileId||raw.FileId||raw.AttachmentFileId||item.attachmentFileId||item.AttachmentFileId||item.fileId||'').trim();var url=String(a.url||a.URL||a.viewUrl||a.fileUrl||a.AttachmentUrl||raw.url||raw.URL||raw.viewUrl||raw.fileUrl||item.attachmentUrl||item.AttachmentUrl||item.photoUrl||'').trim();if(!url&&fid)url='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';return{url:url,fileId:fid,pending:!!(a.pending||raw.pending||item.attachmentPending)};}
-function itemFromCard_(card){if(!card)return null;var input=card.querySelector('input[id^="shop_photo_"]'),id=input&&input.id?input.id.replace(/^shop_photo_/,''):'';if(!id){var cb=card.querySelector('input[onchange*="toggleShoppingItemCheck"]');var m=cb&&String(cb.getAttribute('onchange')||'').match(/toggleShoppingItemCheck\(['"]([^'"]+)/);if(m)id=m[1];}return id?(Array.isArray(window.shoppingItems)?window.shoppingItems:[]).find(function(x){return String(x&&x.id||'')===String(id);})||null:null;}
-function camera_(id){var label=document.createElement('label');label.className='rk57-shop-photo-btn camera';label.title='Kamera / pilih foto';label.setAttribute('aria-label',label.title);label.innerHTML='<i class="fa-solid fa-camera"></i>';var input=document.createElement('input');input.type='file';input.accept='image/*';input.capture='environment';input.id='rk57_camera_'+id;input.addEventListener('change',function(ev){if(typeof window.handleShoppingPhotoChangeV101==='function')window.handleShoppingPhotoChangeV101(id,ev);});label.appendChild(input);return label;}
-function view_(url){var b=document.createElement('button');b.type='button';b.className='rk57-shop-photo-btn view';b.title='Lihat foto';b.setAttribute('aria-label','Lihat foto');b.setAttribute('data-photo-url',url);b.innerHTML='<i class="fa-solid fa-image"></i>';b.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();if(typeof window.openAttachmentUrl_==='function')window.openAttachmentUrl_(url);});return b;}
-function pending_(){var b=document.createElement('button');b.type='button';b.disabled=true;b.className='rk57-shop-photo-btn pending';b.title='Foto masih menunggu sinkronisasi';b.setAttribute('aria-label',b.title);b.innerHTML='<i class="fa-solid fa-cloud-arrow-up animate-pulse"></i>';return b;}
-function patch_(){var root=document.getElementById('shoppingCardList');if(!root)return;root.querySelectorAll(':scope > *').forEach(function(card){var item=itemFromCard_(card);if(!item)return;var meta=meta_(item),actions=card.querySelector('.v108-shop-actions');if(!actions){var proof=card.querySelector('.v101-shopping-proof');if(proof){actions=document.createElement('div');actions.className='v108-shop-actions rk57-shop-photo-actions';var top=card.querySelector('.flex.justify-between.items-center');if(top)top.appendChild(actions);proof.remove();}}if(!actions)return;actions.classList.add('rk57-shop-photo-actions');actions.querySelectorAll('.rk57-shop-photo-btn,.v106-photo-check,.v2009-shop-view,.v188-photo-view,.rk-v20046-shop-photo,.rk-v20013-shop-photo').forEach(function(x){x.remove();});actions.querySelectorAll('label.v187-shop-btn,label.v101-upload-label').forEach(function(x){x.remove();});if(meta.url)actions.insertBefore(view_(meta.url),actions.firstChild);else if(meta.pending)actions.insertBefore(pending_(),actions.firstChild);actions.insertBefore(camera_(String(item.id)),actions.firstChild);});}
-function schedule_(){clearTimeout(window.__rk57ShopPhotoTimer);window.__rk57ShopPhotoTimer=setTimeout(patch_,0);}
-var old=window.renderShoppingList;if(typeof old==='function'&&!window.__rk57ShopPhotoWrapped){window.__rk57ShopPhotoWrapped=true;window.renderShoppingList=function(){var r=old.apply(this,arguments);schedule_();return r;};}
-window.rekenanV20057ShoppingPhotoAudit=function(){patch_();var r={build:'V200.57',cards:document.querySelectorAll('#shoppingCardList > *').length,cameraButtons:document.querySelectorAll('#shoppingCardList .rk57-shop-photo-btn.camera').length,photoButtons:document.querySelectorAll('#shoppingCardList .rk57-shop-photo-btn.view').length,pendingButtons:document.querySelectorAll('#shoppingCardList .rk57-shop-photo-btn.pending').length,handler:typeof window.handleShoppingPhotoChangeV101==='function',viewer:typeof window.openAttachmentUrl_==='function',observerAdded:false};console.info('[Rekenan AUDIT V200.57] SHOPPING PHOTO/CAMERA',r);return r;};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){patch_();window.rekenanV20057ShoppingPhotoAudit();},80);},{once:true});else setTimeout(function(){patch_();window.rekenanV20057ShoppingPhotoAudit();},80);
-})();
-</script>
