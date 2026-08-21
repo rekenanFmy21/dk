@@ -7,12 +7,12 @@
         window.REKENAN_BUILD_VERSION = 'V200.52';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.61';
-        console.info('[Rekenan BUILD] UI V200.61');
+        window.REKENAN_UI_BUILD = 'V200.62';
+        console.info('[Rekenan BUILD] UI V200.62');
         console.info('[Rekenan BUILD] V200.42 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
-                const expected = 'V200.61';
+                const expected = 'V200.62';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.61">
+    <meta name="rekenan-build" content="V200.62">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -3711,6 +3711,9 @@ margin:0!important;
                     setTimeout(() => { try { loadAdminPanel(false).catch(() => {}); } catch (_) {} }, 50);
                 }
                 if (activeCloudUser && cloudToken) {
+                    if (!Array.isArray(calcHistory) || !calcHistory.length) {
+                        setTimeout(() => { try { rkReconcileCalculatorFromCloud_(false).catch(() => {}); } catch (_) {} }, 900);
+                    }
                     // Loan realtime/version pulse runs even when the user has not opened
                     // Pinjaman. This keeps Local loan/cicilan current at app entry.
                     try { startBorrowerRealtimePulse_(); } catch (_) {}
@@ -3826,8 +3829,16 @@ margin:0!important;
                     };
                     window[cb] = bodyData => {
                         if (settled) return;
-                        settled = true; clean(false);
-                        if (bodyData && bodyData.pending) {pollTimer = setTimeout(poll, 350); return;}
+                        settled = true;
+                        // Keep a no-op callback alive briefly. GAS/Googleusercontent can
+                        // deliver a delayed response from an older poll; deleting the
+                        // callback immediately causes "__rekenan_write_* is not defined".
+                        clean(true);
+                        if (bodyData && bodyData.pending) {
+                            settled = false;
+                            pollTimer = setTimeout(poll, 350);
+                            return;
+                        }
                         finish(bodyData, true);
                     };
                     script.onerror = () => {
@@ -4316,6 +4327,56 @@ margin:0!important;
             if (data.catatanCategories !== undefined) {catatanCategories = data.catatanCategories; if (persist) secureSave('rekenan_catatan_categories', catatanCategories);}
         }
 
+
+        // V200.62 CALCULATOR CLOUD RECONCILIATION
+        // Local-first remains authoritative for local CRUD. This helper only imports
+        // CALC_HISTORY rows that are missing locally, so an existing local history is
+        // never replaced by a partial Cloud snapshot.
+        let rkCalcCloudReadInFlight_ = false;
+        async function rkReconcileCalculatorFromCloud_(force = false) {
+            if (rkCalcCloudReadInFlight_ || !activeCloudUser || !cloudToken) return false;
+            const localRows = Array.isArray(calcHistory) ? calcHistory : [];
+            // If Local already has data, normal Local-first rendering stays immediate.
+            // A forced/manual refresh can still reconcile missing rows from Sheet.
+            if (!force && localRows.length) return false;
+            rkCalcCloudReadInFlight_ = true;
+            try {
+                const r = await cloudRequest({
+                    action: 'getData',
+                    username: activeCloudUser,
+                    token: cloudToken,
+                    forceRefresh: !!force
+                }, force ? 12000 : 9000);
+                const payload = r?.data || r;
+                if (!(r?.success || r?.status === 'success') || !Array.isArray(payload?.calcHistory)) return false;
+                const map = new Map((Array.isArray(calcHistory) ? calcHistory : []).map(x => [String(x?.id || ''), x]));
+                let added = 0;
+                for (const item of payload.calcHistory) {
+                    const id = String(item?.id || '');
+                    if (!id) continue;
+                    if (!map.has(id)) { map.set(id, item); added++; }
+                    else map.set(id, Object.assign({}, map.get(id), item));
+                }
+                if (added || force) {
+                    calcHistory = Array.from(map.values());
+                    secureSave('rekenan_calc_history', calcHistory);
+                    try { if (typeof renderV101CalcHistory === 'function') renderV101CalcHistory(); } catch (_) {}
+                    try { if (typeof renderV101CalcHistoryCore_ === 'function') renderV101CalcHistoryCore_(); } catch (_) {}
+                    console.info('[Rekenan CALC] SHEET → LOCAL MERGE', {
+                        cloudRows: payload.calcHistory.length,
+                        added,
+                        totalLocal: calcHistory.length
+                    });
+                }
+                return true;
+            } catch (e) {
+                console.warn('[Rekenan CALC] Cloud read failed; Local retained:', e?.message || e);
+                return false;
+            } finally {
+                rkCalcCloudReadInFlight_ = false;
+            }
+        }
+
         function logoutAppFromSettings() {
             if (!confirm('Keluar dari aplikasi?')) return;
             try {logoutEmbeddedAdmin();} catch (e) { }
@@ -4397,6 +4458,12 @@ margin:0!important;
             if (tabId === 'dashboard') initDashboard();
             else if (tabId === 'catatan') {renderCatatanList();}
             else if (tabId === 'belanja') renderShoppingList();
+            else if (tabId === 'kalkulator') {
+                try { if (typeof renderV101CalcHistory === 'function') renderV101CalcHistory(); } catch (_) {}
+                // Only read Cloud when Local calculator history is empty. This preserves
+                // the fast Local-first path and repairs legacy/first-device imports.
+                rkReconcileCalculatorFromCloud_(false).catch(() => {});
+            }
             else if (tabId === 'peminjam') {initBorrowerTab();}
             else if (tabId === 'admin') {initEmbeddedAdmin();}
         }
@@ -6279,9 +6346,20 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             // Drive /view links are HTML pages and often cannot be displayed in an iframe.
             // Prefer the Drive thumbnail endpoint for an actual image preview.
             const previewUrl = fileId ? ('https://drive.google.com/thumbnail?id=' + encodeURIComponent(fileId) + '&sz=w2000') : url;
+            const directDriveUrl = fileId ? ('https://drive.google.com/uc?export=view&id=' + encodeURIComponent(fileId)) : url;
             const isDirectImage = /\.(jpe?g|png|webp|gif|bmp|avif)(?:[?#].*)?$/i.test(url) || !!fileId;
             img.classList.toggle('hidden', !isDirectImage); frame.classList.toggle('hidden', isDirectImage);
-            img.onerror = () => {img.classList.add('hidden'); frame.classList.remove('hidden'); frame.src = url;};
+            img.onerror = () => {
+                // Some Drive files reject thumbnail requests but accept the direct
+                // view endpoint. Try it once before falling back to the Drive page.
+                if (fileId && img.dataset.directTried !== '1') {
+                    img.dataset.directTried = '1';
+                    img.src = directDriveUrl;
+                    return;
+                }
+                img.classList.add('hidden'); frame.classList.remove('hidden'); frame.src = url;
+            };
+            img.dataset.directTried = '0';
             if (isDirectImage) {img.src = previewUrl;} else {frame.src = url;}
             open.onclick = () => {const target = fileId ? ('https://drive.google.com/file/d/' + encodeURIComponent(fileId) + '/view') : url; const w = window.open(target, '_blank', 'noopener,noreferrer'); if (!w) {try {navigator.clipboard?.writeText(target); showToast('Popup diblokir. Link foto disalin.', 'warning');} catch (_) { } } };
             modal.classList.remove('hidden'); modal.classList.add('flex');
@@ -6779,7 +6857,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 const fid = String(a.fileId || a.FileId || a.AttachmentFileId || raw.fileId || item.attachmentFileId || item.fileId || '').trim();
                 const target = url || (fid ? 'https://drive.google.com/file/d/' + encodeURIComponent(fid) + '/view' : '');
                 if (target && typeof window.openAttachmentUrl_ === 'function') window.openAttachmentUrl_(target);
-            } catch (e) { console.warn('[Rekenan V200.61] SHOPPING PHOTO OPEN FAILED', e); }
+            } catch (e) { console.warn('[Rekenan V200.62] SHOPPING PHOTO OPEN FAILED', e); }
         }
 
         function renderShoppingList() {
@@ -8477,13 +8555,19 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     if (v && v !== adminPulseVersion_) {
                         adminPulseVersion_ = v;
                         sessionStorage.setItem('rekenan_admin_loan_sync_version', String(v));
-                        loadAdminPanel(true).catch(() => {});
+                        // A loan version pulse may change several times during one
+                        // attachment/payment operation. Do not turn every pulse into
+                        // a heavy Admin snapshot read.
+                        const sinceAdminFetch = Date.now() - Number(adminLastFetchAt_ || 0);
+                        if (sinceAdminFetch >= 15000 && !adminFetchInFlight_) {
+                            loadAdminPanel(true).catch(() => {});
+                        }
                     }
                 } catch (e) {
                     // Do not leave Admin frozen on an old snapshot when the tiny
                     // pulse endpoint/JSONP callback is the part that failed.
                     const now = Date.now();
-                    if (now - adminPulseFallbackAt_ >= 12000 && !adminFetchInFlight_) {
+                    if (now - adminPulseFallbackAt_ >= 30000 && !adminFetchInFlight_) {
                         adminPulseFallbackAt_ = now;
                         loadAdminPanel(true).catch(() => {});
                     }
@@ -12060,7 +12144,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
   }catch(e){console.warn('[Rekenan V200.46] ACC patch failed',e);}
 
-  console.info('[Rekenan BUILD] V200.61 PHOTO VIEWER + TRANSFER INDICATOR STABLE');
+  console.info('[Rekenan BUILD] V200.62 PHOTO VIEWER + CALC CLOUD RECONCILE + ADMIN PULSE THROTTLE');
 })();
 </script>
 <style id="rk-v20057-shopping-photo-fix-css">
