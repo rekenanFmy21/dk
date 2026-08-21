@@ -12895,7 +12895,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.95';
+window.REKENAN_UI_BUILD='V200.97';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan BUILD] FINAL CLIENT V200.90 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
@@ -13002,7 +13002,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V200.95';
+  window.REKENAN_UI_BUILD='V200.97';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -13037,7 +13037,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.95';
+window.REKENAN_UI_BUILD='V200.97';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13180,7 +13180,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   console.info('[Rekenan BUILD] V200.90 CALC SHEET READ + PDF HEADER LOGO + APP-SHELL');
-  window.__REKENAN_BUILD__='V200.95';
+  window.__REKENAN_BUILD__='V200.97';
 })();
 </script>
 
@@ -13188,8 +13188,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20065-calc-photo-audit-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.95';
-  window.REKENAN_UI_BUILD='V200.95';
+  window.__REKENAN_BUILD__='V200.97';
+  window.REKENAN_UI_BUILD='V200.97';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13388,8 +13388,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20067-calculator-hard-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.95';
-  window.REKENAN_UI_BUILD='V200.95';
+  window.__REKENAN_BUILD__='V200.97';
+  window.REKENAN_UI_BUILD='V200.97';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
@@ -13399,8 +13399,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <script>
 (function(){
-  window.__REKENAN_BUILD__='V200.95';
-  window.REKENAN_UI_BUILD='V200.95';
+  window.__REKENAN_BUILD__='V200.97';
+  window.REKENAN_UI_BUILD='V200.97';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
@@ -13423,11 +13423,16 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       if(kind==='loanList' || kind==='loanHistory'){
         const q = document.getElementById('loanSearchInput')?.value || '';
         const st = document.getElementById('filterLoanStatus')?.value || '';
-        return q+'#'+st+'#'+sigList(window.loansData,['id','status','jumlah','totalPinjaman','sisaHutang','remaining','updatedAt','createdAt'])+'#'+sigList(window.riwayatCicilanData,['id','loanId','cicilanKe','jumlah','amount','createdAt']);
+        const loanRows = (typeof loansData !== 'undefined' && Array.isArray(loansData)) ? loansData : (Array.isArray(window.loansData) ? window.loansData : []);
+        const paymentRows = (typeof riwayatCicilanData !== 'undefined' && Array.isArray(riwayatCicilanData)) ? riwayatCicilanData : (Array.isArray(window.riwayatCicilanData) ? window.riwayatCicilanData : []);
+        return q+'#'+st+'#'+sigList(loanRows,['id','status','jumlah','totalPinjaman','sisaHutang','remaining','updatedAt','createdAt'])+'#'+sigList(paymentRows,['id','loanId','cicilanKe','jumlah','amount','createdAt']);
       }
       if(kind==='admin'){
         const q = document.getElementById('adminSearchInput')?.value || '';
-        return q+'#'+sigList(window.embeddedAdminBorrowers,['id','username','name','nama'])+'#'+sigList(window.embeddedAdminLoans,['id','status','jumlah','totalPinjaman','sisaHutang','remaining','updatedAt','createdAt'])+'#'+sigList(window.embeddedAdminPayments,['id','loanId','cicilanKe','jumlah','amount','createdAt']);
+        const adminBorrowers = (typeof embeddedAdminBorrowers !== 'undefined' && Array.isArray(embeddedAdminBorrowers)) ? embeddedAdminBorrowers : (Array.isArray(window.embeddedAdminBorrowers) ? window.embeddedAdminBorrowers : []);
+        const adminLoans = (typeof embeddedAdminLoans !== 'undefined' && Array.isArray(embeddedAdminLoans)) ? embeddedAdminLoans : (Array.isArray(window.embeddedAdminLoans) ? window.embeddedAdminLoans : []);
+        const adminPayments = (typeof embeddedAdminPayments !== 'undefined' && Array.isArray(embeddedAdminPayments)) ? embeddedAdminPayments : (Array.isArray(window.embeddedAdminPayments) ? window.embeddedAdminPayments : []);
+        return q+'#'+sigList(adminBorrowers,['id','username','name','nama'])+'#'+sigList(adminLoans,['id','status','jumlah','totalPinjaman','sisaHutang','remaining','updatedAt','createdAt'])+'#'+sigList(adminPayments,['id','loanId','cicilanKe','jumlah','amount','createdAt']);
       }
     }catch(_){ }
     return String(Date.now());
@@ -13453,9 +13458,18 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   wrap('renderLoanList','loanList',40);
   wrap('renderRiwayatCicilanList','loanHistory',40);
   wrap('renderEmbeddedAdmin','admin',40);
+  // V200.97: top-level let bindings are not exposed on window. The old
+  // dedupe signature therefore saw an always-empty window.loansData and could
+  // suppress the first real paint after Cloud merge. Force one data-aware paint
+  // after the current event loop, without creating a visible flicker.
+  setTimeout(function(){
+    try { if (typeof renderLoanList === 'function') renderLoanList(); } catch(e) { console.warn('[Rekenan STABLE RENDER] loan safety paint', e); }
+    try { if (typeof renderRiwayatCicilanList === 'function') renderRiwayatCicilanList(); } catch(e) { console.warn('[Rekenan STABLE RENDER] payment safety paint', e); }
+    try { if (typeof renderEmbeddedAdmin === 'function') renderEmbeddedAdmin(); } catch(e) { console.warn('[Rekenan STABLE RENDER] admin safety paint', e); }
+  }, 0);
   window.__rkV20092StableRender=true;
-  window.REKENAN_BUILD_VERSION='V200.95';
-  window.REKENAN_CLIENT_BUILD='V200.95 DATA READ UNBLOCKED + ADMIN REALTIME + STABLE RENDER';
-  console.info('[Rekenan BUILD] V200.96 DATA DISPLAY UNBLOCKED + ADMIN AUTHORITATIVE READ + NO FLICKER');
+  window.REKENAN_BUILD_VERSION='V200.97';
+  window.REKENAN_CLIENT_BUILD='V200.97 DATA DISPLAY FIX + STABLE RENDER SAFE';
+  console.info('[Rekenan BUILD] V200.97 DATA DISPLAY FIX + STABLE RENDER SAFE');
 })();
 </script>
