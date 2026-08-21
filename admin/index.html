@@ -11069,7 +11069,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             window.openV101NoteModal = function (note) {const m = makeModal('v101NoteModal', '<i class="fa-solid fa-note-sticky text-emerald-300 mr-2"></i>Note', `<input id="v101NoteId" type="hidden"><input id="v101NoteTitle" class="v101-input mb-2" placeholder="Judul Note"><textarea id="v101NoteBody" class="v101-input" rows="7" placeholder="Tulis Note..."></textarea><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto Note"><i class="fa-solid fa-camera"></i><input id="v101NoteAttachment" type="file" class="hidden"></label><div class="v101-proof-meta"><b>Foto Note</b><small id="v101NoteAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" class="flex-1 bg-zinc-800 text-zinc-300 py-3 rounded-xl text-xs font-bold" onclick="closeV101Modal('v101NoteModal')">Batal</button><button type="button" id="v101NoteSaveBtn" class="flex-1 bg-emerald-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Note()">Simpan</button></div><div class="mt-4"><div class="text-[10px] text-zinc-500 mb-2">Note tersimpan</div><div id="v101NoteSearchFallback" class="mb-3"><div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i><input id="v101NoteSearchInput" class="v101-input pl-9" placeholder="Cari Note berdasarkan judul atau isi..." autocomplete="off"></div></div><div id="v101NoteList" class="space-y-2"></div></div>`); const n = note || {}; document.getElementById('v101NoteId').value = n.id || ''; document.getElementById('v101NoteTitle').value = n.title || ''; document.getElementById('v101NoteBody').value = n.body || ''; const f = document.getElementById('v101NoteAttachment'); if (f) f.value = ''; const st = document.getElementById('v101NoteAttachmentStatus'); if (st) st.textContent = hasAttachment_(n) ? 'Foto tersimpan — pilih foto baru untuk mengganti' : 'Opsional — boleh dikosongkan'; m.classList.add('show'); renderV101Notes()};
             let noteBusy = false; window.saveV101Note = async function () {if (noteBusy) return; const title = (document.getElementById('v101NoteTitle')?.value || '').trim(), body = (document.getElementById('v101NoteBody')?.value || '').trim(); if (!title && !body) return showToast('Isi Note terlebih dahulu.', 'error'); noteBusy = true; const btn = document.getElementById('v101NoteSaveBtn'); if (btn) {btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Menyimpan...'} try {ensureNotes(); const id = document.getElementById('v101NoteId')?.value || ('note_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7)), now = new Date().toISOString(), old = notesData.find(x => String(x.id) === String(id)) || {}, file = document.getElementById('v101NoteAttachment')?.files?.[0]; let attachment = old.attachment || null; if (file) {attachment = await rkQueueAttachmentFile_(file, 'Note', id, 'NOTE');} const obj = {id, title: title || 'Tanpa Judul', body, date: now, updatedAt: now, ...(attachment ? {attachment} : {})}; const i = notesData.findIndex(x => String(x.id) === String(id)); if (i >= 0) notesData[i] = {...notesData[i], ...obj}; else notesData.unshift(obj); secureSave('rekenan_notes', notesData); renderV101Notes(); rkMarkSyncPending_(); showToast('Note tersimpan di perangkat. Sinkronisasi otomatis berjalan saat internet tersedia.', 'success'); const titleEl = document.getElementById('v101NoteTitle'), bodyEl = document.getElementById('v101NoteBody'), fileEl = document.getElementById('v101NoteAttachment'); if (titleEl) titleEl.value = ''; if (bodyEl) bodyEl.value = ''; if (fileEl) fileEl.value = ''; closeV101Modal('v101NoteModal')} catch (e) {showToast(e?.message || 'Note gagal disimpan.', 'error')} finally {noteBusy = false; if (btn) {btn.disabled = false; btn.textContent = 'Simpan'} } };
             let noteDeleteBusy = false; window.deleteV101Note = async function (id) {if (noteDeleteBusy) return; if (!confirm('Hapus Note ini?')) return; noteDeleteBusy = true; try {ensureNotes(); notesData = notesData.filter(x => String(x.id) !== String(id)); secureSave('rekenan_notes', notesData); rkMarkRecordDeleted_('NOTE', id); renderV101Notes(); rkMarkSyncPending_(); showToast('Note dihapus di perangkat. Sinkronisasi otomatis berjalan saat online tersedia.', 'success')} catch (e) {showToast(e?.message || 'Penghapusan Cloud belum terverifikasi.', 'error')} finally {noteDeleteBusy = false} };
-            window.openV101CalculatorModal = function () {const m = makeModal('v101CalculatorModal', '<i class="fa-solid fa-calculator text-blue-300 mr-2"></i>Kalkulator', `<div class="rk-calc-phone"><div class="rk-calc-display"><div id="v101CalcExpr" class="rk-calc-expression">0</div><div id="v101CalcResult" class="rk-calc-result">0</div></div><div class="rk-calc-grid"><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('C')">AC</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('⌫')">⌫</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('.')">.</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('÷')">÷</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('7')">7</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('8')">8</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('9')">9</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('×')">×</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('4')">4</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('5')">5</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('6')">6</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('−')">−</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('1')">1</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('2')">2</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('3')">3</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('+')">+</button><button type="button" class="v106-calc-key v106-calc-num rk-calc-zero" onclick="v101CalcKey('0')">0</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('00')">00</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('000')">000</button><button type="button" class="v106-calc-key v106-calc-eq" onclick="v101CalcKey('=')">=</button></div><div id="rkCalcHistorySection" class="mt-3"><div class="text-[10px] text-zinc-500 mb-2">Riwayat Kalkulator</div><div id="v101CalcHistory" class="space-y-2"></div></div><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v101CalcAttachment" type="file" accept="image/*" class="hidden"></label><div class="v101-proof-meta"><b>Foto Bukti</b><small id="v101CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" id="v101CalcSaveBtn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Calculator()">Simpan</button></div></div>`); m.classList.add('show'); currentActiveTab = 'kalkulator'; try { localStorage.setItem('rekenan_active_tab','kalkulator'); } catch(_){} rkSetCalculatorNavActive_(true); renderV101CalcHistory(); console.info('[Rekenan CALC] APP-SHELL OPEN V200.90 — HEADER + MENU VISIBLE'); try { rkReconcileCalculatorFromCloud_(true); setTimeout(function(){ try{ rkReconcileCalculatorFromCloud_(true); }catch(_){} }, 1800); } catch(_){}};
+            window.openV101CalculatorModal = function () {const m = makeModal('v101CalculatorModal', '<i class="fa-solid fa-calculator text-blue-300 mr-2"></i>Kalkulator', `<div class="rk-calc-phone"><div class="rk-calc-display"><div id="v101CalcExpr" class="rk-calc-expression">0</div><div id="v101CalcResult" class="rk-calc-result">0</div></div><div class="rk-calc-grid"><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('C')">AC</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('⌫')">⌫</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('.')">.</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('÷')">÷</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('7')">7</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('8')">8</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('9')">9</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('×')">×</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('4')">4</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('5')">5</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('6')">6</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('−')">−</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('1')">1</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('2')">2</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('3')">3</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('+')">+</button><button type="button" class="v106-calc-key v106-calc-num rk-calc-zero" onclick="v101CalcKey('0')">0</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('000')">000</button><button type="button" class="v106-calc-key v106-calc-eq" onclick="v101CalcKey('=')">=</button></div><div class="rk-calc-quick" aria-label="Nominal cepat"><span>Nominal cepat</span><div class="rk-calc-quick-grid"><button type="button" onclick="rkCalcQuickAmount_(10000)">+10K</button><button type="button" onclick="rkCalcQuickAmount_(50000)">+50K</button><button type="button" onclick="rkCalcQuickAmount_(100000)">+100K</button><button type="button" onclick="rkCalcQuickAmount_(500000)">+500K</button></div></div><div id="rkCalcHistorySection" class="mt-3"><div class="text-[10px] text-zinc-500 mb-2">Riwayat Kalkulator</div><div id="v101CalcHistory" class="space-y-2"></div></div><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v101CalcAttachment" type="file" accept="image/*" class="hidden"></label><div class="v101-proof-meta"><b>Foto Bukti</b><small id="v101CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" id="v101CalcSaveBtn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Calculator()">Simpan</button></div></div>`); m.classList.add('show'); currentActiveTab = 'kalkulator'; try { localStorage.setItem('rekenan_active_tab','kalkulator'); } catch(_){} rkSetCalculatorNavActive_(true); renderV101CalcHistory(); console.info('[Rekenan CALC] APP-SHELL OPEN V201.03 — HEADER + MENU VISIBLE'); try { rkReconcileCalculatorFromCloud_(true); setTimeout(function(){ try{ rkReconcileCalculatorFromCloud_(true); }catch(_){} }, 1800); } catch(_){}};
             window.saveV101Calculator = async function () {const btn = document.getElementById('v101CalcSaveBtn'); if (btn?.dataset.busy === '1') return; const expr = String((document.getElementById('v101CalcExpr')?.value ?? document.getElementById('v101CalcExpr')?.textContent) || '').trim(), out = document.getElementById('v101CalcResult')?.textContent || '0'; if (!expr || out === '...') return showToast('Perhitungan belum valid.', 'error'); if (btn) btn.dataset.busy = '1'; try {const id = 'calc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6), file = document.getElementById('v101CalcAttachment')?.files?.[0]; const item = {id, type: 'calculator', expression: expr, result: parseRupiah(out), date: rkLocalDateTimeYMD_(new Date()), createdAt: new Date().toISOString()}; calcHistory.unshift(item); let attachment = null; if (file) attachment = await rkQueueAttachmentFile_(file, 'Kalkulator', id, 'CALC_HISTORY', item); if (attachment) item.attachment = attachment; secureSave('rekenan_calc_history', calcHistory); renderV101CalcHistory(); rkMarkSyncPending_(); showToast('Kalkulator tersimpan di perangkat. Sinkronisasi otomatis berjalan saat internet tersedia.', 'success'); const exprEl = document.getElementById('v101CalcExpr'), fileEl = document.getElementById('v101CalcAttachment'), resEl = document.getElementById('v101CalcResult'); if (exprEl) exprEl.value = ''; if (fileEl) fileEl.value = ''; if (resEl) resEl.textContent = '0'; const stEl = document.getElementById('v101CalcAttachmentStatus'); if (stEl) stEl.textContent = 'Opsional — boleh dikosongkan';} catch (e) {showToast(e?.message || 'Kalkulator gagal disimpan.', 'error')} finally {if (btn) {delete btn.dataset.busy; btn.textContent = 'Simpan'} } };
             window.renderV101CalcHistoryCore_ = function () {
                 const el = document.getElementById('v101CalcHistory');
@@ -12985,7 +12985,7 @@ window.rkRenderIncremental=function(items,render,batch){
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V201.02';
+window.REKENAN_UI_BUILD='V201.03';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan BUILD] FINAL CLIENT V200.90 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
@@ -13092,7 +13092,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V201.02';
+  window.REKENAN_UI_BUILD='V201.03';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -13127,7 +13127,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V201.02';
+window.REKENAN_UI_BUILD='V201.03';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13279,7 +13279,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.02';
+  window.REKENAN_UI_BUILD='V201.03';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13479,7 +13479,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.02';
+  window.REKENAN_UI_BUILD='V201.03';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
@@ -13490,7 +13490,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.02';
+  window.REKENAN_UI_BUILD='V201.03';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
@@ -13614,65 +13614,16 @@ nav.fixed.bottom-0 {
 }
 </style>
 
-<style id="rekenan-v20102-calculator-design">
-/* REKENAN V201.02 — Calculator UI polish only. Existing calculator logic/history is preserved. */
-#v101CalculatorModal .v101-panel{
-  background:linear-gradient(180deg,#0f1117 0%,#0b0d12 100%)!important;
-  color:#f4f4f5!important;
-}
-#v101CalculatorModal .rk-calc-phone{
-  width:min(100%,430px)!important;
-  margin:0 auto!important;
-  display:flex!important;
-  flex-direction:column!important;
-  gap:12px!important;
-}
-#v101CalculatorModal .rk-calc-display{
-  padding:16px 16px 14px!important;
-  border:1px solid #272b35!important;
-  border-radius:20px!important;
-  background:linear-gradient(145deg,#171a22,#101219)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 10px 30px rgba(0,0,0,.16)!important;
-  min-height:112px!important;
-  display:flex!important;
-  flex-direction:column!important;
-  justify-content:flex-end!important;
-  gap:6px!important;
-}
-#v101CalculatorModal #v101CalcExpr{
-  font-size:14px!important;
-  line-height:1.35!important;
-  color:#a1a1aa!important;
-  font-weight:700!important;
-  min-height:20px!important;
-  text-align:right!important;
-  white-space:nowrap!important;
-  overflow-x:auto!important;
-  scrollbar-width:none!important;
-}
+<style id="rekenan-v20103-calculator-design">
+/* REKENAN V201.03 — Calculator Pro UI. 00 removed; 000 retained. Desktop uses two columns; mobile stays single-column. */
+#v101CalculatorModal .v101-panel{background:linear-gradient(180deg,#0f1117 0%,#0b0d12 100%)!important;color:#f4f4f5!important;width:min(100%,980px)!important;max-width:980px!important}
+#v101CalculatorModal .rk-calc-phone{width:min(100%,900px)!important;margin:0 auto!important;display:grid!important;grid-template-columns:minmax(0,1.02fr) minmax(300px,.98fr)!important;grid-template-areas:"display history" "keypad history" "quick history" "proof history" "actions history";gap:12px!important;align-items:start!important}
+#v101CalculatorModal .rk-calc-display{grid-area:display!important;padding:16px 16px 14px!important;border:1px solid #272b35!important;border-radius:20px!important;background:linear-gradient(145deg,#171a22,#101219)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 10px 30px rgba(0,0,0,.16)!important;min-height:112px!important;display:flex!important;flex-direction:column!important;justify-content:flex-end!important;gap:6px!important}
+#v101CalculatorModal #v101CalcExpr{font-size:14px!important;line-height:1.35!important;color:#a1a1aa!important;font-weight:700!important;min-height:20px!important;text-align:right!important;white-space:nowrap!important;overflow-x:auto!important;scrollbar-width:none!important}
 #v101CalculatorModal #v101CalcExpr::-webkit-scrollbar{display:none!important}
-#v101CalculatorModal #v101CalcResult{
-  font-size:clamp(30px,8vw,42px)!important;
-  line-height:1.08!important;
-  color:#fff!important;
-  font-weight:900!important;
-  text-align:right!important;
-  letter-spacing:-.025em!important;
-}
-#v101CalculatorModal .rk-calc-grid{
-  gap:9px!important;
-  padding:2px!important;
-}
-#v101CalculatorModal .rk-calc-grid .v106-calc-key{
-  min-height:56px!important;
-  height:56px!important;
-  border:1px solid rgba(255,255,255,.055)!important;
-  border-radius:16px!important;
-  font-size:17px!important;
-  font-weight:900!important;
-  box-shadow:0 4px 12px rgba(0,0,0,.12)!important;
-  transition:transform .08s ease,filter .12s ease,background .12s ease!important;
-}
+#v101CalculatorModal #v101CalcResult{font-size:clamp(30px,5vw,44px)!important;line-height:1.08!important;color:#fff!important;font-weight:900!important;text-align:right!important;letter-spacing:-.025em!important}
+#v101CalculatorModal .rk-calc-grid{grid-area:keypad!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:9px!important;padding:2px!important}
+#v101CalculatorModal .rk-calc-grid .v106-calc-key{min-height:56px!important;height:56px!important;border:1px solid rgba(255,255,255,.055)!important;border-radius:16px!important;font-size:17px!important;font-weight:900!important;box-shadow:0 4px 12px rgba(0,0,0,.12)!important;transition:transform .08s ease,filter .12s ease,background .12s ease!important}
 #v101CalculatorModal .rk-calc-grid .v106-calc-key:hover{filter:brightness(1.08)!important}
 #v101CalculatorModal .rk-calc-grid .v106-calc-key:active{transform:scale(.95)!important}
 #v101CalculatorModal .rk-calc-grid .v106-calc-num{background:#1b1e26!important;color:#f4f4f5!important}
@@ -13680,69 +13631,59 @@ nav.fixed.bottom-0 {
 #v101CalculatorModal .rk-calc-grid .v106-calc-op{background:#27224a!important;color:#c4b5fd!important}
 #v101CalculatorModal .rk-calc-grid .v106-calc-eq{background:#166534!important;color:#dcfce7!important}
 #v101CalculatorModal .rk-calc-grid .rk-calc-zero{grid-column:auto!important}
-#v101CalculatorModal #rkCalcHistorySection{
-  margin-top:2px!important;
-  padding:12px!important;
-  border:1px solid #252934!important;
-  border-radius:18px!important;
-  background:#12151b!important;
-}
-#v101CalculatorModal #rkCalcHistorySection>div:first-child{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  color:#a1a1aa!important;
-  font-size:11px!important;
-  font-weight:800!important;
-  margin-bottom:9px!important;
-}
-#v101CalculatorModal #v101CalcHistory{display:flex!important;flex-direction:column!important;gap:8px!important}
+#v101CalculatorModal .rk-calc-quick{grid-area:quick!important;padding:11px 12px!important;border:1px solid #252934!important;border-radius:16px!important;background:#12151b!important}
+#v101CalculatorModal .rk-calc-quick>span{display:block!important;margin-bottom:8px!important;color:#71717a!important;font-size:10px!important;font-weight:900!important;text-transform:uppercase!important;letter-spacing:.04em!important}
+#v101CalculatorModal .rk-calc-quick-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}
+#v101CalculatorModal .rk-calc-quick-grid button{min-height:38px!important;border:1px solid rgba(99,102,241,.22)!important;border-radius:11px!important;background:#17152d!important;color:#c4b5fd!important;font-size:11px!important;font-weight:900!important;cursor:pointer!important}
+#v101CalculatorModal .rk-calc-quick-grid button:active{transform:scale(.97)!important}
+#v101CalculatorModal #rkCalcHistorySection{grid-area:history!important;margin-top:0!important;padding:12px!important;border:1px solid #252934!important;border-radius:18px!important;background:#12151b!important;min-height:100%!important;box-sizing:border-box!important}
+#v101CalculatorModal #rkCalcHistorySection>div:first-child{display:flex!important;align-items:center!important;justify-content:space-between!important;color:#a1a1aa!important;font-size:11px!important;font-weight:800!important;margin-bottom:9px!important}
+#v101CalculatorModal #v101CalcHistory{display:flex!important;flex-direction:column!important;gap:8px!important;max-height:470px!important;overflow:auto!important;padding-right:2px!important}
 #v101CalculatorModal #v101CalcHistory>*{margin:0!important}
-#v101CalculatorModal .v101-proof{
-  margin-top:0!important;
-  padding:11px 12px!important;
-  border:1px solid #252934!important;
-  border-radius:16px!important;
-  background:#12151b!important;
-}
-#v101CalculatorModal #v101CalcSaveBtn{
-  min-height:50px!important;
-  border-radius:15px!important;
-  font-size:13px!important;
-  font-weight:900!important;
-  letter-spacing:.01em!important;
-  box-shadow:0 8px 20px rgba(37,99,235,.18)!important;
-}
-@media (max-width:600px){
-  #v101CalculatorModal .rk-calc-phone{gap:10px!important}
+#v101CalculatorModal .v101-proof{grid-area:proof!important;margin-top:0!important;padding:11px 12px!important;border:1px solid #252934!important;border-radius:16px!important;background:#12151b!important}
+#v101CalculatorModal #v101CalcSaveBtn{grid-area:actions!important;min-height:50px!important;border-radius:15px!important;font-size:13px!important;font-weight:900!important;letter-spacing:.01em!important;box-shadow:0 8px 20px rgba(37,99,235,.18)!important}
+@media (max-width:760px){
+  #v101CalculatorModal .v101-panel{width:min(100%,480px)!important;max-width:480px!important}
+  #v101CalculatorModal .rk-calc-phone{width:100%!important;grid-template-columns:1fr!important;grid-template-areas:"display" "keypad" "quick" "history" "proof" "actions"!important;gap:10px!important}
   #v101CalculatorModal .rk-calc-display{min-height:104px!important;padding:14px!important;border-radius:18px!important}
   #v101CalculatorModal .rk-calc-grid{gap:7px!important}
   #v101CalculatorModal .rk-calc-grid .v106-calc-key{height:52px!important;min-height:52px!important;border-radius:14px!important;font-size:16px!important}
-  #v101CalculatorModal #rkCalcHistorySection{padding:10px!important}
+  #v101CalculatorModal .rk-calc-quick-grid{gap:6px!important}
+  #v101CalculatorModal #rkCalcHistorySection{padding:10px!important;min-height:0!important}
+  #v101CalculatorModal #v101CalcHistory{max-height:none!important;overflow:visible!important}
 }
 </style>
-<script id="rekenan-v20102-calculator-design-runtime">
+<script id="rekenan-v20103-calculator-design-runtime">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V201.02';
+  window.REKENAN_UI_BUILD='V201.03';
+  window.rkCalcQuickAmount_=function(amount){
+    const i=document.getElementById('v101CalcExpr'); if(!i) return;
+    let v=String(i.textContent||i.value||'').trim();
+    const n=String(Math.max(0,Number(amount)||0));
+    if(!v||v==='0'){v=n;}else{v=v.replace(/[+−×÷*/-]$/,'')+'+'+n;}
+    i.textContent=v; i.value=v;
+    try{const r=document.getElementById('v101CalcResult');if(r&&typeof window.rkCalcEval1961_==='function')r.textContent=window.rkFormatNumber_(window.rkCalcEval1961_(v));}catch(_){ }
+  };
   function polish(){
     const m=document.getElementById('v101CalculatorModal'); if(!m) return;
     const phone=m.querySelector('.rk-calc-phone'); if(!phone) return;
-    phone.classList.add('rk-v20102-ready');
-    const title=m.querySelector('.v101-panel > .flex:first-child');
-    if(title){
-      const text=[...title.querySelectorAll('*')].find(x=>/Kalkulator/.test(x.textContent||''));
-      if(text && !text.dataset.v20102){text.dataset.v20102='1';}
-    }
+    phone.classList.add('rk-v20103-ready');
     if(typeof window.forceCalcHistoryBelowKeypad==='function') window.forceCalcHistoryBelowKeypad();
+    console.info('[Rekenan CALC] V201.03 PRO UI READY | 000 KEPT | 00 REMOVED | DESKTOP TWO-COLUMN');
   }
   const old=window.openV101CalculatorModal;
-  if(typeof old==='function' && !old.__v20102){
+  if(typeof old==='function' && !old.__v20103){
     const wrapped=function(){const r=old.apply(this,arguments);setTimeout(polish,0);setTimeout(polish,80);return r;};
-    wrapped.__v20102=true; window.openV101CalculatorModal=wrapped;
+    wrapped.__v20103=true; window.openV101CalculatorModal=wrapped;
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(polish,120));
-  else setTimeout(polish,120);
-  console.info('[Rekenan BUILD] V201.02 CALCULATOR UI POLISH LOADED');
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(polish,120)); else setTimeout(polish,120);
+  console.info('[Rekenan BUILD] V201.03 CALCULATOR PRO UI LOADED');
 })();
+</script>
+
+<script id="rekenan-v20103-authoritative-build">
+window.REKENAN_UI_BUILD='V201.03';
+window.REKENAN_CALCULATOR_BUILD='V201.03';
+console.info('[Rekenan BUILD] UI V201.03 | CALCULATOR V201.03 PRO | 000 KEPT | 00 REMOVED | DESKTOP 2-COLUMN | MOBILE SINGLE-COLUMN');
 </script>
