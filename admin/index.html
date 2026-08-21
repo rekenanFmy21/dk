@@ -5135,7 +5135,7 @@ nav.fixed.bottom-0 {
                     }
                 } catch (_) {}
             }
-            else if (tabId === 'peminjam') {initBorrowerTab();}
+            else if (tabId === 'peminjam') {initBorrowerTab(); setTimeout(() => { try { renderLoanList(true); } catch (_) {} }, 0);}
             else if (tabId === 'admin') {initEmbeddedAdmin();}
         }
 
@@ -8281,11 +8281,51 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             const paint = () => {
                 rkLoanRenderTimer_ = null;
                 const sig = rkLoanViewSig_();
-                if (sig === rkLoanLastPaintSig_) return;
-                rkLoanLastPaintSig_ = sig;
-                try { renderLoanListCore_(); } catch (e) { console.warn('[Rekenan PINJAMAN] render failed', e); }
+                const container = document.getElementById('loanCardList');
+
+                // V200.99 FIX: data fingerprint alone is NOT proof that the DOM
+                // is still painted. Tab switches, DOM replacement, browser restore,
+                // or a previous failed render can leave an empty container while
+                // the data signature remains unchanged. Repaint whenever the
+                // actual loan list DOM is missing/empty.
+                const domCards = container ? container.querySelectorAll('.v37-loan-card').length : -1;
+                const domHasEmptyState = !!(container && container.querySelector('.v37-loan-shell'));
+                const domNeedsPaint = !!container && domCards === 0 && !domHasEmptyState;
+
+                if (sig === rkLoanLastPaintSig_ && !domNeedsPaint) {
+                    console.info('[Rekenan PINJAMAN] RENDER CHECK — DOM OK', {
+                        stateLoans: Array.isArray(loansData) ? loansData.length : 0,
+                        renderedCards: domCards,
+                        containerFound: !!container,
+                        activeMenu: currentActiveTab || ''
+                    });
+                    return;
+                }
+
+                try {
+                    renderLoanListCore_();
+                    const afterContainer = document.getElementById('loanCardList');
+                    const renderedCards = afterContainer ? afterContainer.querySelectorAll('.v37-loan-card').length : -1;
+                    rkLoanLastPaintSig_ = sig;
+                    console.info('[Rekenan PINJAMAN DOM] PAINT COMPLETE', {
+                        stateLoans: Array.isArray(loansData) ? loansData.length : 0,
+                        renderedCards,
+                        containerFound: !!afterContainer,
+                        containerDisplay: afterContainer ? getComputedStyle(afterContainer).display : 'missing',
+                        containerVisibility: afterContainer ? getComputedStyle(afterContainer).visibility : 'missing',
+                        containerHeight: afterContainer ? afterContainer.getBoundingClientRect().height : 0,
+                        activeMenu: currentActiveTab || ''
+                    });
+                } catch (e) {
+                    // Do not advance the paint signature when rendering failed.
+                    console.warn('[Rekenan PINJAMAN] render failed', e);
+                }
             };
-            if (immediate && !rkLoanRenderTimer_) { paint(); return; }
+            if (immediate) {
+                if (rkLoanRenderTimer_) { clearTimeout(rkLoanRenderTimer_); rkLoanRenderTimer_ = null; }
+                paint();
+                return;
+            }
             if (rkLoanRenderTimer_) return;
             rkLoanRenderTimer_ = setTimeout(paint, 32);
         }
@@ -12943,7 +12983,23 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
    rkBorrowerPulse_();
  }
  startBorrowerRealtimePulse_();
- window.rkRenderIncremental=function(items,render,batch){
+ // V200.99: DOM self-heal for Pinjaman. If the browser/tab restored the
+// page after the data snapshot was already painted, force one lightweight
+// render when the tab becomes visible again.
+try {
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden && String(currentActiveTab || '') === 'peminjam') {
+      setTimeout(function(){ try { renderLoanList(true); } catch (_) {} }, 0);
+    }
+  });
+  window.addEventListener('pageshow', function(){
+    if (String(currentActiveTab || '') === 'peminjam') {
+      setTimeout(function(){ try { renderLoanList(true); } catch (_) {} }, 0);
+    }
+  });
+} catch (_) {}
+
+window.rkRenderIncremental=function(items,render,batch){
    items=Array.isArray(items)?items:[]; batch=batch||80; let i=0;
    return new Promise(resolve=>{function step(){const end=Math.min(i+batch,items.length);for(;i<end;i++)render(items[i],i);if(i<items.length)requestAnimationFrame(step);else resolve()}step()});
  };
@@ -12958,7 +13014,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.98';
+window.REKENAN_UI_BUILD='V200.99';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan BUILD] FINAL CLIENT V200.90 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
@@ -13065,7 +13121,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V200.98';
+  window.REKENAN_UI_BUILD='V200.99';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -13100,7 +13156,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.98';
+window.REKENAN_UI_BUILD='V200.99';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13252,7 +13308,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V200.98';
-  window.REKENAN_UI_BUILD='V200.98';
+  window.REKENAN_UI_BUILD='V200.99';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13452,7 +13508,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V200.98';
-  window.REKENAN_UI_BUILD='V200.98';
+  window.REKENAN_UI_BUILD='V200.99';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
@@ -13463,7 +13519,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   window.__REKENAN_BUILD__='V200.98';
-  window.REKENAN_UI_BUILD='V200.98';
+  window.REKENAN_UI_BUILD='V200.99';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
