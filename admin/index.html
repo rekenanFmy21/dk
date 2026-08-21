@@ -4,11 +4,11 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V200.65';
+        window.REKENAN_BUILD_VERSION = 'V200.68';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.63';
-        console.info('[Rekenan BUILD] UI V200.64');
+        window.REKENAN_UI_BUILD = 'V200.68';
+        console.info('[Rekenan BUILD] UI V200.68');
         console.info('[Rekenan BUILD] V200.42 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.65">
+    <meta name="rekenan-build" content="V200.68">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -3740,8 +3740,8 @@ margin:0!important;
         // normal cross-origin GAS response without CORS.
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
         const API_VERSION = 'V200.32-LOCAL-FIRST-CACHED';
-        window.REKENAN_SERVER_BUILD = 'V200.66';
-        console.info('[Rekenan BUILD] CLIENT V200.66 / SERVER API COMPATIBLE');
+        window.REKENAN_SERVER_BUILD = 'V200.68';
+        console.info('[Rekenan BUILD] CLIENT V200.68 / SERVER API COMPATIBLE');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -4370,7 +4370,7 @@ margin:0!important;
                     token: cloudToken,
                     forceRefresh: true,
                     noCache: true,
-                    __clientBuild: 'V200.65'
+                    __clientBuild: 'V200.68'
                 }, force ? 12000 : 9000);
                 const payload = r?.data || r;
                 if (!(r?.success || r?.status === 'success')) {
@@ -11133,7 +11133,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
             const ui = 'V200.63';
-            console.info('[Rekenan BUILD] UI V200.66 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.64 / SERVER API COMPATIBLE');
+            console.info('[Rekenan BUILD] UI V200.68 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.68 / SERVER API COMPATIBLE');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -11933,10 +11933,10 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 <script id="rekenan-v2009-final-repair">
 (function(){
 'use strict';
-window.REKENAN_BUILD_VERSION='V200.65';
-window.REKENAN_UI_BUILD='V200.65';
-window.REKENAN_SERVER_BUILD='V200.32';
-console.info('[Rekenan BUILD] FINAL CLIENT V200.64 / SERVER API COMPATIBLE');
+window.REKENAN_BUILD_VERSION='V200.68';
+window.REKENAN_UI_BUILD='V200.68';
+window.REKENAN_SERVER_BUILD='V200.68';
+console.info('[Rekenan BUILD] FINAL CLIENT V200.68 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
 
 /* Calculator: one authoritative save path, then completely reset the calculator UI. */
@@ -12029,7 +12029,7 @@ if(typeof oldCalcSave2008==='function'){
 }
 
 setTimeout(function(){rkPatchShoppingPhotoButtons2008_();rkPatchLoanPhotoButtons2008_();},250);
-window.rekenanV2008Health=function(){return {client:'V200.32',server:window.REKENAN_SERVER_BUILD,calculator:true,shoppingPhoto:true,loanPhoto:true};};
+window.rekenanV2008Health=function(){return {client:'V200.68',server:window.REKENAN_SERVER_BUILD,calculator:true,shoppingPhoto:true,loanPhoto:true};};
 })();
 </script>
 <style id="rekenan-v2009-final-css">
@@ -12040,9 +12040,9 @@ window.rekenanV2008Health=function(){return {client:'V200.32',server:window.REKE
 <script id="rekenan-v20018-transaction-history-fix">
 (function(){
   'use strict';
-  window.REKENAN_BUILD_VERSION='V200.65';
-  window.REKENAN_UI_BUILD='V200.65';
-  window.REKENAN_SERVER_BUILD='V200.32';
+  window.REKENAN_BUILD_VERSION='V200.68';
+  window.REKENAN_UI_BUILD='V200.68';
+  window.REKENAN_SERVER_BUILD='V200.68';
   console.info('[Rekenan BUILD] V200.35 TRANSACTION HISTORY SAFE RENDER');
 
   // Do not alter transaction data. Only restore the canonical local source when
@@ -12075,9 +12075,9 @@ window.rekenanV2008Health=function(){return {client:'V200.32',server:window.REKE
 <script id="rekenan-v20031-final-audit">
 (function(){
 'use strict';
-window.REKENAN_BUILD_VERSION='V200.65';
-window.REKENAN_UI_BUILD='V200.65';
-window.REKENAN_SERVER_BUILD='V200.30';
+window.REKENAN_BUILD_VERSION='V200.68';
+window.REKENAN_UI_BUILD='V200.68';
+window.REKENAN_SERVER_BUILD='V200.68';
 console.info('[Rekenan AUDIT V200.40] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.40 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
 
@@ -12219,7 +12219,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   console.info('[Rekenan BUILD] V200.66 CALC SHEET READ + PDF HEADER LOGO');
-  window.__REKENAN_BUILD__='V200.65';
+  window.__REKENAN_BUILD__='V200.68';
 })();
 </script>
 
@@ -12227,8 +12227,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20065-calc-photo-audit-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.65';
-  window.REKENAN_UI_BUILD='V200.65';
+  window.__REKENAN_BUILD__='V200.68';
+  window.REKENAN_UI_BUILD='V200.68';
   console.info('[Rekenan BUILD] V200.66 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -12240,7 +12240,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         return false;
       }
       if (typeof rkCalcCloudReadInFlight_ !== 'undefined' && rkCalcCloudReadInFlight_) return false;
-      const key='rekenan_calc_cloud_reconciled_V200.67_' + String(activeCloudUser);
+      const key='rekenan_calc_cloud_reconciled_V200.68_' + String(activeCloudUser);
       try { if (!force && sessionStorage.getItem(key) === '1') return false; } catch(_){}
       rkCalcCloudReadInFlight_ = true;
       try {
@@ -12248,7 +12248,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
           action:'getCalcHistory',
           username:activeCloudUser,
           token:cloudToken,
-          __clientBuild:'V200.67',
+          __clientBuild:'V200.68',
           forceRefresh:true,
           noCache:true
         }, 30000);
@@ -12265,7 +12265,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
             token:cloudToken,
             forceRefresh:true,
             noCache:true,
-            __clientBuild:'V200.67'
+            __clientBuild:'V200.68'
           }, 30000);
           payload = r && r.data ? r.data : r;
         }
@@ -12295,7 +12295,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         console.info('[Rekenan CALC] SHEET → LOCAL MERGE', {
           cloudRows:payload.calcHistory.length, added:added, updated:updated, totalLocal:calcHistory.length
         });
-        try { sessionStorage.setItem('rekenan_calc_cloud_reconciled_V200.67_' + String(activeCloudUser),'1'); } catch(_){}
+        try { sessionStorage.setItem('rekenan_calc_cloud_reconciled_V200.68_' + String(activeCloudUser),'1'); } catch(_){}
         return true;
       } catch(e) {
         console.warn('[Rekenan CALC] SHEET READ ERROR',e);
@@ -12307,6 +12307,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   /* Schedule AFTER auth/bootstrap has had a chance to establish activeCloudUser.
      This fixes the V200.64 ordering bug where the 900ms timer was installed
      before FIRST BOOTSTRAP populated the active session. */
+  window.rekenanForceCalculatorSheetRead = function(){ try { return rkReconcileCalculatorFromCloud_(true); } catch(e){ console.warn('[Rekenan CALC] FORCE READ ERROR',e); return Promise.resolve(false); } };
+
   function scheduleCalcRead_(){
     let tries=0;
     const timer=setInterval(function(){
@@ -12408,7 +12410,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const loanBtns=document.querySelectorAll('#loanCardList .v106-photo-check');
     const calcBtns=document.querySelectorAll('#v101CalcHistory [data-v146-photo],#v101CalcHistory [data-rk65-photo]');
     const out={
-      build:'V200.65',
+      build:'V200.68',
       loanPhotoButtons:loanBtns.length,
       loanPhotoClickable:Array.from(loanBtns).filter(b=>b.tagName==='BUTTON'&&!b.disabled&&b.dataset.rkPhotoUrl).length,
       calcPhotoButtons:calcBtns.length,
@@ -12426,8 +12428,10 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V200.67';
-  window.REKENAN_UI_BUILD='V200.67';
-  window.REKENAN_SERVER_BUILD='V200.67';
-  console.info('[Rekenan BUILD] V200.67 CALCULATOR HARD FIX | SHEET READ FALLBACK + MENU FORCE READ + CALC SEED SYNC');
+  window.REKENAN_UI_BUILD='V200.68';
+  window.REKENAN_SERVER_BUILD='V200.68';
+  console.info('[Rekenan BUILD] V200.68 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
 </script>
+
+<script id="rekenan-v20068-release-marker">console.info('[Rekenan BUILD] RELEASE V200.68 | INDEX/UI/SW/MANIFEST/HOST ALIGNED | CALCULATOR SHEET READ HARDENED');</script>
