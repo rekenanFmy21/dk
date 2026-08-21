@@ -9613,14 +9613,42 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             rkAdminQueuePush_(async () => {
                 try {
                     const tokenAtSend = sessionStorage.getItem('rekenan_admin_token') || adminToken;
-                    const data = await cloudRequest({action: 'verifyLoan', id, status, token: tokenAtSend}, 45000);
-                    if (data.status === 'SESSION_EXPIRED') {
+                    const adminPinAtSend = sessionStorage.getItem('rekenan_admin_pin') || '';
+                    let data = await cloudRequest({
+                        action: 'verifyLoan',
+                        id,
+                        status,
+                        token: tokenAtSend,
+                        adminPin: adminPinAtSend
+                    }, 45000);
+
+                    // V200.91: if the cached Admin token has expired, retry the
+                    // authentication once using the PIN kept for this browser tab.
+                    // The server accepts the PIN only as an Admin-session refresh;
+                    // the loan mutation is still protected by requireAdmin_().
+                    if (data?.status === 'SESSION_EXPIRED' && /^\d{4}$/.test(adminPinAtSend)) {
+                        data = await cloudRequest({
+                            action: 'verifyLoan',
+                            id,
+                            status,
+                            token: '',
+                            adminPin: adminPinAtSend
+                        }, 45000);
+                    }
+
+                    if (data?.status === 'SESSION_EXPIRED') {
                         sessionStorage.removeItem('rekenan_admin_logged');
                         sessionStorage.removeItem('rekenan_admin_token');
                         initEmbeddedAdmin();
-                        throw new Error('Sesi admin berakhir. Silakan login admin kembali.');
+                        throw new Error('Sesi admin tidak valid. Silakan login admin kembali.');
                     }
                     if (!(data.status === 'success' || data.success)) throw new Error(data.message || 'Gagal memproses pinjaman.');
+
+                    // Server may issue a fresh Admin token when the old token was
+                    // renewed from the browser-tab PIN. Persist it before the next
+                    // queued ACC request.
+                    const refreshedAdminToken = String(data.data?.adminToken || data.adminToken || '').trim();
+                    if (refreshedAdminToken) sessionStorage.setItem('rekenan_admin_token', refreshedAdminToken);
 
                     const updatedLoan = data.data?.loan || data.loan || null;
                     if (updatedLoan) {
@@ -9675,14 +9703,34 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             rkAdminQueuePush_(async () => {
                 try {
                     const tokenAtSend = sessionStorage.getItem('rekenan_admin_token') || adminToken;
-                    const data = await cloudRequest({action: 'verifyCicilan', loanId: String(loanId), cicilanKe: Number(cicilanKe), statusPembayaran: status, token: tokenAtSend}, 45000);
-                    if (data.status === 'SESSION_EXPIRED') {
+                    const adminPinAtSend = sessionStorage.getItem('rekenan_admin_pin') || '';
+                    let data = await cloudRequest({
+                        action: 'verifyCicilan',
+                        loanId: String(loanId),
+                        cicilanKe: Number(cicilanKe),
+                        statusPembayaran: status,
+                        token: tokenAtSend,
+                        adminPin: adminPinAtSend
+                    }, 45000);
+                    if (data?.status === 'SESSION_EXPIRED' && /^\d{4}$/.test(adminPinAtSend)) {
+                        data = await cloudRequest({
+                            action: 'verifyCicilan',
+                            loanId: String(loanId),
+                            cicilanKe: Number(cicilanKe),
+                            statusPembayaran: status,
+                            token: '',
+                            adminPin: adminPinAtSend
+                        }, 45000);
+                    }
+                    if (data?.status === 'SESSION_EXPIRED') {
                         sessionStorage.removeItem('rekenan_admin_logged');
                         sessionStorage.removeItem('rekenan_admin_token');
                         initEmbeddedAdmin();
-                        throw new Error('Sesi admin berakhir. Silakan login admin kembali.');
+                        throw new Error('Sesi admin tidak valid. Silakan login admin kembali.');
                     }
                     if (!(data.status === 'success' || data.success)) throw new Error(data.message || 'Gagal memproses cicilan.');
+                    const refreshedAdminToken = String(data.data?.adminToken || data.adminToken || '').trim();
+                    if (refreshedAdminToken) sessionStorage.setItem('rekenan_admin_token', refreshedAdminToken);
                     const updated = data.data?.payment || data.payment || null;
                     const i = (embeddedAdminPayments || []).findIndex(x => String(x?.loanId || '') === String(loanId) && Number(x?.cicilanKe || 0) === Number(cicilanKe));
                     if (i >= 0) embeddedAdminPayments[i] = Object.assign({}, embeddedAdminPayments[i], updated || {}, {status, statusPembayaran: status, _accPending:false});
@@ -12797,7 +12845,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.90';
+window.REKENAN_UI_BUILD='V200.91';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan BUILD] FINAL CLIENT V200.90 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
@@ -12904,7 +12952,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V200.90';
+  window.REKENAN_UI_BUILD='V200.91';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -12939,7 +12987,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.90';
+window.REKENAN_UI_BUILD='V200.91';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13082,7 +13130,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   console.info('[Rekenan BUILD] V200.90 CALC SHEET READ + PDF HEADER LOGO + APP-SHELL');
-  window.__REKENAN_BUILD__='V200.90';
+  window.__REKENAN_BUILD__='V200.91';
 })();
 </script>
 
@@ -13090,8 +13138,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20065-calc-photo-audit-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.90';
-  window.REKENAN_UI_BUILD='V200.90';
+  window.__REKENAN_BUILD__='V200.91';
+  window.REKENAN_UI_BUILD='V200.91';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13290,11 +13338,19 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20067-calculator-hard-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.90';
-  window.REKENAN_UI_BUILD='V200.90';
+  window.__REKENAN_BUILD__='V200.91';
+  window.REKENAN_UI_BUILD='V200.91';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
 </script>
 
 <script id="rekenan-v20068-release-marker">console.info('[Rekenan BUILD] RELEASE V200.90 | INDEX/UI/SW/MANIFEST/HOST ALIGNED | CALCULATOR SHEET READ HARDENED');</script>
+
+<script>
+(function(){
+  window.__REKENAN_BUILD__='V200.91';
+  window.REKENAN_UI_BUILD='V200.91';
+  console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
+})();
+</script>
