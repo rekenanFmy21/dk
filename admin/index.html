@@ -4509,7 +4509,12 @@ margin:0!important;
                 // so a new app version cannot inherit a stale "already reconciled" flag.
                 try {
                     if (typeof rkReconcileCalculatorFromCloud_ === 'function') {
-                        rkReconcileCalculatorFromCloud_(false).catch(() => {});
+                        console.info('[Rekenan CALC] MENU OPEN — Cloud Sheet reconcile START', {
+                            user: activeCloudUser || '', online: navigator.onLine, localRows: Array.isArray(calcHistory) ? calcHistory.length : 0
+                        });
+                        rkReconcileCalculatorFromCloud_(true).catch((e) => {
+                            console.warn('[Rekenan CALC] MENU RECONCILE ERROR', e);
+                        });
                     }
                 } catch (_) {}
             }
@@ -5563,7 +5568,13 @@ margin:0!important;
             // Catatan, Belanja, and other menus from re-uploading 1,000+ rows.
             if (!prevMap) {
                 const firstMap={};
-                for(let i=0;i<list.length;i++){ const id=rkRecordId_(list[i],i); if(!id) return {value:[],changed:false,complete:false,map:{}}; firstMap[id]=rkHash_(list[i]); }
+                for(let i=0;i<list.length;i++){ const id=rkRecordId_(list[i],i); if(!id) continue; firstMap[id]=rkHash_(list[i]); }
+                // Calculator history must be recoverable in Cloud even when the local
+                // record baseline was created before the first sync. Seed + upload it
+                // in one pass; this prevents "Local ada, Sheet kosong".
+                if (String(key) === 'calcHistory' && list.length) {
+                    return {value:list.slice(),changed:true,complete:true,map:firstMap,seedOnly:true};
+                }
                 return {value:[],changed:false,complete:false,map:firstMap,seedOnly:true};
             }
             const delta=[]; let changed=false; const currentMap={};
@@ -12224,20 +12235,40 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
      CALC_HISTORY-only API. Local stays immediate/authoritative. */
   try {
     rkReconcileCalculatorFromCloud_ = async function(force){
-      if (typeof activeCloudUser === 'undefined' || !activeCloudUser || !cloudToken) return false;
+      if (typeof activeCloudUser === 'undefined' || !activeCloudUser || !cloudToken) {
+        console.warn('[Rekenan CALC] READ SKIP — sesi Cloud belum siap', {user:activeCloudUser||'', token:!!cloudToken});
+        return false;
+      }
       if (typeof rkCalcCloudReadInFlight_ !== 'undefined' && rkCalcCloudReadInFlight_) return false;
-      try { if (!force && sessionStorage.getItem('rekenan_calc_cloud_reconciled_V200.66_' + String(activeCloudUser)) === '1') return false; } catch(_){}
+      const key='rekenan_calc_cloud_reconciled_V200.67_' + String(activeCloudUser);
+      try { if (!force && sessionStorage.getItem(key) === '1') return false; } catch(_){}
       rkCalcCloudReadInFlight_ = true;
       try {
-        const r = await cloudRequest({
+        let r = await cloudRequest({
           action:'getCalcHistory',
           username:activeCloudUser,
           token:cloudToken,
-          __clientBuild:'V200.65',
+          __clientBuild:'V200.67',
           forceRefresh:true,
           noCache:true
-        }, 9000);
-        const payload = r && r.data ? r.data : r;
+        }, 30000);
+        let payload = r && r.data ? r.data : r;
+        // Fallback to the normal Cloud snapshot. This keeps the calculator working
+        // even if an older GAS deployment does not yet expose getCalcHistory.
+        if (!(r && (r.success || r.status === 'success')) || !Array.isArray(payload && payload.calcHistory)) {
+          console.warn('[Rekenan CALC] LIGHT READ FAILED — fallback getData', {
+            message:r && (r.message || r.error || 'API gagal')
+          });
+          r = await cloudRequest({
+            action:'getData',
+            username:activeCloudUser,
+            token:cloudToken,
+            forceRefresh:true,
+            noCache:true,
+            __clientBuild:'V200.67'
+          }, 30000);
+          payload = r && r.data ? r.data : r;
+        }
         if (!(r && (r.success || r.status === 'success')) || !Array.isArray(payload && payload.calcHistory)) {
           console.warn('[Rekenan CALC] SHEET READ FAILED', {
             serverBuild:r && (r.serverBuild || r.build || (r.data && r.data.serverBuild) || ''),
@@ -12264,7 +12295,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         console.info('[Rekenan CALC] SHEET → LOCAL MERGE', {
           cloudRows:payload.calcHistory.length, added:added, updated:updated, totalLocal:calcHistory.length
         });
-        try { sessionStorage.setItem('rekenan_calc_cloud_reconciled_V200.66_' + String(activeCloudUser),'1'); } catch(_){}
+        try { sessionStorage.setItem('rekenan_calc_cloud_reconciled_V200.67_' + String(activeCloudUser),'1'); } catch(_){}
         return true;
       } catch(e) {
         console.warn('[Rekenan CALC] SHEET READ ERROR',e);
@@ -12284,7 +12315,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         if(typeof activeCloudUser !== 'undefined' && activeCloudUser && cloudToken){
           clearInterval(timer);
           setTimeout(function(){
-            try { rkReconcileCalculatorFromCloud_(false).catch(function(){}); } catch(_){}
+            try { rkReconcileCalculatorFromCloud_(true).catch(function(){}); } catch(_){}
           }, 500);
         } else if(tries>=12) clearInterval(timer);
       } catch(_){ if(tries>=12) clearInterval(timer); }
@@ -12388,5 +12419,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     return out;
   };
   console.info('[Rekenan BUILD] V200.66 PHOTO BUTTONS HARDENED');
+})();
+</script>
+
+<script id="rekenan-v20067-calculator-hard-fix">
+(function(){
+  'use strict';
+  window.__REKENAN_BUILD__='V200.67';
+  window.REKENAN_UI_BUILD='V200.67';
+  window.REKENAN_SERVER_BUILD='V200.67';
+  console.info('[Rekenan BUILD] V200.67 CALCULATOR HARD FIX | SHEET READ FALLBACK + MENU FORCE READ + CALC SEED SYNC');
 })();
 </script>
