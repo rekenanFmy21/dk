@@ -1,9 +1,9 @@
 {
   "id": "./admin",
-  "name": "Rekenan V200.70",
-  "short_name": "Rekenan V200.70",
-  "description": "Rekenan V200.70 — keuangan, pinjaman, catatan, belanja dan administrasi",
-  "start_url": "./index.html?v=2070",
+  "name": "Rekenan V200.71",
+  "short_name": "Rekenan V200.71",
+  "description": "Rekenan V200.71 — keuangan, pinjaman, catatan, belanja dan administrasi",
+  "start_url": "./index.html?v=2071",
   "scope": "./",
   "display": "standalone",
   "display_override": [
@@ -33,7 +33,7 @@
     {
       "name": "Belanja",
       "short_name": "Belanja",
-      "url": "./#belanja?v=2070",
+      "url": "./#belanja?v=2071",
       "icons": [
         {
           "src": "./icons/rekenan-admin-192.png",
@@ -45,7 +45,7 @@
     {
       "name": "Catatan",
       "short_name": "Catatan",
-      "url": "./#catatan?v=2070",
+      "url": "./#catatan?v=2071",
       "icons": [
         {
           "src": "./icons/rekenan-admin-192.png",
