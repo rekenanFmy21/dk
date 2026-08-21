@@ -3,7 +3,7 @@
   "name": "Rekenan V200.65",
   "short_name": "Rekenan V200.65",
   "description": "Rekenan V200.65 — keuangan, pinjaman, catatan, belanja dan administrasi",
-  "start_url": "./index.html?v=2064",
+  "start_url": "./index.html?v=2065",
   "scope": "./",
   "display": "standalone",
   "display_override": [
