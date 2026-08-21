@@ -5957,7 +5957,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 return selected === 'loan' ? loanPhoto : selected === 'data' ? !loanPhoto : true;
             });
             let uploaded = 0;
-            console.info('[Rekenan SYNC] ATTACHMENT UPLOAD START', processable.length, {scope: selected, total: q.length}); try { rkSetTransferIndicator_('active', `Mengirim foto… 0/${processable.length} • Pinjaman tetap bisa di-ACC`); } catch (_) {}
+            console.info('[Rekenan SYNC] ATTACHMENT UPLOAD START', processable.length, {scope: selected, total: q.length}); try { rkSetTransferIndicator_('active', `Mengirim foto… 0/${processable.length}`); } catch (_) {}
             for (const originalItem of processable) {
                 // Persist the Drive result before Sheet metadata. A timeout during
                 // metadata update must never create a second Drive file on retry.
@@ -6041,7 +6041,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                         if (dt === 'SHOPPING' && typeof renderShoppingList === 'function') renderShoppingList();
                     } catch (_) {}
                                         uploaded++;
-                    try { rkSetTransferIndicator_('active', `Mengirim foto… ${uploaded}/${processable.length} • Pinjaman tetap bisa di-ACC`); } catch (_) {}
+                    try { rkSetTransferIndicator_('active', `Mengirim foto… ${uploaded}/${processable.length}`); } catch (_) {}
                     console.info('[Rekenan SYNC] ATTACHMENT LINKED', {dataType: dt, recordId: item.recordId, fileId: att.fileId});
                     if (dt === 'LOAN') {
                         try { renderEmbeddedAdmin(); } catch (_) {}
@@ -6057,6 +6057,18 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             }
             const remainingQ = rkLoadAttachmentQueue_();
             const scopedRemaining = remainingQ.filter(item => selected === 'loan' ? isLoan(item) : selected === 'data' ? !isLoan(item) : true).length;
+            // The transfer indicator belongs to the attachment worker, not to the
+            // loan-ACC UI. Always close the photo-transfer state when this scope has
+            // no remaining attachment queue. This prevents a permanent
+            // "Mengirim foto… 1/1" state after a successful Drive upload.
+            try {
+                if (scopedRemaining === 0) {
+                    rkSetTransferIndicator_('ok', uploaded > 0 ? `Foto selesai • ${uploaded} berhasil` : 'Foto selesai');
+                } else {
+                    rkSetTransferIndicator_('active', `Foto masih diproses… ${scopedRemaining} tersisa`);
+                }
+            } catch (_) {}
+            console.info('[Rekenan SYNC] ATTACHMENT QUEUE DONE', {scope: selected, uploaded, remaining: remainingQ.length, scopedRemaining});
             return {uploaded, remaining: remainingQ.length, scopedRemaining};
         }
         const RK_SYNC_SNAPSHOT_KEY_ = 'rekenan_sync_snapshot_v1982';
@@ -6755,7 +6767,10 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 
         function rk59OpenShoppingPhoto_(id) {
             try {
-                const item = (Array.isArray(window.shoppingItems) ? window.shoppingItems : []).find(x => String(x?.id || '') === String(id || ''));
+                // Top-level `let shoppingItems` is not exposed as window.shoppingItems.
+                // Read the authoritative local array directly so the viewer works after
+                // the attachment is linked locally, without requiring another Cloud read.
+                const item = (Array.isArray(shoppingItems) ? shoppingItems : []).find(x => String(x?.id || '') === String(id || ''));
                 if (!item) return;
                 let a = {};
                 try { a = typeof parseAttachmentMeta_ === 'function' ? (parseAttachmentMeta_(item) || {}) : (item.attachment || {}); } catch (_) { a = item.attachment || {}; }
@@ -12045,7 +12060,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
   }catch(e){console.warn('[Rekenan V200.46] ACC patch failed',e);}
 
-  console.info('[Rekenan BUILD] V200.59 PHOTO CORE CONSOLIDATED INTO SHOPPING RENDER');
+  console.info('[Rekenan BUILD] V200.60 PHOTO VIEWER + TRANSFER INDICATOR STABLE');
 })();
 </script>
 <style id="rk-v20057-shopping-photo-fix-css">
