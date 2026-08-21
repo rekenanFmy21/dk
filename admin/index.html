@@ -4,11 +4,11 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V200.92';
+        window.REKENAN_BUILD_VERSION = 'V200.93';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.92';
-        console.info('[Rekenan BUILD] UI V200.92');
+        window.REKENAN_UI_BUILD = 'V200.93';
+        console.info('[Rekenan BUILD] UI V200.93');
         console.info('[Rekenan BUILD] V200.90 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.92">
+    <meta name="rekenan-build" content="V200.93">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -4192,8 +4192,10 @@ nav.fixed.bottom-0 {
                 if (sessionStorage.getItem('rekenan_admin_logged') === 'true' && sessionStorage.getItem('rekenan_admin_token')) {
                     try { initEmbeddedAdmin(); } catch (_) {}
                     try { startAdminBackgroundSync_(); } catch (_) {}
-                    // Cache-first: refresh Admin in background, never block app entry.
-                    setTimeout(() => { try { loadAdminPanel(false).catch(() => {}); } catch (_) {} }, 50);
+                    // V200.94: cache paints immediately, then one authoritative
+                    // Admin refresh is forced in background so a persisted local
+                    // timestamp can never hide newer Sheet Loan/Payment rows.
+                    setTimeout(() => { try { loadAdminPanel(true).catch(() => {}); } catch (_) {} }, 50);
                 }
                 if (activeCloudUser && cloudToken) {
                     // V200.90: one non-blocking CALC_HISTORY reconciliation after the
@@ -6644,6 +6646,15 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     if (!(data?.success || data?.status === 'success')) throw new Error(data?.message || 'Pengajuan pinjaman ditolak Cloud.');
                     submitted++;
                     console.info('[Rekenan LOAN] UPLOADED', loan.id);
+                    // V200.93: reconcile the borrower's authoritative loan index
+                    // immediately after the Sheet write. This fixes the case where
+                    // the version pulse changes but the visible list still carries
+                    // the pre-upload user snapshot. It never blocks the queue/UI.
+                    try {
+                        if (activeCloudUser && cloudToken) {
+                            setTimeout(() => fetchLoansFromCloud(true).catch(() => {}), 80);
+                        }
+                    } catch (_) {}
                     // V200.90: Admin gets the uploaded loan immediately from the
                     // same Local-first operation. ACC never waits for Drive/photo.
                     // Cloud/adminData remains the authoritative reconciliation path.
@@ -8032,7 +8043,12 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         }
 
         async function fetchLoansFromCloud(force = false) {
-  if (window.__RK_STRICT_PRIORITY_STARTUP__ && window.__RK_PRIORITY_LOAN_ACTIVE__) {
+  // V200.94: explicit authoritative reads must never be blocked by the
+  // startup priority gate. V200.90/93 set the gate before calling P2, which
+  // caused the function to return `deferred` and left the borrower on stale
+  // Local data even though the log said P2 READ COMPLETE. Non-forced calls
+  // may still yield while the strict startup phase is actively warming.
+  if (window.__RK_STRICT_PRIORITY_STARTUP__ && window.__RK_PRIORITY_LOAN_ACTIVE__ && !force) {
     return { deferred: true, source: 'strict-priority-gate' };
   }
 
@@ -8150,16 +8166,20 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             const statusEl = document.getElementById('filterLoanStatus');
             const statusFilter = String(statusEl?.value || 'all');
             const source = Array.isArray(loansData) ? loansData : [];
-            const borrowerName = String(activeBorrowerUser?.name || '').trim().toLowerCase();
-            const borrowerId = String(activeBorrowerUser?.id || activeCloudUser || '').trim();
+            const norm = v => String(v ?? '').trim().toLowerCase();
+            const borrowerName = norm(activeBorrowerUser?.name || activeBorrowerUser?.nama || '');
+            const borrowerIds = new Set([norm(activeCloudUser), norm(activeBorrowerUser?.id), norm(activeBorrowerUser?.username)].filter(Boolean));
 
             const filtered = source.filter(l => {
                 const row = l || {};
-                const rowBorrowerId = String(row.borrowerId ?? row.username ?? '').trim();
-                const rowName = String(row.nama ?? row.name ?? '').trim().toLowerCase();
-                if (activeBorrowerUser) {
-                    const sameId = borrowerId && rowBorrowerId && rowBorrowerId === borrowerId;
-                    const sameName = borrowerName && rowName === borrowerName;
+                const rowBorrowerId = norm(row.borrowerId ?? row.username ?? row.userId ?? '');
+                const rowName = norm(row.nama ?? row.name ?? '');
+                if (activeBorrowerUser || activeCloudUser) {
+                    const sameId = !!rowBorrowerId && borrowerIds.has(rowBorrowerId);
+                    const sameName = !!rowName && !!borrowerName && rowName === borrowerName;
+                    // Do not hide a legitimate loan merely because the server's
+                    // display-name and username fields differ. Username/borrowerId
+                    // is authoritative; name is only a compatibility fallback.
                     if (rowBorrowerId || rowName) {
                         if (!sameId && !sameName) return false;
                     }
@@ -8183,6 +8203,12 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             const container = document.getElementById('loanCardList');
             if (!container) return;
             if (!filtered.length) {
+                if (source.length) {
+                    console.warn('[Rekenan PINJAMAN] DATA RECEIVED BUT FILTERED OUT', {
+                        source: source.length, activeCloudUser, activeBorrowerUser,
+                        sample: source.slice(0,3).map(x => ({id:x?.id, borrowerId:x?.borrowerId, username:x?.username, nama:x?.nama, name:x?.name}))
+                    });
+                }
                 container.innerHTML = '<div class="v37-loan-shell p-5 rounded-3xl text-center text-zinc-400 text-sm italic">Belum ada pengajuan pinjaman yang sesuai.</div>';
                 updateBorrowerLoanActivityBadge_();
                 return;
@@ -9528,10 +9554,14 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     // V137: keep the Admin PIN only for the current browser tab/session.
                     // It is used to transparently renew an expired Admin token.
                     sessionStorage.setItem('rekenan_admin_pin', pin);
-                    // V195.4 PERF: initEmbeddedAdmin() paints the cached snapshot and
-                    // performs the single Admin refresh. Do not immediately issue a
-                    // second adminGetData + reload request here.
-                    closeAdminLogin(); initEmbeddedAdmin(); showToast('Login admin berhasil', 'success');
+                    // V200.93: a successful Admin login is an explicit identity
+                    // boundary. Never let a previous 5-minute local snapshot satisfy
+                    // the first read for this session. Paint local immediately, then
+                    // force exactly one authoritative Cloud refresh in background.
+                    closeAdminLogin();
+                    initEmbeddedAdmin();
+                    try { loadAdminPanel(true).catch(() => {}); } catch (_) {}
+                    showToast('Login admin berhasil', 'success');
                 } else showToast(/PIN|pin/i.test(String(data?.message || '')) ? 'PIN salah.' : (data.message || 'PIN admin tidak valid.'), 'error');
             } catch (e) {const msg = e?.apiResponse?.message || e?.message || 'Login Admin gagal.'; showToast(String(msg), 'error'); console.error('[V146] Admin login:', e);} finally {hideLoading(); rkActionButtonUnlock_(btn, 'Masuk');}
         }
@@ -9824,10 +9854,10 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             // Background-only: timeout never blocks the already painted UI.
             adminFetchInFlight_ = true;
             try {
-                let data = await cloudRequest({action: 'adminData', token: sessionStorage.getItem('rekenan_admin_token') || '', adminPin: sessionStorage.getItem('rekenan_admin_pin') || '', forceRefresh: !!force}, 15000);
+                let data = await cloudRequest({action: 'adminData', token: sessionStorage.getItem('rekenan_admin_token') || '', adminPin: sessionStorage.getItem('rekenan_admin_pin') || '', forceRefresh: !!force}, 30000);
                 if (data.status === 'SESSION_EXPIRED') {
                     const adminPin = sessionStorage.getItem('rekenan_admin_pin') || '';
-                    if (/^\d{4}$/.test(adminPin)) data = await cloudRequest({action: 'adminData', token: '', adminPin: adminPin, forceRefresh: true}, 15000);
+                    if (/^\d{4}$/.test(adminPin)) data = await cloudRequest({action: 'adminData', token: '', adminPin: adminPin, forceRefresh: true}, 30000);
                 }
                 if (data.data?.adminToken || data.adminToken) sessionStorage.setItem('rekenan_admin_token', String(data.data?.adminToken || data.adminToken));
                 if (data.status === 'SESSION_EXPIRED') {
@@ -13138,7 +13168,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   console.info('[Rekenan BUILD] V200.90 CALC SHEET READ + PDF HEADER LOGO + APP-SHELL');
-  window.__REKENAN_BUILD__='V200.92';
+  window.__REKENAN_BUILD__='V200.93';
 })();
 </script>
 
@@ -13146,7 +13176,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20065-calc-photo-audit-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.92';
+  window.__REKENAN_BUILD__='V200.93';
   window.REKENAN_UI_BUILD='V200.92';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
@@ -13346,7 +13376,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20067-calculator-hard-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.92';
+  window.__REKENAN_BUILD__='V200.93';
   window.REKENAN_UI_BUILD='V200.92';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
@@ -13357,7 +13387,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <script>
 (function(){
-  window.__REKENAN_BUILD__='V200.92';
+  window.__REKENAN_BUILD__='V200.93';
   window.REKENAN_UI_BUILD='V200.92';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
@@ -13412,6 +13442,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   wrap('renderRiwayatCicilanList','loanHistory',40);
   wrap('renderEmbeddedAdmin','admin',40);
   window.__rkV20092StableRender=true;
-  console.info('[Rekenan BUILD] V200.92 STABLE BACKGROUND RENDER / NO REDUNDANT PAINT');
+  window.REKENAN_BUILD_VERSION='V200.94';
+  window.REKENAN_CLIENT_BUILD='V200.94 DATA READ REAL + STABLE RENDER';
+  console.info('[Rekenan BUILD] V200.94 DATA READ REAL + ADMIN AUTHORITATIVE REFRESH + NO FLICKER');
 })();
 </script>
