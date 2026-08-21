@@ -12985,7 +12985,7 @@ window.rkRenderIncremental=function(items,render,batch){
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V201.03';
+window.REKENAN_UI_BUILD='V201.04';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan BUILD] FINAL CLIENT V200.90 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
@@ -13158,10 +13158,14 @@ window.v101CalcKey=function(key){
 window.forceCalcHistoryBelowKeypad=function(){
   const modal=document.getElementById('v101CalculatorModal'); if(!modal)return;
   const phone=modal.querySelector('.rk-calc-phone'); if(!phone)return;
-  const grid=phone.querySelector('.rk-calc-grid'), hist=phone.querySelector('#rkCalcHistorySection'); if(!grid||!hist)return;
-  phone.style.display='flex';phone.style.flexDirection='column';
-  const display=phone.querySelector('.rk-calc-display'), proof=phone.querySelector('.v101-proof'), actions=phone.querySelector('.flex.gap-2.mt-3');
-  if(display)display.style.order='1';grid.style.order='2';hist.style.order='3';hist.style.display='block';hist.style.width='100%';if(proof)proof.style.order='4';if(actions)actions.style.order='5';
+  // V201.04: do not inject inline flex/column styles. The Calculator Pro CSS owns
+  // the desktop grid and mobile single-column layout. This prevents the old
+  // V200.90 force-column helper from overriding the new two-column design.
+  phone.style.removeProperty('display');
+  phone.style.removeProperty('flex-direction');
+  const display=phone.querySelector('.rk-calc-display'), grid=phone.querySelector('.rk-calc-grid'), hist=phone.querySelector('#rkCalcHistorySection'), proof=phone.querySelector('.v101-proof'), actions=phone.querySelector('.flex.gap-2.mt-3');
+  [display,grid,hist,proof,actions].forEach(el=>{ if(!el) return; el.style.removeProperty('order'); });
+  if(hist){ hist.style.removeProperty('display'); hist.style.removeProperty('width'); }
 };
 const oldOpenCalc=window.openV101CalculatorModal;
 if(typeof oldOpenCalc==='function'){
@@ -13653,6 +13657,46 @@ nav.fixed.bottom-0 {
   #v101CalculatorModal #v101CalcHistory{max-height:none!important;overflow:visible!important}
 }
 </style>
+
+<style id="rekenan-v20104-calculator-authoritative-layout">
+/* REKENAN V201.04 — authoritative Calculator Pro layout.
+   Fixes the legacy force-column inline styles that made the result/history
+   appear clipped or disappear. */
+#v101CalculatorModal .rk-calc-phone{
+  display:grid !important;
+  flex-direction:initial !important;
+  grid-template-columns:minmax(0,1.02fr) minmax(300px,.98fr) !important;
+  grid-template-areas:"display history" "keypad history" "quick history" "proof history" "actions history" !important;
+  align-items:start !important;
+  width:min(100%,900px) !important;
+  margin:0 auto !important;
+}
+#v101CalculatorModal .rk-calc-display{grid-area:display !important;}
+#v101CalculatorModal .rk-calc-grid{grid-area:keypad !important;}
+#v101CalculatorModal .rk-calc-quick{grid-area:quick !important;}
+#v101CalculatorModal #rkCalcHistorySection{
+  grid-area:history !important;
+  min-height:0 !important;
+  height:auto !important;
+  width:auto !important;
+  display:block !important;
+  align-self:stretch !important;
+  overflow:hidden !important;
+}
+#v101CalculatorModal .v101-proof{grid-area:proof !important;}
+#v101CalculatorModal .rk-calc-phone > .flex.gap-2.mt-3{grid-area:actions !important;}
+#v101CalculatorModal #v101CalcHistory{max-height:520px !important;overflow:auto !important;}
+@media (max-width:760px){
+  #v101CalculatorModal .rk-calc-phone{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    grid-template-areas:"display" "keypad" "quick" "history" "proof" "actions" !important;
+    width:100% !important;
+  }
+  #v101CalculatorModal #rkCalcHistorySection{min-height:0 !important;height:auto !important;overflow:visible !important;}
+  #v101CalculatorModal #v101CalcHistory{max-height:none !important;overflow:visible !important;}
+}
+</style>
 <script id="rekenan-v20103-calculator-design-runtime">
 (function(){
   'use strict';
@@ -13678,12 +13722,12 @@ nav.fixed.bottom-0 {
     wrapped.__v20103=true; window.openV101CalculatorModal=wrapped;
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(polish,120)); else setTimeout(polish,120);
-  console.info('[Rekenan BUILD] V201.03 CALCULATOR PRO UI LOADED');
+  console.info('[Rekenan BUILD] V201.04 CALCULATOR PRO UI LOADED | LEGACY FLEX OVERRIDE FIXED');
 })();
 </script>
 
 <script id="rekenan-v20103-authoritative-build">
 window.REKENAN_UI_BUILD='V201.03';
-window.REKENAN_CALCULATOR_BUILD='V201.03';
-console.info('[Rekenan BUILD] UI V201.03 | CALCULATOR V201.03 PRO | 000 KEPT | 00 REMOVED | DESKTOP 2-COLUMN | MOBILE SINGLE-COLUMN');
+window.REKENAN_CALCULATOR_BUILD='V201.04';
+console.info('[Rekenan BUILD] UI V201.04 | CALCULATOR V201.04 PRO | 000 KEPT | 00 REMOVED | DESKTOP 2-COLUMN | MOBILE SINGLE-COLUMN | LAYOUT FIX');
 </script>
