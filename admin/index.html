@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.63">
+    <meta name="rekenan-build" content="V200.65">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -3740,8 +3740,8 @@ margin:0!important;
         // normal cross-origin GAS response without CORS.
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
         const API_VERSION = 'V200.32-LOCAL-FIRST-CACHED';
-        window.REKENAN_SERVER_BUILD = 'V200.32';
-        console.info('[Rekenan BUILD] CLIENT V200.64 / SERVER API COMPATIBLE');
+        window.REKENAN_SERVER_BUILD = 'V200.66';
+        console.info('[Rekenan BUILD] CLIENT V200.66 / SERVER API COMPATIBLE');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -3865,7 +3865,7 @@ margin:0!important;
             });
         }
 
-        function cloudBridge(payload, timeoutMs = 20000) {
+        function cloudBridge(payload, timeoutMs = 30000) {
             if (WRITE_ACTIONS_V83.has(String(payload?.action || '')) && !(window.google && google.script && google.script.run)) return postWriteV83_(payload, timeoutMs);
             if (window.google && google.script && google.script.run && typeof google.script.run.withSuccessHandler === 'function') {
                 return new Promise((resolve) => {
@@ -3950,10 +3950,27 @@ margin:0!important;
             }
         }
 
-        async function cloudRequest(payload, timeoutMs = 15000) {
+        async function cloudRequest(payload, timeoutMs = 30000) {
             const original = Object.assign({}, payload || {});
-            let response = await cloudBridge(original, timeoutMs);
-            let data = await response.json();
+            // V200.66: GAS Web App can cold-start or briefly return a redirect/404
+            // while the execution endpoint is warming. Retry read requests instead
+            // of immediately converting a transient condition into WEB_APP_TIMEOUT.
+            const readAction = !WRITE_ACTIONS_V83.has(String(original.action || ''));
+            let response;
+            let data;
+            let lastErr = null;
+            for (let attempt = 0; attempt < (readAction ? 2 : 1); attempt++) {
+                try {
+                    response = await cloudBridge(original, timeoutMs);
+                    data = await response.json();
+                    if (response.ok) break;
+                    lastErr = new Error(String(data?.message || 'Cloud read gagal.'));
+                } catch (e) {
+                    lastErr = e;
+                }
+                if (attempt === 0 && readAction) await new Promise(r => setTimeout(r, 1200));
+            }
+            if (!response) throw lastErr || new Error('Cloud tidak merespons.');
 
             const action = String(original.action || '');
             const msg = String(data?.message || '');
@@ -4341,7 +4358,7 @@ margin:0!important;
             // already contains rows. The old guard returned early when localRows.length
             // was non-zero, which made existing-but-incomplete local history impossible
             // to reconcile from the Sheet.
-            const reconcileKey = 'rekenan_calc_cloud_reconciled_' + String(activeCloudUser || '');
+            const reconcileKey = 'rekenan_calc_cloud_reconciled_V200.66_' + String(activeCloudUser || '');
             if (!force) {
                 try { if (sessionStorage.getItem(reconcileKey) === '1') return false; } catch (_) {}
             }
@@ -4353,7 +4370,7 @@ margin:0!important;
                     token: cloudToken,
                     forceRefresh: true,
                     noCache: true,
-                    __clientBuild: 'V200.64'
+                    __clientBuild: 'V200.65'
                 }, force ? 12000 : 9000);
                 const payload = r?.data || r;
                 if (!(r?.success || r?.status === 'success')) {
@@ -4487,9 +4504,14 @@ margin:0!important;
             else if (tabId === 'belanja') renderShoppingList();
             else if (tabId === 'kalkulator') {
                 try { if (typeof renderV101CalcHistory === 'function') renderV101CalcHistory(); } catch (_) {}
-                // Only read Cloud when Local calculator history is empty. This preserves
-                // the fast Local-first path and repairs legacy/first-device imports.
-                rkReconcileCalculatorFromCloud_(false).catch(() => {});
+                // V200.65: render Local immediately, then perform one version-scoped
+                // CALC_HISTORY Sheet reconcile. The session guard is build-specific,
+                // so a new app version cannot inherit a stale "already reconciled" flag.
+                try {
+                    if (typeof rkReconcileCalculatorFromCloud_ === 'function') {
+                        rkReconcileCalculatorFromCloud_(false).catch(() => {});
+                    }
+                } catch (_) {}
             }
             else if (tabId === 'peminjam') {initBorrowerTab();}
             else if (tabId === 'admin') {initEmbeddedAdmin();}
@@ -4824,7 +4846,7 @@ margin:0!important;
         function registerRekenanPWA_() {
             try {
                 if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-                navigator.serviceWorker.register('./sw.js?v=2065', {scope: './', updateViaCache: 'none'})
+                navigator.serviceWorker.register('./sw.js?v=2066', {scope: './', updateViaCache: 'none'})
                     .then(function (registration) {
                         console.info('[Rekenan PWA] Local Service Worker registered:', registration.scope);
                         try {registration.update();} catch (_) { }
@@ -4960,7 +4982,7 @@ margin:0!important;
                 // One-time bootstrap for an account that has never initialized local
                 // authority on this device. This is migration/initial seeding only.
                 console.info('[Rekenan LOCAL-FIRST] FIRST BOOTSTRAP — importing Cloud once into Local');
-                const fresh = await cloudRequest({action:'getData', username:activeCloudUser, token:cloudToken}, 10000);
+                const fresh = await cloudRequest({action:'getData', username:activeCloudUser, token:cloudToken, forceRefresh:false}, 30000);
                 if (fresh?.success || fresh?.status === 'success') {
                     const cloudData = fresh.data || fresh;
                     applyCloudData_(cloudData, true);
@@ -11100,7 +11122,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
             const ui = 'V200.63';
-            console.info('[Rekenan BUILD] UI V200.63 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.64 / SERVER API COMPATIBLE');
+            console.info('[Rekenan BUILD] UI V200.66 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.64 / SERVER API COMPATIBLE');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -12172,7 +12194,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
   }catch(e){console.warn('[Rekenan V200.46] ACC patch failed',e);}
 
-  console.info('[Rekenan BUILD] V200.65 CALC SHEET READ + PDF HEADER LOGO + STARTUP NO-RELOAD');
+  console.info('[Rekenan BUILD] V200.66 CALC SHEET READ + PDF HEADER LOGO + STARTUP NO-RELOAD');
 })();
 </script>
 <style id="rk-v20057-shopping-photo-fix-css">
@@ -12185,7 +12207,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <script>
 (function(){
-  console.info('[Rekenan BUILD] V200.65 CALC SHEET READ + PDF HEADER LOGO');
+  console.info('[Rekenan BUILD] V200.66 CALC SHEET READ + PDF HEADER LOGO');
   window.__REKENAN_BUILD__='V200.65';
 })();
 </script>
@@ -12196,7 +12218,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   'use strict';
   window.__REKENAN_BUILD__='V200.65';
   window.REKENAN_UI_BUILD='V200.65';
-  console.info('[Rekenan BUILD] V200.65 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
+  console.info('[Rekenan BUILD] V200.66 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
      CALC_HISTORY-only API. Local stays immediate/authoritative. */
@@ -12204,7 +12226,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     rkReconcileCalculatorFromCloud_ = async function(force){
       if (typeof activeCloudUser === 'undefined' || !activeCloudUser || !cloudToken) return false;
       if (typeof rkCalcCloudReadInFlight_ !== 'undefined' && rkCalcCloudReadInFlight_) return false;
-      try { if (!force && sessionStorage.getItem('rekenan_calc_cloud_reconciled_' + String(activeCloudUser)) === '1') return false; } catch(_){}
+      try { if (!force && sessionStorage.getItem('rekenan_calc_cloud_reconciled_V200.66_' + String(activeCloudUser)) === '1') return false; } catch(_){}
       rkCalcCloudReadInFlight_ = true;
       try {
         const r = await cloudRequest({
@@ -12242,7 +12264,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         console.info('[Rekenan CALC] SHEET → LOCAL MERGE', {
           cloudRows:payload.calcHistory.length, added:added, updated:updated, totalLocal:calcHistory.length
         });
-        try { sessionStorage.setItem('rekenan_calc_cloud_reconciled_' + String(activeCloudUser),'1'); } catch(_){}
+        try { sessionStorage.setItem('rekenan_calc_cloud_reconciled_V200.66_' + String(activeCloudUser),'1'); } catch(_){}
         return true;
       } catch(e) {
         console.warn('[Rekenan CALC] SHEET READ ERROR',e);
@@ -12365,6 +12387,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     console.info('[Rekenan AUDIT V200.65] LOAN/CALC PHOTO',out);
     return out;
   };
-  console.info('[Rekenan BUILD] V200.65 PHOTO BUTTONS HARDENED');
+  console.info('[Rekenan BUILD] V200.66 PHOTO BUTTONS HARDENED');
 })();
 </script>
