@@ -4,15 +4,15 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V200.68';
+        window.REKENAN_BUILD_VERSION = 'V200.69';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.68';
-        console.info('[Rekenan BUILD] UI V200.68');
+        window.REKENAN_UI_BUILD = 'V200.69';
+        console.info('[Rekenan BUILD] UI V200.69');
         console.info('[Rekenan BUILD] V200.42 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
-                const expected = 'V200.63';
+                const expected = 'V200.69';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.68">
+    <meta name="rekenan-build" content="V200.69">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -3740,8 +3740,8 @@ margin:0!important;
         // normal cross-origin GAS response without CORS.
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
         const API_VERSION = 'V200.32-LOCAL-FIRST-CACHED';
-        window.REKENAN_SERVER_BUILD = 'V200.68';
-        console.info('[Rekenan BUILD] CLIENT V200.68 / SERVER API COMPATIBLE');
+        window.REKENAN_SERVER_BUILD = 'V200.69';
+        console.info('[Rekenan BUILD] CLIENT V200.69 / SERVER API COMPATIBLE');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -4851,7 +4851,7 @@ margin:0!important;
         function registerRekenanPWA_() {
             try {
                 if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-                navigator.serviceWorker.register('./sw.js?v=2066', {scope: './', updateViaCache: 'none'})
+                navigator.serviceWorker.register('./sw.js?v=2069', {scope: './', updateViaCache: 'none'})
                     .then(function (registration) {
                         console.info('[Rekenan PWA] Local Service Worker registered:', registration.scope);
                         try {registration.update();} catch (_) { }
@@ -4864,7 +4864,7 @@ margin:0!important;
                     // V200.63: never reload the visible login/app shell when a new
                     // Service Worker takes control. The previous implementation caused
                     // a visible login flash/reload several seconds after first paint.
-                    console.info('[Rekenan PWA] controller changed — no forced reload (V200.63)');
+                    console.info('[Rekenan PWA] controller changed — no forced reload (V200.68)');
                 }, {once: true});
             } catch (err) {
                 console.warn('[Rekenan PWA] Registration skipped:', err);
@@ -9826,6 +9826,41 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             border-color: #6366f1
         }
 
+        /* V200.69 CALCULATOR APP-SHELL: keep the real app header + bottom menu visible */
+        .v101-modal.rk-calculator-shell {
+            z-index: 30 !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            padding: 0 !important;
+            align-items: stretch !important;
+            justify-content: center !important;
+            pointer-events: none !important;
+        }
+        .v101-modal.rk-calculator-shell .v101-panel {
+            pointer-events: auto !important;
+            position: absolute !important;
+            top: 66px !important;
+            bottom: 70px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: min(480px, 100%) !important;
+            max-width: 480px !important;
+            max-height: none !important;
+            border-radius: 0 !important;
+            border-left: 1px solid #27272a !important;
+            border-right: 1px solid #27272a !important;
+            border-top: 1px solid #27272a !important;
+            border-bottom: 1px solid #27272a !important;
+            padding: 16px !important;
+            box-shadow: 0 20px 50px rgba(0,0,0,.28) !important;
+        }
+        @media (max-width: 480px) {
+            .v101-modal.rk-calculator-shell .v101-panel {
+                top: 62px !important;
+                bottom: 68px !important;
+            }
+        }
+
         .v101-proof {
             display: flex;
             align-items: center;
@@ -10021,14 +10056,48 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             function proof(att, label = 'Foto Struk/Bukti') {if (!att?.url) return '<span class="text-[9px] text-zinc-500">Belum ada foto</span>'; const url = encodeURIComponent(String(att.url)), name = esc(att.name || label), id = esc(att.fileId || ''); return `<div class="v101-proof"><i class="fa-solid fa-image text-emerald-300"></i><div class="v101-proof-meta"><b title="${name}">${name}</b>${id ? `<small>ID: ${id}</small>` : ''}</div><button type="button" class="v101-image-btn" title="Lihat foto" onclick="openAttachmentUrl_(decodeURIComponent('${url}'))"><i class="fa-solid fa-image"></i></button></div>`}
             window.v101GetAttachment = attOf; window.v101Proof = proof;
             window.renderExistingTransactionProofV101 = function (att) {const el = document.getElementById('txAttachmentStatus'); if (el) el.innerHTML = proof(att, 'Foto Struk/Bukti');};
-            function makeModal(id, title, body) {let m = document.getElementById(id); if (m) return m; m = document.createElement('div'); m.id = id; m.className = 'v101-modal'; m.innerHTML = `<div class="v101-panel"><div class="flex justify-between items-center mb-4"><h3 class="text-sm font-black text-white">${title}</h3><button type="button" class="text-zinc-400 text-xl" onclick="closeV101Modal('${id}')">×</button></div>${body}</div>`; document.body.appendChild(m); return m}
-            window.closeV101Modal = id => document.getElementById(id)?.classList.remove('show');
+            function makeModal(id, title, body) {
+                let m = document.getElementById(id);
+                if (m) return m;
+                m = document.createElement('div');
+                m.id = id;
+                m.className = 'v101-modal' + (id === 'v101CalculatorModal' ? ' rk-calculator-shell' : '');
+                m.innerHTML = `<div class="v101-panel"><div class="flex justify-between items-center mb-4"><h3 class="text-sm font-black text-white">${title}</h3><button type="button" class="text-zinc-400 text-xl" onclick="closeV101Modal('${id}')">×</button></div>${body}</div>`;
+                document.body.appendChild(m);
+                return m
+            }
+            function rkSetCalculatorNavActive_(active) {
+                try {
+                    const calc = document.getElementById('nav-kalkulator');
+                    if (!calc) return;
+                    document.querySelectorAll('.nav-btn').forEach(b => {
+                        b.classList.remove('text-indigo-400', 'active');
+                        if (!b.classList.contains('text-zinc-400')) b.classList.add('text-zinc-400');
+                    });
+                    if (active) {
+                        calc.classList.remove('text-zinc-400');
+                        calc.classList.add('text-indigo-400', 'active');
+                    } else {
+                        const tab = String(window.currentActiveTab || currentActiveTab || 'dashboard');
+                        const nav = document.getElementById('nav-' + tab);
+                        if (nav) {
+                            nav.classList.remove('text-zinc-400');
+                            nav.classList.add('text-indigo-400', 'active');
+                        }
+                    }
+                } catch (_) {}
+            }
+            window.closeV101Modal = id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('show');
+                if (id === 'v101CalculatorModal') rkSetCalculatorNavActive_(false);
+            };
             function ensureNotes() {if (!Array.isArray(window.notesData)) window.notesData = Array.isArray(notesData) ? notesData : []; else if (window.notesData !== notesData) notesData = window.notesData;}
             window.renderV101Notes = function () {ensureNotes(); const el = document.getElementById('v101NoteList'); if (!el) return; const noteRows = Array.isArray(window.notesData) ? window.notesData : []; el.innerHTML = noteRows.length ? noteRows.slice().sort((a, b) => String(b.updatedAt || b.date || '').localeCompare(String(a.updatedAt || a.date || ''))).map(n => {const a = hasAttachment_(n) ? `<button type="button" class="v101-image-btn" title="Lihat foto" onclick="openAttachmentUrl_(decodeURIComponent('${encodeURIComponent(attachmentUrl_(n))}'))"><i class="fa-solid fa-image"></i></button>` : ''; return `<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3"><div class="flex items-center gap-2"><b class="text-xs text-white flex-1">${esc(n.title || 'Tanpa Judul')}</b>${a}</div><div class="text-[10px] text-zinc-300 mt-1 whitespace-pre-wrap">${esc(n.body || '')}</div><div class="text-[9px] text-zinc-500 mt-1">${esc(String(n.updatedAt || n.date || '').replace('T', ' ').slice(0, 16))}</div><div class="flex gap-2 mt-2"><button type="button" class="px-2 py-1 rounded-lg bg-zinc-800 text-xs" onclick='openV101NoteModal(${JSON.stringify(n).replace(/</g, '\u003c')})'>Edit</button><button type="button" class="px-2 py-1 rounded-lg bg-zinc-800 text-rose-300 text-xs" onclick="deleteV101Note('${esc(n.id)}')">Hapus</button></div></div>`}).join('') : '<div class="text-[10px] text-zinc-500 text-center py-3">Belum ada Note.</div>'};
             window.openV101NoteModal = function (note) {const m = makeModal('v101NoteModal', '<i class="fa-solid fa-note-sticky text-emerald-300 mr-2"></i>Note', `<input id="v101NoteId" type="hidden"><input id="v101NoteTitle" class="v101-input mb-2" placeholder="Judul Note"><textarea id="v101NoteBody" class="v101-input" rows="7" placeholder="Tulis Note..."></textarea><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto Note"><i class="fa-solid fa-camera"></i><input id="v101NoteAttachment" type="file" class="hidden"></label><div class="v101-proof-meta"><b>Foto Note</b><small id="v101NoteAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" class="flex-1 bg-zinc-800 text-zinc-300 py-3 rounded-xl text-xs font-bold" onclick="closeV101Modal('v101NoteModal')">Batal</button><button type="button" id="v101NoteSaveBtn" class="flex-1 bg-emerald-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Note()">Simpan</button></div><div class="mt-4"><div class="text-[10px] text-zinc-500 mb-2">Note tersimpan</div><div id="v101NoteSearchFallback" class="mb-3"><div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i><input id="v101NoteSearchInput" class="v101-input pl-9" placeholder="Cari Note berdasarkan judul atau isi..." autocomplete="off"></div></div><div id="v101NoteList" class="space-y-2"></div></div>`); const n = note || {}; document.getElementById('v101NoteId').value = n.id || ''; document.getElementById('v101NoteTitle').value = n.title || ''; document.getElementById('v101NoteBody').value = n.body || ''; const f = document.getElementById('v101NoteAttachment'); if (f) f.value = ''; const st = document.getElementById('v101NoteAttachmentStatus'); if (st) st.textContent = hasAttachment_(n) ? 'Foto tersimpan — pilih foto baru untuk mengganti' : 'Opsional — boleh dikosongkan'; m.classList.add('show'); renderV101Notes()};
             let noteBusy = false; window.saveV101Note = async function () {if (noteBusy) return; const title = (document.getElementById('v101NoteTitle')?.value || '').trim(), body = (document.getElementById('v101NoteBody')?.value || '').trim(); if (!title && !body) return showToast('Isi Note terlebih dahulu.', 'error'); noteBusy = true; const btn = document.getElementById('v101NoteSaveBtn'); if (btn) {btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Menyimpan...'} try {ensureNotes(); const id = document.getElementById('v101NoteId')?.value || ('note_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7)), now = new Date().toISOString(), old = notesData.find(x => String(x.id) === String(id)) || {}, file = document.getElementById('v101NoteAttachment')?.files?.[0]; let attachment = old.attachment || null; if (file) {attachment = await rkQueueAttachmentFile_(file, 'Note', id, 'NOTE');} const obj = {id, title: title || 'Tanpa Judul', body, date: now, updatedAt: now, ...(attachment ? {attachment} : {})}; const i = notesData.findIndex(x => String(x.id) === String(id)); if (i >= 0) notesData[i] = {...notesData[i], ...obj}; else notesData.unshift(obj); secureSave('rekenan_notes', notesData); renderV101Notes(); rkMarkSyncPending_(); showToast('Note tersimpan di perangkat. Sinkronisasi otomatis berjalan saat internet tersedia.', 'success'); const titleEl = document.getElementById('v101NoteTitle'), bodyEl = document.getElementById('v101NoteBody'), fileEl = document.getElementById('v101NoteAttachment'); if (titleEl) titleEl.value = ''; if (bodyEl) bodyEl.value = ''; if (fileEl) fileEl.value = ''; closeV101Modal('v101NoteModal')} catch (e) {showToast(e?.message || 'Note gagal disimpan.', 'error')} finally {noteBusy = false; if (btn) {btn.disabled = false; btn.textContent = 'Simpan'} } };
             let noteDeleteBusy = false; window.deleteV101Note = async function (id) {if (noteDeleteBusy) return; if (!confirm('Hapus Note ini?')) return; noteDeleteBusy = true; try {ensureNotes(); notesData = notesData.filter(x => String(x.id) !== String(id)); secureSave('rekenan_notes', notesData); rkMarkRecordDeleted_('NOTE', id); renderV101Notes(); rkMarkSyncPending_(); showToast('Note dihapus di perangkat. Sinkronisasi otomatis berjalan saat online tersedia.', 'success')} catch (e) {showToast(e?.message || 'Penghapusan Cloud belum terverifikasi.', 'error')} finally {noteDeleteBusy = false} };
-            window.openV101CalculatorModal = function () {const m = makeModal('v101CalculatorModal', '<i class="fa-solid fa-calculator text-blue-300 mr-2"></i>Kalkulator', `<div class="rk-calc-phone"><div class="rk-calc-display"><div id="v101CalcExpr" class="rk-calc-expression">0</div><div id="v101CalcResult" class="rk-calc-result">0</div></div><div class="rk-calc-grid"><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('C')">AC</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('⌫')">⌫</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('.')">.</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('÷')">÷</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('7')">7</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('8')">8</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('9')">9</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('×')">×</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('4')">4</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('5')">5</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('6')">6</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('−')">−</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('1')">1</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('2')">2</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('3')">3</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('+')">+</button><button type="button" class="v106-calc-key v106-calc-num rk-calc-zero" onclick="v101CalcKey('0')">0</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('00')">00</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('000')">000</button><button type="button" class="v106-calc-key v106-calc-eq" onclick="v101CalcKey('=')">=</button></div><div id="rkCalcHistorySection" class="mt-3"><div class="text-[10px] text-zinc-500 mb-2">Riwayat Kalkulator</div><div id="v101CalcHistory" class="space-y-2"></div></div><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v101CalcAttachment" type="file" accept="image/*" class="hidden"></label><div class="v101-proof-meta"><b>Foto Bukti</b><small id="v101CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" class="flex-1 bg-zinc-800 text-zinc-300 py-3 rounded-xl text-xs font-bold" onclick="closeV101Modal('v101CalculatorModal')">Tutup</button><button type="button" id="v101CalcSaveBtn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Calculator()">Simpan</button></div></div>`); m.classList.add('show'); renderV101CalcHistory()};
+            window.openV101CalculatorModal = function () {const m = makeModal('v101CalculatorModal', '<i class="fa-solid fa-calculator text-blue-300 mr-2"></i>Kalkulator', `<div class="rk-calc-phone"><div class="rk-calc-display"><div id="v101CalcExpr" class="rk-calc-expression">0</div><div id="v101CalcResult" class="rk-calc-result">0</div></div><div class="rk-calc-grid"><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('C')">AC</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('⌫')">⌫</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('.')">.</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('÷')">÷</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('7')">7</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('8')">8</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('9')">9</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('×')">×</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('4')">4</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('5')">5</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('6')">6</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('−')">−</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('1')">1</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('2')">2</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('3')">3</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('+')">+</button><button type="button" class="v106-calc-key v106-calc-num rk-calc-zero" onclick="v101CalcKey('0')">0</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('00')">00</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('000')">000</button><button type="button" class="v106-calc-key v106-calc-eq" onclick="v101CalcKey('=')">=</button></div><div id="rkCalcHistorySection" class="mt-3"><div class="text-[10px] text-zinc-500 mb-2">Riwayat Kalkulator</div><div id="v101CalcHistory" class="space-y-2"></div></div><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v101CalcAttachment" type="file" accept="image/*" class="hidden"></label><div class="v101-proof-meta"><b>Foto Bukti</b><small id="v101CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" class="flex-1 bg-zinc-800 text-zinc-300 py-3 rounded-xl text-xs font-bold" onclick="closeV101Modal('v101CalculatorModal')">Tutup</button><button type="button" id="v101CalcSaveBtn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Calculator()">Simpan</button></div></div>`); m.classList.add('show'); rkSetCalculatorNavActive_(true); renderV101CalcHistory(); console.info('[Rekenan CALC] APP-SHELL OPEN V200.69 — HEADER + MENU VISIBLE')};
             window.saveV101Calculator = async function () {const btn = document.getElementById('v101CalcSaveBtn'); if (btn?.dataset.busy === '1') return; const expr = String((document.getElementById('v101CalcExpr')?.value ?? document.getElementById('v101CalcExpr')?.textContent) || '').trim(), out = document.getElementById('v101CalcResult')?.textContent || '0'; if (!expr || out === '...') return showToast('Perhitungan belum valid.', 'error'); if (btn) btn.dataset.busy = '1'; try {const id = 'calc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6), file = document.getElementById('v101CalcAttachment')?.files?.[0]; const item = {id, type: 'calculator', expression: expr, result: parseRupiah(out), date: rkLocalDateTimeYMD_(new Date()), createdAt: new Date().toISOString()}; calcHistory.unshift(item); let attachment = null; if (file) attachment = await rkQueueAttachmentFile_(file, 'Kalkulator', id, 'CALC_HISTORY', item); if (attachment) item.attachment = attachment; secureSave('rekenan_calc_history', calcHistory); renderV101CalcHistory(); rkMarkSyncPending_(); showToast('Kalkulator tersimpan di perangkat. Sinkronisasi otomatis berjalan saat internet tersedia.', 'success'); const exprEl = document.getElementById('v101CalcExpr'), fileEl = document.getElementById('v101CalcAttachment'), resEl = document.getElementById('v101CalcResult'); if (exprEl) exprEl.value = ''; if (fileEl) fileEl.value = ''; if (resEl) resEl.textContent = '0'; const stEl = document.getElementById('v101CalcAttachmentStatus'); if (stEl) stEl.textContent = 'Opsional — boleh dikosongkan';} catch (e) {showToast(e?.message || 'Kalkulator gagal disimpan.', 'error')} finally {if (btn) {delete btn.dataset.busy; btn.textContent = 'Simpan'} } };
             window.renderV101CalcHistoryCore_ = function () {
                 const el = document.getElementById('v101CalcHistory');
@@ -11132,8 +11201,8 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
-            const ui = 'V200.63';
-            console.info('[Rekenan BUILD] UI V200.68 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.68 / SERVER API COMPATIBLE');
+            const ui = 'V200.68';
+            console.info('[Rekenan BUILD] UI V200.68 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.69 / SERVER API COMPATIBLE');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -11936,7 +12005,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 window.REKENAN_BUILD_VERSION='V200.68';
 window.REKENAN_UI_BUILD='V200.68';
 window.REKENAN_SERVER_BUILD='V200.68';
-console.info('[Rekenan BUILD] FINAL CLIENT V200.68 / SERVER API COMPATIBLE');
+console.info('[Rekenan BUILD] FINAL CLIENT V200.69 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
 
 /* Calculator: one authoritative save path, then completely reset the calculator UI. */
@@ -12205,7 +12274,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
   }catch(e){console.warn('[Rekenan V200.46] ACC patch failed',e);}
 
-  console.info('[Rekenan BUILD] V200.66 CALC SHEET READ + PDF HEADER LOGO + STARTUP NO-RELOAD');
+  console.info('[Rekenan BUILD] V200.69 CALC SHEET READ + PDF HEADER LOGO + APP-SHELL + VERSION ALIGNED');
 })();
 </script>
 <style id="rk-v20057-shopping-photo-fix-css">
