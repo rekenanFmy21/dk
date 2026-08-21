@@ -7,12 +7,12 @@
         window.REKENAN_BUILD_VERSION = 'V200.52';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.59';
-        console.info('[Rekenan BUILD] UI V200.59');
+        window.REKENAN_UI_BUILD = 'V200.61';
+        console.info('[Rekenan BUILD] UI V200.61');
         console.info('[Rekenan BUILD] V200.42 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
-                const expected = 'V200.59';
+                const expected = 'V200.61';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.59">
+    <meta name="rekenan-build" content="V200.61">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -6779,7 +6779,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 const fid = String(a.fileId || a.FileId || a.AttachmentFileId || raw.fileId || item.attachmentFileId || item.fileId || '').trim();
                 const target = url || (fid ? 'https://drive.google.com/file/d/' + encodeURIComponent(fid) + '/view' : '');
                 if (target && typeof window.openAttachmentUrl_ === 'function') window.openAttachmentUrl_(target);
-            } catch (e) { console.warn('[Rekenan V200.59] SHOPPING PHOTO OPEN FAILED', e); }
+            } catch (e) { console.warn('[Rekenan V200.61] SHOPPING PHOTO OPEN FAILED', e); }
         }
 
         function renderShoppingList() {
@@ -12060,7 +12060,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
   }catch(e){console.warn('[Rekenan V200.46] ACC patch failed',e);}
 
-  console.info('[Rekenan BUILD] V200.60 PHOTO VIEWER + TRANSFER INDICATOR STABLE');
+  console.info('[Rekenan BUILD] V200.61 PHOTO VIEWER + TRANSFER INDICATOR STABLE');
 })();
 </script>
 <style id="rk-v20057-shopping-photo-fix-css">
