@@ -4182,7 +4182,7 @@ nav.fixed.bottom-0 {
         // Menu entry must never be the first moment when Loan/Admin data are loaded.
         function rkWarmAllDomainsOnStartup_() {
             try {
-                console.info('[Rekenan STARTUP] STRICT PRIORITY — LOCAL PAINT FIRST; ADMIN -> PINJAMAN/CICILAN -> LAINNYA -> FOTO'); console.info('[Rekenan BUILD] V200.90 | ACC NON-BLOCKING + PHOTO ICONS + CALC HISTORY MERGE + ADMIN LIVE FALLBACK');
+                console.info('[Rekenan STARTUP] V201.00 USER-FIRST — PINJAMAN/TRANSAKSI FIRST; ADMIN BACKGROUND'); console.info('[Rekenan BUILD] V200.90 | ACC NON-BLOCKING + PHOTO ICONS + CALC HISTORY MERGE + ADMIN LIVE FALLBACK');
                 // These arrays are already restored above via secureLoad(). Re-rendering
                 // is deferred so startup stays light; no Cloud request is required to
                 // make Local state available.
@@ -4555,7 +4555,7 @@ nav.fixed.bottom-0 {
         let cloudToken = localStorage.getItem('rekenan_cloud_token') || '';
 
         function secureSave(key, data) {
-            // V200.98: undefined must never be serialized into an application cache.
+            // V201.00: undefined must never be serialized into an application cache.
             // The previous path encoded `undefined` as dW5kZWZpbmVk, which later
             // caused secureLoad(JSON.parse) errors and poisoned rekenan_loans.
             if (typeof data === 'undefined' || typeof data === 'function') {
@@ -4630,7 +4630,7 @@ nav.fixed.bottom-0 {
 
         let loansData = secureLoad('rekenan_loans', []);
         let riwayatCicilanData = secureLoad('rekenan_riwayat_cicilan', []);
-        // V200.98: normalize loan caches once at boot. A corrupt/undefined cache
+        // V201.00: normalize loan caches once at boot. A corrupt/undefined cache
         // must never become the authoritative source; Cloud reconciliation follows.
         if (!Array.isArray(loansData)) { loansData = []; try { localStorage.removeItem('rekenan_loans'); } catch (_) {} }
         if (!Array.isArray(riwayatCicilanData)) { riwayatCicilanData = []; try { localStorage.removeItem('rekenan_riwayat_cicilan'); } catch (_) {} }
@@ -5579,106 +5579,74 @@ nav.fixed.bottom-0 {
         }
 
         async function rkPriorityStartupSync_() {
-  // V200.90: strict startup gate. Non-priority background refreshes must not
-  // compete with Admin/PINJAMAN during initial login.
-  window.__RK_STRICT_PRIORITY_STARTUP__ = true;
-  // V200.90: pre-auth warmup. This prepares only non-authoritative/cache-safe
-  // resources before PIN verification. It never stores or verifies the PIN.
-  window.__RK_PREAUTH_WARMUP_V200_90__ = true;
-  window.__RK_PREAUTH_ADMIN_READY__ = false;
-  window.__RK_PREAUTH_LOAN_READY__ = false;
+  // V201.00: USER-FIRST startup. Admin is never a startup gate.
+  window.__RK_STRICT_PRIORITY_STARTUP__ = false;
+  window.__RK_STARTUP_V201_00__ = true;
+  console.info('[Rekenan STARTUP] V201.00 USER-FIRST — BELANJA/TRANSAKSI + PINJAMAN/CICILAN + LAINNYA FIRST; ADMIN BACKGROUND');
 
-  function rkPreAuthWarmup_() {
-    try {
-      console.info('[Rekenan STARTUP] PRE-AUTH WARMUP START — UI/LOCAL/ADMIN CACHE/LOAN CACHE');
-      try { if (typeof rkLoadAllLocalData_ === 'function') rkLoadAllLocalData_(); } catch (_) {}
-      try { if (typeof renderAdminPanel === 'function') renderAdminPanel(); } catch (_) {}
-      try {
-        const cachedLoan = localStorage.getItem('loanSyncState');
-        if (cachedLoan) {
-          window.__RK_PREAUTH_LOAN_READY__ = true;
-          console.info('[Rekenan STARTUP] PRE-AUTH LOAN CACHE READY');
-        }
-      } catch (_) {}
-      window.__RK_PREAUTH_ADMIN_READY__ = true;
-      console.info('[Rekenan STARTUP] PRE-AUTH WARMUP READY — PIN VERIFICATION STILL REQUIRED');
-    } catch (e) {
-      console.warn('[Rekenan STARTUP] PRE-AUTH WARMUP NON-BLOCKING', e);
+  // Paint local state immediately.
+  try { if (typeof rkLoadAllLocalData_ === 'function') rkLoadAllLocalData_(); } catch (_) {}
+  try { if (typeof renderAll === 'function') renderAll(); } catch (_) {}
+
+  const coreTasks = [];
+
+  // Pinjaman/Cicilan refresh runs concurrently with the general snapshot.
+  try {
+    if (typeof fetchLoansFromCloud === 'function' && rkCloudAuthReady_()) {
+      window.__RK_PRIORITY_LOAN_ACTIVE__ = true;
+      console.info('[Rekenan STARTUP] CORE PINJAMAN READ START');
+      coreTasks.push(Promise.resolve(fetchLoansFromCloud(true))
+        .then(r => console.info('[Rekenan STARTUP] CORE PINJAMAN READY', r || {}))
+        .catch(e => console.warn('[Rekenan STARTUP] CORE PINJAMAN FAILED — local retained', e?.message || e))
+        .finally(() => { window.__RK_PRIORITY_LOAN_ACTIVE__ = false; }));
     }
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(rkPreAuthWarmup_, 0), {once:true});
-  } else {
-    setTimeout(rkPreAuthWarmup_, 0);
-  }
+  } catch (_) { window.__RK_PRIORITY_LOAN_ACTIVE__ = false; }
 
+  // Belanja/Transaksi/other collections refresh at the same time.
+  try {
+    if (typeof cloudRequest === 'function') {
+      console.info('[Rekenan STARTUP] CORE TRANSAKSI/BELANJA/LAINNYA READ START');
+      coreTasks.push(Promise.resolve(cloudRequest({
+        action:'getData', username:activeCloudUser, token:cloudToken, forceRefresh:true
+      }, 12000)).then(fresh => {
+        if (fresh?.success || fresh?.status === 'success') {
+          applyCloudData_(fresh.data || fresh, true);
+          console.info('[Rekenan STARTUP] CORE TRANSAKSI/BELANJA/LAINNYA READY');
+        } else console.warn('[Rekenan STARTUP] CORE GENERAL READ FAILED — local retained');
+      }).catch(e => console.warn('[Rekenan STARTUP] CORE GENERAL READ FAILED — local retained', e?.message || e)));
+    }
+  } catch (_) {}
 
-            console.info('[Rekenan STARTUP] NEW PRIORITY ORDER: BELANJA/TRANSAKSI -> PINJAMAN/CICILAN -> ADMIN -> LAINNYA -> FOTO');
+  // Hard startup budget: never make login/menu entry wait for Cloud longer than ~2.2s.
+  // The original requests keep running and merge into Local-First when they finish.
+  const STARTUP_CORE_BUDGET_MS = 2200;
+  await Promise.race([
+    Promise.allSettled(coreTasks),
+    new Promise(resolve => setTimeout(() => {
+      console.warn('[Rekenan STARTUP] CORE BUDGET REACHED — UI CONTINUES WITH LOCAL/PARTIAL DATA');
+      resolve();
+    }, STARTUP_CORE_BUDGET_MS))
+  ]);
+  try { if (typeof renderAll === 'function') renderAll(); } catch (_) {}
 
-            // P1 BELANJA + TRANSAKSI: these are the first cloud collections users
-            // normally need after login. Paint Local immediately, then reconcile
-            // the normal user data snapshot without waiting for the heavy Admin panel.
-            try {
-                console.info('[Rekenan STARTUP] P1 BELANJA/TRANSAKSI READ START');
-                const fresh = await cloudRequest({
-                    action:'getData',
-                    username:activeCloudUser,
-                    token:cloudToken,
-                    forceRefresh:true
-                }, 10000);
-                if (fresh?.success || fresh?.status === 'success') {
-                    const cloudData = fresh.data || fresh;
-                    applyCloudData_(cloudData, true);
-                    try { renderAll(); } catch (_) {}
-                }
-                console.info('[Rekenan STARTUP] P1 BELANJA/TRANSAKSI READ COMPLETE');
-            } catch (e) {
-                console.warn('[Rekenan STARTUP] P1 BELANJA/TRANSAKSI READ FAILED — Local retained', e?.message || e);
-            }
-
-            // P2 PINJAMAN + CICILAN. This starts only after the lightweight user
-            // snapshot has painted, so the first screen is not held hostage by Admin.
-            try {
-                if (typeof fetchLoansFromCloud === 'function') {
-                    if (!(rkCloudAuthReady_())) await rkEnsureCloudAuthForSync_();
-                    if (rkCloudAuthReady_()) {
-                        window.__RK_PRIORITY_LOAN_ACTIVE__ = true;
-                        console.info('[Rekenan STARTUP] P2 PINJAMAN READ START — VERIFY CACHE FIRST');
-                        const p2Result = await fetchLoansFromCloud(true);
-                        window.__RK_PRIORITY_LOAN_ACTIVE__ = false;
-                        console.info('[Rekenan STARTUP] P2 PINJAMAN READ COMPLETE', p2Result || {
-                            loans: Array.isArray(loansData) ? loansData.length : 0,
-                            payments: Array.isArray(riwayatCicilanData) ? riwayatCicilanData.length : 0
-                        });
-                    } else {
-                        console.warn('[Rekenan STARTUP] P2 PINJAMAN SKIP — Cloud auth unavailable; Local retained');
-                    }
-                }
-            } catch (e) {
-                window.__RK_PRIORITY_LOAN_ACTIVE__ = false;
-                console.warn('[Rekenan STARTUP] P2 PINJAMAN READ FAILED — continuing to Admin/other data', e?.message || e);
-            }
-
-            // P3 ADMIN: NEVER block first login. Admin snapshot is intentionally
-            // delayed so Belanja/Transaksi/Pinjaman become usable first. Cached Admin
-            // state is already painted locally by rkWarmAllDomainsOnStartup_.
-            if (sessionStorage.getItem('rekenan_admin_logged') === 'true' && typeof loadAdminPanel === 'function') {
-                console.info('[Rekenan STARTUP] P3 ADMIN QUEUED — NON BLOCKING');
-                setTimeout(() => {
-                    try {
-                        loadAdminPanel(true).catch(err => console.warn('[Rekenan STARTUP] ADMIN BACKGROUND FAILED', err?.message || err));
-                    } catch (err) {
-                        console.warn('[Rekenan STARTUP] ADMIN BACKGROUND FAILED', err?.message || err);
-                    }
-                }, 5000);
-            }
-        }
+  // Admin is background-only and must not delay first usable screen.
+  setTimeout(() => {
+    try {
+      if (typeof loadAdminPanel === 'function') {
+        console.info('[Rekenan STARTUP] BACKGROUND ADMIN READ START');
+        Promise.resolve(loadAdminPanel(true)).then(() => {
+          console.info('[Rekenan STARTUP] BACKGROUND ADMIN READY');
+        }).catch(e => console.warn('[Rekenan STARTUP] BACKGROUND ADMIN FAILED', e?.message || e));
+      }
+    } catch (e) { console.warn('[Rekenan STARTUP] BACKGROUND ADMIN FAILED', e?.message || e); }
+  }, 1200);
+}
 
         async function rkRestoreCloudStateOnStartup_() {
             console.groupCollapsed('[Rekenan STARTUP] TRUE LOCAL-FIRST V200.90');
             console.info('Client UI build:', window.REKENAN_BUILD_VERSION);
             console.info('Client API build:', window.REKENAN_SERVER_BUILD);
-            console.info('Startup priority: BELANJA/TRANSAKSI -> PINJAMAN/CICILAN -> ADMIN -> LAINNYA -> FOTO');
+            console.info('Startup priority: BELANJA/TRANSAKSI + PINJAMAN/CICILAN + LAINNYA -> ADMIN BACKGROUND');
             console.groupEnd();
             if (rkStartupCloudRestoreInFlight_) return;
             rkStartupCloudRestoreInFlight_ = true;
@@ -5693,30 +5661,12 @@ nav.fixed.bottom-0 {
 
                 if (!(await rkEnsureCloudAuthForSync_())) return;
 
-                // P1 ADMIN -> P2 PINJAMAN are mandatory order. Each phase handles
-                // its own auth recovery and failure is isolated so the next phase
-                // still runs.
+                // V201.00: user-facing core refreshes run concurrently; Admin is background-only.
                 await rkPriorityStartupSync_();
 
-                // P3 other collections.
-                try {
-                    const fresh = await cloudRequest({
-                        action:'getData',
-                        username:activeCloudUser,
-                        token:cloudToken,
-                        forceRefresh:true
-                    }, 12000);
-                    if (fresh?.success || fresh?.status === 'success') {
-                        const cloudData = fresh.data || fresh;
-                        applyCloudData_(cloudData, true);
-                        if (!rkLocalAuthority_() || rkLocalStateIsEmpty_()) rkLocalFirstMarkBootstrapComplete_();
-                        else console.info('[Rekenan LOCAL-FIRST] RECONCILIATION COMPLETE — Local pending rows preserved');
-                    } else {
-                        console.warn('[Rekenan LOCAL-FIRST] P3 CLOUD READ FAILED — Local retained');
-                    }
-                } catch (e) {
-                    console.warn('[Rekenan STARTUP] P3 TRANSAKSI/LAINNYA FAILED — Local retained', e?.message || e);
-                }
+                // V201.00: general cloud read is already part of the concurrent core phase.
+                try { if (!rkLocalAuthority_() || rkLocalStateIsEmpty_()) rkLocalFirstMarkBootstrapComplete_();
+                      else console.info('[Rekenan LOCAL-FIRST] RECONCILIATION COMPLETE — Local pending rows preserved'); } catch (_) {}
 
                 try { renderAll(); } catch (_) {}
                 try { rkSetTransferIndicator_('ok','Data lokal siap • Cloud tersinkron'); } catch (_) {}
@@ -8206,7 +8156,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             const statusFilter = String(statusEl?.value || 'all');
             const source = Array.isArray(loansData) ? loansData : [];
             const norm = v => String(v ?? '').trim().toLowerCase();
-            // IMPORTANT V200.98: loansData is already server-scoped to the
+            // IMPORTANT V201.00: loansData is already server-scoped to the
             // authenticated borrower by loanSyncState/getBorrowerData. Re-filtering
             // it in the UI by borrowerId/name was the reason valid cards could vanish
             // while the console still reported cloudLoans > 0. Display the scoped
@@ -8285,7 +8235,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             updateBorrowerLoanActivityBadge_();
         }
 
-        // V200.98: one authoritative loan render entry point. It reads the actual
+        // V201.00: one authoritative loan render entry point. It reads the actual
         // lexical loan arrays, never window.loansData, and coalesces bursty realtime
         // callbacks without suppressing a genuinely changed snapshot.
         let rkLoanRenderTimer_ = null;
@@ -9940,7 +9890,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             // V200.90 CACHE-FIRST: paint local snapshot immediately.
             try {renderEmbeddedAdmin();} catch (_) { }
             const age = Date.now() - Number(adminLastFetchAt_ || 0);
-            // V200.98: the Admin menu is a reconciliation point. Paint the local
+            // V201.00: the Admin menu is a reconciliation point. Paint the local
             // snapshot first, then always perform one background authoritative read
             // when the menu is opened/explicitly refreshed. This prevents a fresh
             // loan from being hidden behind a 5-minute client freshness gate.
@@ -10163,7 +10113,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             }
             try { renderEmbeddedAdmin(); } catch (_) {}
         }
-        // V200.98: Admin gets the same single-render rule, without stale
+        // V201.00: Admin gets the same single-render rule, without stale
         // fingerprint suppression. The current embedded arrays are the source.
         let rkAdminRenderTimer_ = null;
         let rkAdminLastPaintSig_ = '';
@@ -12922,9 +12872,9 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 <script>
 /* V200.90 PERFORMANCE + ADMIN ACC QUEUE + REALTIME PULSE PATCH */
 (function(){
- const RK_BUILD='V200.98';
+ const RK_BUILD='V201.00';
  window.REKENAN_BUILD=RK_BUILD;
- console.info('[Rekenan BUILD] V200.98 | CONSOLIDATED LOAN STORE + ADMIN STABLE RENDER');
+ console.info('[Rekenan BUILD] V201.00 | CONSOLIDATED LOAN STORE + USER-FIRST STARTUP');
  window.rkBusinessNow=function(){ return new Date(); };
  window.rkBusinessDate=function(v){
    const d=v instanceof Date?v:new Date(v==null?Date.now():v);
@@ -13320,7 +13270,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   console.info('[Rekenan BUILD] V200.90 CALC SHEET READ + PDF HEADER LOGO + APP-SHELL');
-  window.__REKENAN_BUILD__='V200.98';
+  window.__REKENAN_BUILD__='V201.00';
 })();
 </script>
 
@@ -13328,7 +13278,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20065-calc-photo-audit-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.98';
+  window.__REKENAN_BUILD__='V201.00';
   window.REKENAN_UI_BUILD='V201.00';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
@@ -13528,7 +13478,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20067-calculator-hard-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.98';
+  window.__REKENAN_BUILD__='V201.00';
   window.REKENAN_UI_BUILD='V201.00';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
@@ -13539,10 +13489,127 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <script>
 (function(){
-  window.__REKENAN_BUILD__='V200.98';
+  window.__REKENAN_BUILD__='V201.00';
   window.REKENAN_UI_BUILD='V201.00';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
 
 
+
+<style id="rekenan-v20100-final-scroll-fix">
+/* V201.00 FINAL UI SCROLL FIX
+   Single vertical scroll owner, enough clearance for fixed bottom nav,
+   no flex/min-height trap, and calculator remains independently scrollable. */
+html, body {
+  height: 100% !important;
+  min-height: 100% !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+.mobile-container {
+  height: 100dvh !important;
+  min-height: 0 !important;
+  max-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: auto !important;
+  scroll-padding-top: 84px !important;
+  scroll-padding-bottom: calc(var(--rk-nav-height, 68px) + var(--rk-nav-safe, 0px) + 34px) !important;
+}
+
+.mobile-container > header {
+  flex: 0 0 auto !important;
+}
+
+.mobile-container > main {
+  flex: 0 0 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding-bottom: calc(var(--rk-nav-height, 68px) + var(--rk-nav-safe, 0px) + 56px) !important;
+}
+
+.tab-content,
+.tab-content.active,
+.tab-content > section,
+.tab-content > div {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Fixed bottom navigation must never cover the last card/button. */
+.mobile-container > nav.fixed,
+nav.fixed.bottom-0 {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1200 !important;
+  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+}
+
+/* Calculator page: normal document flow; only its own history/panel may scroll. */
+#tab-kalkulator,
+#tab-calculator {
+  position: relative !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+#v101CalculatorModal.rk-calculator-shell {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1100 !important;
+  display: none !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding: max(58px, env(safe-area-inset-top, 0px) + 18px) 8px calc(var(--rk-nav-height, 68px) + 18px) !important;
+  overflow: hidden !important;
+}
+
+#v101CalculatorModal.rk-calculator-shell.show {
+  display: flex !important;
+}
+
+#v101CalculatorModal.rk-calculator-shell .v101-panel {
+  width: min(100%, 430px) !important;
+  max-width: 430px !important;
+  max-height: calc(100dvh - 110px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+  margin: 0 !important;
+  padding-bottom: 20px !important;
+}
+
+/* Prevent accidental nested scroll traps in calculator content. */
+#v101CalculatorModal.rk-calculator-shell .v101-panel > * {
+  min-height: 0 !important;
+}
+
+@media (max-width: 600px) {
+  .mobile-container > main {
+    padding-bottom: calc(var(--rk-nav-height, 68px) + var(--rk-nav-safe, 0px) + 64px) !important;
+  }
+  #v101CalculatorModal.rk-calculator-shell {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    padding-bottom: calc(var(--rk-nav-height, 68px) + 12px) !important;
+  }
+  #v101CalculatorModal.rk-calculator-shell .v101-panel {
+    width: min(100%, 390px) !important;
+    max-height: calc(100dvh - 92px) !important;
+    border-radius: 16px !important;
+  }
+}
+</style>
