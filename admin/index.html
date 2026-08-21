@@ -2924,9 +2924,9 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20108-authoritative-fix">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V201.08';
+  window.REKENAN_UI_BUILD='V201.09';
   window.REKENAN_CALCULATOR_BUILD='V201.08';
-  console.info('[Rekenan BUILD] V201.08 | DESKTOP AUTO SIDEBAR | CALCULATOR PHOTO SINGLE AUTHORITY');
+  console.info('[Rekenan BUILD] V201.09 | DESKTOP AUTO SIDEBAR | CALCULATOR PHOTO SINGLE AUTHORITY');
 
   function dedupeCalculatorPhotoUI_(){
     try{
@@ -2964,8 +2964,8 @@ nav.fixed.bottom-0 {
           }
         });
       }
-      console.info('[Rekenan CALC] V201.08 PHOTO AUDIT', {photoTools:1,cameraButtons:keep.querySelectorAll('label.rk-calc-photo-btn').length,viewButtons:keep.querySelectorAll('#v201CalcPhotoViewBtn').length});
-    }catch(e){console.warn('[Rekenan CALC] V201.08 PHOTO DEDUPE FAILED',e);}
+      console.info('[Rekenan CALC] V201.09 PHOTO AUDIT', {photoTools:1,cameraButtons:keep.querySelectorAll('label.rk-calc-photo-btn').length,viewButtons:keep.querySelectorAll('#v201CalcPhotoViewBtn').length});
+    }catch(e){console.warn('[Rekenan CALC] V201.09 PHOTO DEDUPE FAILED',e);}
   }
   function removeLegacyCalculatorOverlay_(){
     try{
@@ -6723,7 +6723,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             if (rkAutoSyncInFlight_) {window.__rkAutoSyncWakePending = true; return;}
             rkScheduleAutoSync_(delay);
         }
-        function rkSetAutoSyncIndicator_(state = 'idle', detail = 'Sinkronisasi otomatis') {const el = document.getElementById('rkAutoSyncIndicator'); if (!el) return; el.classList.remove('is-pending', 'is-syncing', 'is-ok', 'is-error'); const icon = el.querySelector('[data-auto-sync-icon]'); if (state === 'syncing') {el.classList.add('is-syncing'); if (icon) icon.className = 'fa-solid fa-rotate text-xs'; el.title = 'Sedang menyinkronkan data otomatis';} else if (state === 'pending') {el.classList.add('is-pending'); if (icon) icon.className = 'fa-solid fa-cloud-arrow-up text-xs'; el.title = 'Ada data/foto menunggu koneksi atau retry';} else if (state === 'ok') {el.classList.add('is-ok'); if (icon) icon.className = 'fa-solid fa-cloud-check text-xs'; el.title = 'Semua data sudah tersinkron';} else if (state === 'error') {el.classList.add('is-error'); if (icon) icon.className = 'fa-solid fa-triangle-exclamation text-xs'; el.title = detail || 'Sinkronisasi menunggu retry';} else {if (icon) icon.className = 'fa-solid fa-cloud text-xs'; el.title = detail;} }
+        function rkSetAutoSyncIndicator_(state = 'idle', detail = 'Cloud siap') {const el = document.getElementById('rkAutoSyncIndicator'); if (!el) return; el.classList.remove('is-pending', 'is-syncing', 'is-ok', 'is-error'); const icon = el.querySelector('[data-auto-sync-icon]'); const online = navigator.onLine !== false; if (state === 'syncing') {el.classList.add('is-syncing'); if (icon) icon.className = 'fa-solid fa-rotate text-xs'; el.title = 'Sedang menyinkronkan data otomatis';} else if (state === 'pending') { if (!online) { el.classList.add('is-pending'); if (icon) icon.className = 'fa-solid fa-cloud-arrow-up text-xs'; el.title = 'Offline — data lokal menunggu koneksi'; } else { el.classList.add('is-ok'); if (icon) icon.className = 'fa-solid fa-cloud-check text-xs'; el.title = 'Cloud terhubung — antrean lokal akan disinkronkan otomatis'; } } else if (state === 'ok') {el.classList.add('is-ok'); if (icon) icon.className = 'fa-solid fa-cloud-check text-xs'; el.title = online ? 'Cloud terhubung — siap' : 'Offline — data tetap aman di perangkat';} else if (state === 'error') {el.classList.add('is-error'); if (icon) icon.className = 'fa-solid fa-triangle-exclamation text-xs'; el.title = detail || 'Sinkronisasi gagal; antrean lokal dipertahankan';} else {if (online) {el.classList.add('is-ok'); if (icon) icon.className = 'fa-solid fa-cloud-check text-xs'; el.title = detail || 'Cloud terhubung';} else {el.classList.add('is-pending'); if (icon) icon.className = 'fa-solid fa-cloud-arrow-up text-xs'; el.title = detail || 'Offline — data tetap tersimpan lokal';}} }
         // V200.90 SYNC STABILITY: Cloud failures must pause the worker instead of
         // creating a tight retry loop. Local/queue state remains authoritative.
         let rkSyncPauseUntil_ = 0;
@@ -6813,7 +6813,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         window.addEventListener('online', () => {console.info('[Rekenan SYNC] NETWORK ONLINE — queue retained; worker resumes only when not paused'); if (!rkSyncIsPaused_()) { rkAutoRetry_ = 0; rkQueueAutoSync_(150); } else { console.info('[Rekenan SYNC] NETWORK ONLINE — existing backoff preserved', Math.max(0, rkSyncPauseUntil_ - Date.now()) + 'ms'); }});
         window.addEventListener('offline', () => rkSetAutoSyncIndicator_('pending', 'Offline — data tetap tersimpan di perangkat'));
         window.addEventListener('visibilitychange', () => {if (document.visibilityState === 'visible' && rkIsSyncPending_() && !rkSyncIsPaused_()) rkQueueAutoSync_(150);});
-        function rkUpdateSyncButton_() {rkSetAutoSyncIndicator_(rkIsSyncPending_() ? 'pending' : 'ok');}
+        function rkUpdateSyncButton_() { try { const pending = rkIsSyncPending_(); if (!pending) { try { localStorage.removeItem(rkSyncKey_(RK_SYNC_PENDING_KEY)); } catch (_) {} rkSetAutoSyncIndicator_('ok'); return; } rkSetAutoSyncIndicator_(navigator.onLine ? 'pending' : 'pending'); } catch (_) { rkSetAutoSyncIndicator_('ok'); } }
         // V198.2: Manual Reload/Sync UI is intentionally removed.
         // Automatic queue is the only normal sync path. Queue state is persistent.
         // Data is pushed as soon as the device is online; no day-change trigger is required.
@@ -12443,7 +12443,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         (function () {
             const ui = 'V200.90';
             console.info('[Rekenan BUILD] UI V200.90 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.90 / SERVER API COMPATIBLE');
-            window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
+            window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); console.info('[Rekenan CLOUD] V201.09 INDICATOR FIX — orange only when offline; green when connected/idle'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
 
@@ -13360,7 +13360,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V201.08';
+  window.REKENAN_UI_BUILD='V201.09';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -13395,7 +13395,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V201.08';
+window.REKENAN_UI_BUILD='V201.09';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13551,7 +13551,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.08';
+  window.REKENAN_UI_BUILD='V201.09';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13751,7 +13751,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.08';
+  window.REKENAN_UI_BUILD='V201.09';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
@@ -13762,7 +13762,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.08';
+  window.REKENAN_UI_BUILD='V201.09';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
@@ -13968,7 +13968,7 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20103-calculator-design-runtime">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V201.08';
+  window.REKENAN_UI_BUILD='V201.09';
   window.rkCalcQuickAmount_=function(amount){
     const i=document.getElementById('v101CalcExpr'); if(!i) return;
     let v=String(i.textContent||i.value||'').trim();
@@ -13995,7 +13995,7 @@ nav.fixed.bottom-0 {
 </script>
 
 <script id="rekenan-v20103-authoritative-build">
-window.REKENAN_UI_BUILD='V201.08';
+window.REKENAN_UI_BUILD='V201.09';
 window.REKENAN_CALCULATOR_BUILD='V201.04';
 console.info('[Rekenan BUILD] UI V201.04 | CALCULATOR V201.04 PRO | 000 KEPT | 00 REMOVED | DESKTOP 2-COLUMN | MOBILE SINGLE-COLUMN | LAYOUT FIX');
 </script>
