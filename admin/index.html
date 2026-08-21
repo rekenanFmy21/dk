@@ -4,11 +4,11 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V200.7';
+        window.REKENAN_BUILD_VERSION = 'V200.5';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.7';
-        console.info('[Rekenan BUILD] UI V200.7');
+        window.REKENAN_UI_BUILD = 'V200.5';
+        console.info('[Rekenan BUILD] UI V200.5');
         console.info('[Rekenan BUILD] LOCAL-FIRST + AUTO-ONLINE QUEUE + DATA-FIRST PHOTO BACKGROUND + SINGLE WORKER + IDEMPOTENT RETRY + ATTACHMENT RESUME + IMPORT TRANSFER FIX + CLOUD DELTA + DELETE STATUS V200.1');
         (function () {
             try {
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.7">
+    <meta name="rekenan-build" content="V200.5">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -3691,9 +3691,9 @@ margin:0!important;
         // Local file:// pages use JSONP because browser fetch cannot read a
         // normal cross-origin GAS response without CORS.
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
-        const API_VERSION = 'V200.7-LOCAL-FIRST-CACHED';
-        window.REKENAN_SERVER_BUILD = 'V200.7';
-        console.info('[Rekenan BUILD] CLIENT V200.7 / SERVER API V200.7');
+        const API_VERSION = 'V200.5-LOCAL-FIRST-CACHED';
+        window.REKENAN_SERVER_BUILD = 'V200.5';
+        console.info('[Rekenan BUILD] CLIENT V200.5 / SERVER API V200.5');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -4747,7 +4747,7 @@ margin:0!important;
             console.info('Client UI build:', window.REKENAN_BUILD_VERSION);
             console.info('Client API build:', window.REKENAN_SERVER_BUILD);
             console.info('Service Worker URL:', './sw.js?v=2005');
-            console.info('Expected deploy build:', 'V200.7');
+            console.info('Expected deploy build:', 'V200.5');
             console.info('Current URL:', location.href);
             console.info('Local storage build:', localStorage.getItem('rekenan_expected_build'));
             console.info('SW controller:', navigator.serviceWorker?.controller?.scriptURL || 'none');
@@ -9658,25 +9658,12 @@ margin:0!important;
 
             /* ================= LOAN PHOTO POSITION ================= */
             function v108MoveLoanPhotoIcons_() {
-                // V200.6 FIX: realtime render can replace the status node between
-                // querySelector() and insertBefore(). Never use a stale reference node.
                 document.querySelectorAll('#loanCardList .v106-photo-check').forEach(function (btn) {
-                    try {
-                        if (!btn || !btn.isConnected) return;
-                        var card = btn.closest('.v37-loan-card');
-                        var header = card && card.querySelector('.flex.justify-between.gap-3');
-                        if (!header || !header.isConnected) return;
-                        var status = header.querySelector('span.border');
-                        // Re-check ownership immediately before mutation. If realtime
-                        // rendering replaced the reference, append safely instead.
-                        if (btn.parentElement !== header) {
-                            if (status && status.parentNode === header) header.insertBefore(btn, status);
-                            else header.appendChild(btn);
-                        }
-                        btn.style.marginLeft = 'auto'; btn.style.marginRight = '4px';
-                    } catch (e) {
-                        console.warn('[Rekenan PINJAMAN] photo icon move skipped:', e?.message || e);
-                    }
+                    var header = btn.closest('.v37-loan-card')?.querySelector('.flex.justify-between.gap-3');
+                    if (!header) return;
+                    var status = header.querySelector('span.border');
+                    if (status && btn.parentElement !== header) header.insertBefore(btn, status);
+                    btn.style.marginLeft = 'auto'; btn.style.marginRight = '4px';
                 });
             }
             var v108OldRenderLoan = window.renderLoanList;
@@ -10349,8 +10336,8 @@ margin:0!important;
 
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
-            const ui = 'V200.7';
-            console.info('[Rekenan BUILD] UI V200.7 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.7 / SERVER V200.7');
+            const ui = 'V200.5';
+            console.info('[Rekenan BUILD] UI V200.5 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.5 / SERVER V200.5');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -10486,7 +10473,7 @@ margin:0!important;
     <script id="v1961-final-fixes">
         (function () {
             'use strict';
-            console.info('[Rekenan BUILD] V200.7 ARCHITECTURE LOADED');
+            console.info('[Rekenan BUILD] V200.5 ARCHITECTURE LOADED');
             window.rkNormalizePinError_ = function (err) {
                 const raw = String(err?.message || err || '');
                 return /pin/i.test(raw) && /(salah|wrong|invalid|tidak sesuai|incorrect)/i.test(raw) ? 'PIN salah.' : raw;
@@ -10809,7 +10796,7 @@ margin:0!important;
     <script id="rekenan-v1984-final-functional-fix">
         (function () {
             'use strict';
-            console.info('[Rekenan BUILD] V200.7 UNIVERSAL DELTA SYNC + ATOMIC ATTACHMENT + TRANSFER STATUS LOADED');
+            console.info('[Rekenan BUILD] V200.5 UNIVERSAL DELTA SYNC + ATOMIC ATTACHMENT + TRANSFER STATUS LOADED');
 
             /* ---------- stable calculator formatter ---------- */
             window.v109Fmt = function (v) {
@@ -11049,9 +11036,9 @@ margin:0!important;
 <script>
 /* V200.5 PERFORMANCE + ADMIN ACC QUEUE + REALTIME PULSE PATCH */
 (function(){
- const RK_BUILD='V200.7';
+ const RK_BUILD='V200.5';
  window.REKENAN_BUILD=RK_BUILD;
- console.info('[Rekenan BUILD] V200.7 | ADMIN ACC QUEUE + BORROWER REALTIME ACC');
+ console.info('[Rekenan BUILD] V200.5 | ADMIN ACC QUEUE + BORROWER REALTIME ACC');
  window.rkBusinessNow=function(){ return new Date(); };
  window.rkBusinessDate=function(v){
    const d=v instanceof Date?v:new Date(v==null?Date.now():v);
@@ -11070,9 +11057,6 @@ margin:0!important;
  if(typeof oldAdmin==='function') window.loadAdminPanel=async function(force){
    const c=window.rkGetMenuSnapshot('rekenan_admin_index_v2005');
    if(!force&&c&&c.data){ const p=c.data; embeddedAdminBorrowers=p.borrowers||[];embeddedAdminLoans=p.loans||[];embeddedAdminPayments=p.riwayatCicilan||[]; renderEmbeddedAdmin(); }
-   // A cache-first paint must not trigger a second forced server rebuild.
-   // Explicit refresh still reaches the original loader, but normal menu entry
-   // uses the server's short-lived cache.
    return oldAdmin.call(this,!!force);
  };
  const oldBorrow=window.fetchLoansFromCloud;
