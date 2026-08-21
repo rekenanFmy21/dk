@@ -2924,9 +2924,9 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20108-authoritative-fix">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V201.09';
-  window.REKENAN_CALCULATOR_BUILD='V201.08';
-  console.info('[Rekenan BUILD] V201.09 | DESKTOP AUTO SIDEBAR | CALCULATOR PHOTO SINGLE AUTHORITY');
+  window.REKENAN_UI_BUILD='V201.10';
+  window.REKENAN_CALCULATOR_BUILD='V201.10';
+  console.info('[Rekenan BUILD] V201.10 | DESKTOP AUTO SIDEBAR | CALCULATOR PHOTO NO-OVERLAP');
 
   function dedupeCalculatorPhotoUI_(){
     try{
@@ -2983,6 +2983,65 @@ nav.fixed.bottom-0 {
 })();
 </script>
 
+
+<style id="rekenan-v20110-photo-no-overlap">
+/* V201.10: Calculator photo controls have one isolated flex row. */
+#tab-kalkulator .rk-calc-photo-tools{
+  position:relative!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;
+  gap:10px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;overflow:visible!important;
+}
+#tab-kalkulator .rk-calc-photo-tools > label.rk-calc-photo-btn,
+#tab-kalkulator .rk-calc-photo-tools > button.rk-calc-photo-btn{
+  position:relative!important;inset:auto!important;float:none!important;margin:0!important;
+  width:44px!important;height:44px!important;min-width:44px!important;max-width:44px!important;
+  flex:0 0 44px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;border-radius:12px!important;
+}
+#tab-kalkulator .rk-calc-photo-tools > label.rk-calc-photo-btn input[type=file]{display:none!important;position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;}
+#tab-kalkulator .rk-calc-photo-tools > .v101-proof-meta{position:relative!important;inset:auto!important;margin:0 0 0 2px!important;flex:1 1 auto!important;min-width:0!important;}
+#tab-kalkulator .rk-calc-photo-tools > .v101-proof-meta b,#tab-kalkulator .rk-calc-photo-tools > .v101-proof-meta small{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+/* Any legacy photo wrapper inside the Calculator route is suppressed; the rk-calc-photo-tools row is authoritative. */
+#tab-kalkulator .v101-proof:not(.rk-calc-photo-tools){display:none!important;}
+@media(max-width:760px){#tab-kalkulator .rk-calc-photo-tools{gap:9px!important;}#tab-kalkulator .rk-calc-photo-tools > label.rk-calc-photo-btn,#tab-kalkulator .rk-calc-photo-tools > button.rk-calc-photo-btn{width:42px!important;height:42px!important;min-width:42px!important;max-width:42px!important;flex-basis:42px!important;}}
+</style>
+<script id="rekenan-v20110-photo-dedup">
+(function(){
+  'use strict';
+  window.REKENAN_UI_BUILD='V201.10';
+  window.REKENAN_CALCULATOR_BUILD='V201.10';
+  console.info('[Rekenan BUILD] V201.10 | CALCULATOR PHOTO NO-OVERLAP');
+  function normalizeCalcPhoto_(){
+    const tab=document.getElementById('tab-kalkulator'); if(!tab) return;
+    const rows=[...tab.querySelectorAll('.rk-calc-photo-tools')];
+    if(rows.length>1) rows.slice(1).forEach(x=>x.remove());
+    const row=rows[0]; if(!row) return;
+    [...row.children].forEach(ch=>{
+      if(ch.matches('label.rk-calc-photo-btn,button.rk-calc-photo-btn,.v101-proof-meta')) return;
+      if(ch.querySelector && ch.querySelector('#v201CalcAttachment')) return;
+      ch.remove();
+    });
+    const labels=[...row.querySelectorAll('label.rk-calc-photo-btn')];
+    if(labels.length>1) labels.slice(1).forEach(x=>x.remove());
+    const views=[...row.querySelectorAll('button.rk-calc-photo-view')];
+    if(views.length>1) views.slice(1).forEach(x=>x.remove());
+    const input=row.querySelector('#v201CalcAttachment');
+    if(input){ input.classList.add('hidden'); input.style.display='none'; }
+    const cam=row.querySelector('label.rk-calc-photo-btn');
+    const view=row.querySelector('#v201CalcPhotoViewBtn');
+    if(cam){cam.style.position='relative';cam.style.inset='auto';}
+    if(view){view.style.position='relative';view.style.inset='auto';}
+  }
+  window.rekenanCalcPhotoAuditV20110=function(){
+    const tab=document.getElementById('tab-kalkulator');
+    const row=tab?.querySelector('.rk-calc-photo-tools');
+    const out={photoRows:tab?.querySelectorAll('.rk-calc-photo-tools').length||0,cameraButtons:row?.querySelectorAll('label.rk-calc-photo-btn').length||0,viewButtons:row?.querySelectorAll('#v201CalcPhotoViewBtn').length||0};
+    console.info('[Rekenan AUDIT] CALC PHOTO V201.10',out); return out;
+  };
+  function boot(){normalizeCalcPhoto_();window.rekenanCalcPhotoAuditV20110();}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+  document.addEventListener('click',function(e){if(e.target.closest('[data-cat-tool="calculator"],#tab-kalkulator')) requestAnimationFrame(normalizeCalcPhoto_);},true);
+})();
+</script>
 </head>
 
 <body class="bg-black text-gray-100 flex justify-center min-h-screen">
@@ -13360,7 +13419,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V201.09';
+  window.REKENAN_UI_BUILD='V201.10';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -13395,7 +13454,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V201.09';
+window.REKENAN_UI_BUILD='V201.10';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13551,7 +13610,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.09';
+  window.REKENAN_UI_BUILD='V201.10';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13751,7 +13810,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.09';
+  window.REKENAN_UI_BUILD='V201.10';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
@@ -13762,7 +13821,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.09';
+  window.REKENAN_UI_BUILD='V201.10';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
@@ -13968,7 +14027,7 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20103-calculator-design-runtime">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V201.09';
+  window.REKENAN_UI_BUILD='V201.10';
   window.rkCalcQuickAmount_=function(amount){
     const i=document.getElementById('v101CalcExpr'); if(!i) return;
     let v=String(i.textContent||i.value||'').trim();
@@ -13995,7 +14054,7 @@ nav.fixed.bottom-0 {
 </script>
 
 <script id="rekenan-v20103-authoritative-build">
-window.REKENAN_UI_BUILD='V201.09';
+window.REKENAN_UI_BUILD='V201.10';
 window.REKENAN_CALCULATOR_BUILD='V201.04';
 console.info('[Rekenan BUILD] UI V201.04 | CALCULATOR V201.04 PRO | 000 KEPT | 00 REMOVED | DESKTOP 2-COLUMN | MOBILE SINGLE-COLUMN | LAYOUT FIX');
 </script>
