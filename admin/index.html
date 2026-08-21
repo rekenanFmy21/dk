@@ -2823,6 +2823,49 @@ nav.fixed.bottom-0 {
   }
 }
 </style>
+
+<style id="rekenan-v20105-calculator-route">
+/* V201.05: Calculator is a REAL ROUTE. No fixed overlay, no viewport-trapped panel, one app-shell scroll. */
+#tab-kalkulator{display:none!important;width:100%!important;max-width:none!important;min-width:0!important;overflow:visible!important;transform:none!important}
+#tab-kalkulator.active{display:block!important;opacity:1!important;visibility:visible!important;height:auto!important;min-height:0!important;overflow:visible!important}
+.rk-calc-route-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.rk-calc-route-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid #30344a;border-radius:999px;background:#171827;color:#a5b4fc;font-size:10px;font-weight:900}
+.rk-calc-route-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.9fr);gap:14px;align-items:start}
+.rk-calc-main-card,.rk-calc-history-card{min-width:0;background:#12151d;border:1px solid #292e3a;border-radius:22px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.16)}
+#tab-kalkulator .rk-calc-display{margin-bottom:14px;min-height:112px;padding:18px 16px;border-radius:18px;background:#171a23;border:1px solid #303542;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;overflow:hidden}
+#tab-kalkulator .rk-calc-expression{width:100%;font-size:13px;line-height:1.4;color:#9ca3af;text-align:right;min-height:20px;overflow-wrap:anywhere}
+#tab-kalkulator .rk-calc-result{width:100%;font-size:clamp(34px,5vw,48px);line-height:1.05;font-weight:1000;color:#fff;text-align:right;overflow-wrap:anywhere}
+#tab-kalkulator .rk-calc-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:9px!important;width:100%!important}
+#tab-kalkulator .rk-calc-grid .v106-calc-key{min-height:58px!important;border-radius:15px!important;font-size:17px!important;font-weight:1000!important}
+#tab-kalkulator .rk-calc-grid .v106-calc-key:nth-child(19){grid-column:span 2}
+#tab-kalkulator .rk-calc-quick{margin-top:13px;padding:11px;border:1px solid #292e3a;border-radius:16px;background:#171a23}
+#tab-kalkulator .rk-calc-quick>span{display:block;font-size:10px;font-weight:900;color:#9ca3af;margin-bottom:8px}
+#tab-kalkulator .rk-calc-quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+#tab-kalkulator .rk-calc-quick-grid button{min-height:38px;border-radius:11px;border:1px solid #30364a;background:#202536;color:#c7d2fe;font-size:11px;font-weight:900}
+#tab-kalkulator .rk-calc-save-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:center;margin-top:12px}
+#tab-kalkulator .rk-calc-save-row .v101-proof{margin-top:0;min-width:0}
+.rk-calc-save-btn{min-height:48px;padding:0 18px;border:0;border-radius:14px;background:#2563eb;color:#fff;font-size:12px;font-weight:1000;white-space:nowrap}
+.rk-calc-history-card{position:sticky;top:calc(var(--rk-header,64px) + 10px);max-height:none;overflow:visible}
+.rk-calc-history-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #292e3a}
+#tab-kalkulator #v201CalcHistory{min-height:120px;overflow:visible}
+#tab-kalkulator .rk-history-older{max-height:420px;overflow:auto;padding-right:2px}
+@media(max-width:760px){
+  .rk-calc-route-grid{grid-template-columns:1fr}
+  .rk-calc-history-card{position:static}
+  #tab-kalkulator .rk-calc-grid .v106-calc-key{min-height:54px!important;font-size:16px!important}
+  #tab-kalkulator .rk-calc-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:420px){
+  .rk-calc-main-card,.rk-calc-history-card{padding:11px;border-radius:18px}
+  #tab-kalkulator .rk-calc-grid{gap:7px!important}
+  #tab-kalkulator .rk-calc-grid .v106-calc-key{min-height:50px!important;border-radius:13px!important}
+  #tab-kalkulator .rk-calc-save-row{grid-template-columns:1fr}
+  .rk-calc-save-btn{width:100%}
+}
+/* The old calculator overlay must never be able to trap the route scroll. */
+#v101CalculatorModal.rk-calculator-shell{display:none!important;position:static!important;inset:auto!important;width:0!important;height:0!important;max-height:0!important;overflow:hidden!important;pointer-events:none!important;visibility:hidden!important}
+</style>
+
 </head>
 
 <body class="bg-black text-gray-100 flex justify-center min-h-screen">
@@ -3870,7 +3913,67 @@ nav.fixed.bottom-0 {
                     </div>
                 </div>
             </div>
-            <div class="tab-content space-y-4" id="tab-setting">
+            
+            <div class="tab-content space-y-4" id="tab-kalkulator">
+                <div class="rk-calc-route-head">
+                    <div>
+                        <div class="text-xs text-zinc-400 font-semibold">Kalkulator</div>
+                        <div class="text-lg font-black text-white">Kalkulator Transaksi</div>
+                    </div>
+                    <div class="rk-calc-route-badge"><i class="fa-solid fa-calculator"></i> V201.05</div>
+                </div>
+                <div class="rk-calc-route-grid">
+                    <section class="rk-calc-main-card">
+                        <div class="rk-calc-display">
+                            <div class="rk-calc-expression" id="v201CalcExpr">0</div>
+                            <div class="rk-calc-result" id="v201CalcResult">0</div>
+                        </div>
+                        <div class="rk-calc-grid" id="v201CalcGrid">
+                            <button type="button" class="v106-calc-key v106-calc-action" onclick="v201CalcKey_('C')">AC</button>
+                            <button type="button" class="v106-calc-key v106-calc-action" onclick="v201CalcKey_('⌫')">⌫</button>
+                            <button type="button" class="v106-calc-key v106-calc-action" onclick="v201CalcKey_('.')">.</button>
+                            <button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('÷')">÷</button>
+                            <button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('7')">7</button>
+                            <button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('8')">8</button>
+                            <button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('9')">9</button>
+                            <button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('×')">×</button>
+                            <button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('4')">4</button>
+                            <button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('5')">5</button>
+                            <button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('6')">6</button>
+                            <button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('−')">−</button>
+                            <button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('1')">1</button>
+                            <button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('2')">2</button>
+                            <button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('3')">3</button>
+                            <button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('+')">+</button>
+                            <button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('0')">0</button>
+                            <button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('000')">000</button>
+                            <button type="button" class="v106-calc-key v106-calc-eq" onclick="v201CalcKey_('=')">=</button>
+                        </div>
+                        <div class="rk-calc-quick" aria-label="Nominal cepat">
+                            <span>Nominal cepat</span>
+                            <div class="rk-calc-quick-grid">
+                                <button type="button" onclick="v201CalcQuickAmount_(10000)">+10K</button>
+                                <button type="button" onclick="v201CalcQuickAmount_(50000)">+50K</button>
+                                <button type="button" onclick="v201CalcQuickAmount_(100000)">+100K</button>
+                                <button type="button" onclick="v201CalcQuickAmount_(500000)">+500K</button>
+                            </div>
+                        </div>
+                        <div class="rk-calc-save-row">
+                            <div class="v101-proof">
+                                <label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v201CalcAttachment" type="file" accept="image/*" class="hidden"></label>
+                                <div class="v101-proof-meta"><b>Foto Bukti</b><small id="v201CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div>
+                            </div>
+                            <button type="button" id="v201CalcSaveBtn" class="rk-calc-save-btn" onclick="saveV201Calculator()"><i class="fa-solid fa-floppy-disk"></i> Simpan</button>
+                        </div>
+                    </section>
+                    <aside class="rk-calc-history-card">
+                        <div class="rk-calc-history-head"><div><div class="text-xs text-zinc-400">Catatan hasil</div><div class="text-base font-black text-white">Riwayat Kalkulator</div></div><i class="fa-solid fa-clock-rotate-left text-indigo-300"></i></div>
+                        <div id="v201CalcHistory" class="space-y-2"></div>
+                    </aside>
+                </div>
+            </div>
+
+<div class="tab-content space-y-4" id="tab-setting">
                 <div
                     class="bg-gradient-to-r from-zinc-900 to-indigo-950/60 p-[18px] border border-zinc-800 rounded-3xl flex items-center justify-between shadow-xl min-w-0">
                     <div class="flex items-center gap-3 truncate pr-2 min-w-0">
@@ -5103,16 +5206,11 @@ nav.fixed.bottom-0 {
             localStorage.setItem('rekenan_active_tab', tabId);
             document.querySelector('.mobile-container')?.scrollTo({top: 0, behavior: 'auto'});
 
-            // V200.90: Kalkulator is a real app route, not a blocking modal.
-            // Opening it through switchTab keeps every other navigation route authoritative.
+            // V201.05: Kalkulator is a normal tab route. It never opens a fixed overlay.
             if (tabId === 'kalkulator') {
                 try {
-                    if (typeof window.openV101CalculatorModal === 'function') {
-                        window.openV101CalculatorModal();
-                    }
-                } catch (e) {
-                    console.warn('[Rekenan CALC] route open failed', e);
-                }
+                    if (typeof window.renderV201CalculatorRoute === 'function') window.renderV201CalculatorRoute();
+                } catch (e) { console.warn('[Rekenan CALC] route render failed', e); }
                 return;
             }
 
@@ -11069,7 +11167,54 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             window.openV101NoteModal = function (note) {const m = makeModal('v101NoteModal', '<i class="fa-solid fa-note-sticky text-emerald-300 mr-2"></i>Note', `<input id="v101NoteId" type="hidden"><input id="v101NoteTitle" class="v101-input mb-2" placeholder="Judul Note"><textarea id="v101NoteBody" class="v101-input" rows="7" placeholder="Tulis Note..."></textarea><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto Note"><i class="fa-solid fa-camera"></i><input id="v101NoteAttachment" type="file" class="hidden"></label><div class="v101-proof-meta"><b>Foto Note</b><small id="v101NoteAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" class="flex-1 bg-zinc-800 text-zinc-300 py-3 rounded-xl text-xs font-bold" onclick="closeV101Modal('v101NoteModal')">Batal</button><button type="button" id="v101NoteSaveBtn" class="flex-1 bg-emerald-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Note()">Simpan</button></div><div class="mt-4"><div class="text-[10px] text-zinc-500 mb-2">Note tersimpan</div><div id="v101NoteSearchFallback" class="mb-3"><div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i><input id="v101NoteSearchInput" class="v101-input pl-9" placeholder="Cari Note berdasarkan judul atau isi..." autocomplete="off"></div></div><div id="v101NoteList" class="space-y-2"></div></div>`); const n = note || {}; document.getElementById('v101NoteId').value = n.id || ''; document.getElementById('v101NoteTitle').value = n.title || ''; document.getElementById('v101NoteBody').value = n.body || ''; const f = document.getElementById('v101NoteAttachment'); if (f) f.value = ''; const st = document.getElementById('v101NoteAttachmentStatus'); if (st) st.textContent = hasAttachment_(n) ? 'Foto tersimpan — pilih foto baru untuk mengganti' : 'Opsional — boleh dikosongkan'; m.classList.add('show'); renderV101Notes()};
             let noteBusy = false; window.saveV101Note = async function () {if (noteBusy) return; const title = (document.getElementById('v101NoteTitle')?.value || '').trim(), body = (document.getElementById('v101NoteBody')?.value || '').trim(); if (!title && !body) return showToast('Isi Note terlebih dahulu.', 'error'); noteBusy = true; const btn = document.getElementById('v101NoteSaveBtn'); if (btn) {btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Menyimpan...'} try {ensureNotes(); const id = document.getElementById('v101NoteId')?.value || ('note_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7)), now = new Date().toISOString(), old = notesData.find(x => String(x.id) === String(id)) || {}, file = document.getElementById('v101NoteAttachment')?.files?.[0]; let attachment = old.attachment || null; if (file) {attachment = await rkQueueAttachmentFile_(file, 'Note', id, 'NOTE');} const obj = {id, title: title || 'Tanpa Judul', body, date: now, updatedAt: now, ...(attachment ? {attachment} : {})}; const i = notesData.findIndex(x => String(x.id) === String(id)); if (i >= 0) notesData[i] = {...notesData[i], ...obj}; else notesData.unshift(obj); secureSave('rekenan_notes', notesData); renderV101Notes(); rkMarkSyncPending_(); showToast('Note tersimpan di perangkat. Sinkronisasi otomatis berjalan saat internet tersedia.', 'success'); const titleEl = document.getElementById('v101NoteTitle'), bodyEl = document.getElementById('v101NoteBody'), fileEl = document.getElementById('v101NoteAttachment'); if (titleEl) titleEl.value = ''; if (bodyEl) bodyEl.value = ''; if (fileEl) fileEl.value = ''; closeV101Modal('v101NoteModal')} catch (e) {showToast(e?.message || 'Note gagal disimpan.', 'error')} finally {noteBusy = false; if (btn) {btn.disabled = false; btn.textContent = 'Simpan'} } };
             let noteDeleteBusy = false; window.deleteV101Note = async function (id) {if (noteDeleteBusy) return; if (!confirm('Hapus Note ini?')) return; noteDeleteBusy = true; try {ensureNotes(); notesData = notesData.filter(x => String(x.id) !== String(id)); secureSave('rekenan_notes', notesData); rkMarkRecordDeleted_('NOTE', id); renderV101Notes(); rkMarkSyncPending_(); showToast('Note dihapus di perangkat. Sinkronisasi otomatis berjalan saat online tersedia.', 'success')} catch (e) {showToast(e?.message || 'Penghapusan Cloud belum terverifikasi.', 'error')} finally {noteDeleteBusy = false} };
-            window.openV101CalculatorModal = function () {const m = makeModal('v101CalculatorModal', '<i class="fa-solid fa-calculator text-blue-300 mr-2"></i>Kalkulator', `<div class="rk-calc-phone"><div class="rk-calc-display"><div id="v101CalcExpr" class="rk-calc-expression">0</div><div id="v101CalcResult" class="rk-calc-result">0</div></div><div class="rk-calc-grid"><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('C')">AC</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('⌫')">⌫</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('.')">.</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('÷')">÷</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('7')">7</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('8')">8</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('9')">9</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('×')">×</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('4')">4</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('5')">5</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('6')">6</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('−')">−</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('1')">1</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('2')">2</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('3')">3</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('+')">+</button><button type="button" class="v106-calc-key v106-calc-num rk-calc-zero" onclick="v101CalcKey('0')">0</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('000')">000</button><button type="button" class="v106-calc-key v106-calc-eq" onclick="v101CalcKey('=')">=</button></div><div class="rk-calc-quick" aria-label="Nominal cepat"><span>Nominal cepat</span><div class="rk-calc-quick-grid"><button type="button" onclick="rkCalcQuickAmount_(10000)">+10K</button><button type="button" onclick="rkCalcQuickAmount_(50000)">+50K</button><button type="button" onclick="rkCalcQuickAmount_(100000)">+100K</button><button type="button" onclick="rkCalcQuickAmount_(500000)">+500K</button></div></div><div id="rkCalcHistorySection" class="mt-3"><div class="text-[10px] text-zinc-500 mb-2">Riwayat Kalkulator</div><div id="v101CalcHistory" class="space-y-2"></div></div><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v101CalcAttachment" type="file" accept="image/*" class="hidden"></label><div class="v101-proof-meta"><b>Foto Bukti</b><small id="v101CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" id="v101CalcSaveBtn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Calculator()">Simpan</button></div></div>`); m.classList.add('show'); currentActiveTab = 'kalkulator'; try { localStorage.setItem('rekenan_active_tab','kalkulator'); } catch(_){} rkSetCalculatorNavActive_(true); renderV101CalcHistory(); console.info('[Rekenan CALC] APP-SHELL OPEN V201.03 — HEADER + MENU VISIBLE'); try { rkReconcileCalculatorFromCloud_(true); setTimeout(function(){ try{ rkReconcileCalculatorFromCloud_(true); }catch(_){} }, 1800); } catch(_){}};
+            window.renderV201CalculatorRoute = function () {
+                try { renderV201CalcHistory_(); } catch (_) {}
+                console.info('[Rekenan CALC] V201.05 ROUTE READY — NORMAL APP SCROLL / NO FIXED OVERLAY');
+                try { rkReconcileCalculatorFromCloud_(true); } catch (_) {}
+            };
+            window.v201CalcKey_ = function (key) {
+                const el = document.getElementById('v201CalcExpr'), out = document.getElementById('v201CalcResult');
+                if (!el) return;
+                let v = String(el.textContent || '').trim(); const k = String(key);
+                if (v === '0' && /^[0-9.]$/.test(k)) v = '';
+                if (k === 'C') { el.textContent = '0'; if (out) out.textContent = '0'; window.__rkCalcLastExpression1984 = ''; return; }
+                if (k === '⌫') { v = v.slice(0,-1) || '0'; el.textContent=v; try { if(out) out.textContent=window.v109Fmt(window.rkCalcEval1984_(v)); } catch(_) { if(out) out.textContent='0'; } return; }
+                if (k === '=') { try { const original=v; const n=window.rkCalcEval1984_(v); window.__rkCalcLastExpression1984=original; el.textContent=String(n); if(out) out.textContent=window.v109Fmt(n); } catch(e) { if(out) out.textContent='Error'; try{showToast(e.message||'Perhitungan tidak valid.','error')}catch(_){} } return; }
+                if (['+','−','-','×','÷','*','/'].includes(k)) { v=v.replace(/[+−×÷*/-]$/,''); el.textContent=v+(k==='*'?'×':k==='/'?'÷':k); return; }
+                el.textContent=v+k; try { if(out) out.textContent=window.v109Fmt(window.rkCalcEval1984_(el.textContent)); } catch(_) { if(out) out.textContent='0'; }
+            };
+            window.v201CalcQuickAmount_ = function(amount) {
+                const el=document.getElementById('v201CalcExpr'), out=document.getElementById('v201CalcResult'); if(!el) return;
+                let v=String(el.textContent||'').trim(), n=String(Math.max(0,Number(amount)||0));
+                if(!v||v==='0') v=n; else v=v.replace(/[+−×÷*/-]$/,'')+'+'+n;
+                el.textContent=v; try{if(out)out.textContent=window.v109Fmt(window.rkCalcEval1984_(v));}catch(_){}
+            };
+            window.saveV201Calculator = async function () {
+                const exprEl=document.getElementById('v201CalcExpr'), resultEl=document.getElementById('v201CalcResult'), fileEl=document.getElementById('v201CalcAttachment'), btn=document.getElementById('v201CalcSaveBtn');
+                const expr=String(exprEl?.textContent||'').trim(), out=String(resultEl?.textContent||'0').trim();
+                if(!expr || out==='...' || out==='Error') return showToast('Perhitungan belum valid.','error');
+                if(btn?.dataset.busy==='1') return; if(btn) btn.dataset.busy='1';
+                try{
+                    const id='calc_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6), file=fileEl?.files?.[0];
+                    const item={id,type:'calculator',expression:expr,result:parseRupiah(out),date:rkLocalDateTimeYMD_(new Date()),createdAt:new Date().toISOString()};
+                    if(file){const attachment=await rkQueueAttachmentFile_(file,'Kalkulator',id,'CALC_HISTORY',item); if(attachment) item.attachment=attachment;}
+                    calcHistory.unshift(item); secureSave('rekenan_calc_history',calcHistory); renderV201CalcHistory_();
+                    rkMarkSyncPending_(); showToast('Kalkulator tersimpan di perangkat. Sinkronisasi otomatis berjalan saat internet tersedia.','success');
+                    if(exprEl)exprEl.textContent='0'; if(resultEl)resultEl.textContent='0'; if(fileEl)fileEl.value='';
+                    const st=document.getElementById('v201CalcAttachmentStatus'); if(st)st.textContent='Opsional — boleh dikosongkan';
+                }catch(e){showToast(e?.message||'Kalkulator gagal disimpan.','error');}
+                finally{if(btn){delete btn.dataset.busy;btn.disabled=false;}}
+            };
+            window.renderV201CalcHistory_ = function () {
+                const el=document.getElementById('v201CalcHistory'); if(!el)return;
+                const rows=(Array.isArray(calcHistory)?calcHistory:[]).filter(x=>x&&x.type==='calculator');
+                const getTime=x=>{const raw=x?.createdAt||x?.date||x?.timestamp||x?.updatedAt,t=raw?Date.parse(String(raw)):NaN;return Number.isFinite(t)?t:-Infinity;};
+                const ordered=rows.map((item,index)=>({item,index})).sort((a,b)=>(getTime(b.item)-getTime(a.item))||(b.index-a.index)).map(x=>x.item);
+                const renderItem=x=>{const id=String(x.id||''),photo=typeof attachmentUrl_==='function'?attachmentUrl_(x):'',photoBtn=photo?`<button type="button" class="photo" title="Lihat foto" onclick="openAttachmentUrl_(decodeURIComponent('${encodeURIComponent(photo)}'))"><i class="fa-solid fa-image"></i></button>`:'';const dt=String(x.date||x.createdAt||'').replace('T',' ');return `<div class="v1984-calc-history-row"><div class="text-[9px] text-zinc-500">${esc(dt)}</div><div class="text-sm font-black text-white mt-1">${esc(x.expression||'')}</div><div class="text-base font-black text-blue-300 mt-1">= ${esc(formatRupiah(x.result||0))}</div><div class="actions">${photoBtn}<button type="button" title="Edit" onclick="rkEditCalc1984_('${esc(id)}')"><i class="fa-solid fa-pen"></i></button><button type="button" class="delete" title="Hapus" onclick="rkDeleteCalc1984_('${esc(id)}')"><i class="fa-solid fa-trash"></i></button></div></div>`;};
+                if(!ordered.length){el.innerHTML='<div class="text-[10px] text-zinc-500 text-center py-6">Belum ada riwayat kalkulator.</div>';return;}
+                const newest=ordered.slice(0,1),older=ordered.slice(1);el.innerHTML=newest.map(renderItem).join('')+(older.length?rkHistoryDropdownHtml_(older,renderItem,'Riwayat Kalkulator'):'');
+            };
+            window.openV101CalculatorModal = function () {const m = makeModal('v101CalculatorModal', '<i class="fa-solid fa-calculator text-blue-300 mr-2"></i>Kalkulator', `<div class="rk-calc-phone"><div class="rk-calc-display"><div id="v101CalcExpr" class="rk-calc-expression">0</div><div id="v101CalcResult" class="rk-calc-result">0</div></div><div class="rk-calc-grid"><button type="button" class="v106-calc-key v106-calc-action" onclick="v201CalcKey_('C')">AC</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v201CalcKey_('⌫')">⌫</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v201CalcKey_('.')">.</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('÷')">÷</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('7')">7</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('8')">8</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('9')">9</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('×')">×</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('4')">4</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('5')">5</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('6')">6</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('−')">−</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('1')">1</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('2')">2</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('3')">3</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('+')">+</button><button type="button" class="v106-calc-key v106-calc-num rk-calc-zero" onclick="v201CalcKey_('0')">0</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('000')">000</button><button type="button" class="v106-calc-key v106-calc-eq" onclick="v201CalcKey_('=')">=</button></div><div class="rk-calc-quick" aria-label="Nominal cepat"><span>Nominal cepat</span><div class="rk-calc-quick-grid"><button type="button" onclick="v201CalcQuickAmount_(10000)">+10K</button><button type="button" onclick="v201CalcQuickAmount_(50000)">+50K</button><button type="button" onclick="v201CalcQuickAmount_(100000)">+100K</button><button type="button" onclick="v201CalcQuickAmount_(500000)">+500K</button></div></div><div id="rkCalcHistorySection" class="mt-3"><div class="text-[10px] text-zinc-500 mb-2">Riwayat Kalkulator</div><div id="v101CalcHistory" class="space-y-2"></div></div><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v101CalcAttachment" type="file" accept="image/*" class="hidden"></label><div class="v101-proof-meta"><b>Foto Bukti</b><small id="v101CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" id="v101CalcSaveBtn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Calculator()">Simpan</button></div></div>`); m.classList.add('show'); currentActiveTab = 'kalkulator'; try { localStorage.setItem('rekenan_active_tab','kalkulator'); } catch(_){} rkSetCalculatorNavActive_(true); renderV101CalcHistory(); console.info('[Rekenan CALC] V201.05 LEGACY MODAL DISABLED — ROUTE ACTIVE'); try { rkReconcileCalculatorFromCloud_(true); setTimeout(function(){ try{ rkReconcileCalculatorFromCloud_(true); }catch(_){} }, 1800); } catch(_){}};
             window.saveV101Calculator = async function () {const btn = document.getElementById('v101CalcSaveBtn'); if (btn?.dataset.busy === '1') return; const expr = String((document.getElementById('v101CalcExpr')?.value ?? document.getElementById('v101CalcExpr')?.textContent) || '').trim(), out = document.getElementById('v101CalcResult')?.textContent || '0'; if (!expr || out === '...') return showToast('Perhitungan belum valid.', 'error'); if (btn) btn.dataset.busy = '1'; try {const id = 'calc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6), file = document.getElementById('v101CalcAttachment')?.files?.[0]; const item = {id, type: 'calculator', expression: expr, result: parseRupiah(out), date: rkLocalDateTimeYMD_(new Date()), createdAt: new Date().toISOString()}; calcHistory.unshift(item); let attachment = null; if (file) attachment = await rkQueueAttachmentFile_(file, 'Kalkulator', id, 'CALC_HISTORY', item); if (attachment) item.attachment = attachment; secureSave('rekenan_calc_history', calcHistory); renderV101CalcHistory(); rkMarkSyncPending_(); showToast('Kalkulator tersimpan di perangkat. Sinkronisasi otomatis berjalan saat internet tersedia.', 'success'); const exprEl = document.getElementById('v101CalcExpr'), fileEl = document.getElementById('v101CalcAttachment'), resEl = document.getElementById('v101CalcResult'); if (exprEl) exprEl.value = ''; if (fileEl) fileEl.value = ''; if (resEl) resEl.textContent = '0'; const stEl = document.getElementById('v101CalcAttachmentStatus'); if (stEl) stEl.textContent = 'Opsional — boleh dikosongkan';} catch (e) {showToast(e?.message || 'Kalkulator gagal disimpan.', 'error')} finally {if (btn) {delete btn.dataset.busy; btn.textContent = 'Simpan'} } };
             window.renderV101CalcHistoryCore_ = function () {
                 const el = document.getElementById('v101CalcHistory');
@@ -13092,7 +13237,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V201.03';
+  window.REKENAN_UI_BUILD='V201.05';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -13127,7 +13272,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V201.03';
+window.REKENAN_UI_BUILD='V201.05';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13283,7 +13428,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.03';
+  window.REKENAN_UI_BUILD='V201.05';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13483,7 +13628,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.03';
+  window.REKENAN_UI_BUILD='V201.05';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
@@ -13494,7 +13639,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.03';
+  window.REKENAN_UI_BUILD='V201.05';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
@@ -13700,7 +13845,7 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20103-calculator-design-runtime">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V201.03';
+  window.REKENAN_UI_BUILD='V201.05';
   window.rkCalcQuickAmount_=function(amount){
     const i=document.getElementById('v101CalcExpr'); if(!i) return;
     let v=String(i.textContent||i.value||'').trim();
@@ -13714,7 +13859,7 @@ nav.fixed.bottom-0 {
     const phone=m.querySelector('.rk-calc-phone'); if(!phone) return;
     phone.classList.add('rk-v20103-ready');
     if(typeof window.forceCalcHistoryBelowKeypad==='function') window.forceCalcHistoryBelowKeypad();
-    console.info('[Rekenan CALC] V201.03 PRO UI READY | 000 KEPT | 00 REMOVED | DESKTOP TWO-COLUMN');
+    console.info('[Rekenan CALC] V201.05 PRO UI READY | 000 KEPT | 00 REMOVED | DESKTOP TWO-COLUMN');
   }
   const old=window.openV101CalculatorModal;
   if(typeof old==='function' && !old.__v20103){
@@ -13722,12 +13867,12 @@ nav.fixed.bottom-0 {
     wrapped.__v20103=true; window.openV101CalculatorModal=wrapped;
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(polish,120)); else setTimeout(polish,120);
-  console.info('[Rekenan BUILD] V201.04 CALCULATOR PRO UI LOADED | LEGACY FLEX OVERRIDE FIXED');
+  console.info('[Rekenan BUILD] V201.05 CALCULATOR TRUE ROUTE LOADED | LEGACY FLEX OVERRIDE FIXED');
 })();
 </script>
 
 <script id="rekenan-v20103-authoritative-build">
-window.REKENAN_UI_BUILD='V201.03';
+window.REKENAN_UI_BUILD='V201.05';
 window.REKENAN_CALCULATOR_BUILD='V201.04';
 console.info('[Rekenan BUILD] UI V201.04 | CALCULATOR V201.04 PRO | 000 KEPT | 00 REMOVED | DESKTOP 2-COLUMN | MOBILE SINGLE-COLUMN | LAYOUT FIX');
 </script>

@@ -1,7 +1,7 @@
 {
   "id": "./admin",
-  "name": "Rekenan V201.03",
-  "short_name": "Rekenan V201.03",
+  "name": "Rekenan V201.05",
+  "short_name": "Rekenan",
   "description": "Rekenan V201.03 — keuangan, pinjaman, catatan, belanja dan administrasi",
   "start_url": "./index.html?v=2103",
   "scope": "./",
