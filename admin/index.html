@@ -4,15 +4,15 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V200.52';
+        window.REKENAN_BUILD_VERSION = 'V200.42';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.52';
-        console.info('[Rekenan BUILD] UI V200.52');
+        window.REKENAN_UI_BUILD = 'V200.42';
+        console.info('[Rekenan BUILD] UI V200.44');
         console.info('[Rekenan BUILD] V200.42 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
-                const expected = 'V200.52';
+                const expected = 'V200.35';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.52">
+    <meta name="rekenan-build" content="V200.38">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -3737,7 +3737,7 @@ margin:0!important;
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
         const API_VERSION = 'V200.32-LOCAL-FIRST-CACHED';
         window.REKENAN_SERVER_BUILD = 'V200.32';
-        console.info('[Rekenan BUILD] CLIENT V200.52 / SERVER API COMPATIBLE');
+        console.info('[Rekenan BUILD] CLIENT V200.45 / SERVER API COMPATIBLE');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -5912,7 +5912,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             throw lastMetaError||new Error('Metadata foto gagal disimpan.');
         }
         function rkApplyAttachmentLocal_(dt,id,att){
-            const key=String(dt||'').toUpperCase(); const list=key==='TRANSACTION'?transactions:key==='SHOPPING'?shoppingItems:key==='NOTE'?notesData:key==='SAVINGS'?savingsList:key==='CALC_HISTORY'?calcHistory:key==='PAYMENT'?riwayatCicilanData:key==='LOAN'?loansData:null; const storageKey=key==='TRANSACTION'?'rekenan_transactions':key==='SHOPPING'?'rekenan_shopping':key==='NOTE'?'rekenan_notes':key==='SAVINGS'?'rekenan_savings':key==='CALC_HISTORY'?'rekenan_calc_history':key==='PAYMENT'?'rekenan_riwayat_cicilan':key==='LOAN'?'rekenan_loans':'';
+            const key=String(dt||'').toUpperCase(); const list=key==='TRANSACTION'?transactions:key==='SHOPPING'?shoppingItems:key==='NOTE'?notesData:key==='SAVINGS'?savingsList:key==='CALC_HISTORY'?calcHistory:key==='PAYMENT'?riwayatCicilanData:null; const storageKey=key==='TRANSACTION'?'rekenan_transactions':key==='SHOPPING'?'rekenan_shopping':key==='NOTE'?'rekenan_notes':key==='SAVINGS'?'rekenan_savings':key==='CALC_HISTORY'?'rekenan_calc_history':key==='PAYMENT'?'rekenan_riwayat_cicilan':'';
             const target=Array.isArray(list)?list.find(x=>String(x?.id)===String(id)):null; if(target){target.attachment=att;target.attachmentFileId=att.fileId;target.attachmentUrl=att.url;target.photoUrl=att.url;if(storageKey)secureSave(storageKey,list);}
         }
 
@@ -5985,30 +5985,8 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                             item = latest[qi];
                         }
                         console.info('[Rekenan SYNC] ATTACHMENT DRIVE COMMITTED', {recordId: item.recordId, fileId: att.fileId});
-                        // CRITICAL: Drive success must immediately update Local UI.
-                        // Metadata/Sheet confirmation may timeout; that must never keep the photo
-                        // visually stuck in 'Mengirim foto'. The queue retains the uploadedFileId
-                        // and retries only the metadata step.
-                        try {
-                            const localDt = String(item.dataType || '').toUpperCase();
-                            if (localDt === 'SHOPPING' || localDt === 'LOAN') {
-                                rkApplyAttachmentLocal_(localDt, item.recordId, Object.assign({}, att, {pending:false}));
-                                if (localDt === 'LOAN') {
-                                    try { renderEmbeddedAdmin(); } catch (_) {}
-                                    try { if (typeof renderLoanList === 'function') renderLoanList(); } catch (_) {}
-                                }
-                                if (localDt === 'SHOPPING') {
-                                    try { if (typeof renderShoppingList === 'function') renderShoppingList(); } catch (_) {}
-                                }
-                                console.info('[Rekenan FIX] DRIVE SUCCESS -> LOCAL PHOTO READY', localDt, item.recordId);
-                            }
-                        } catch (localErr) { console.warn('[Rekenan FIX] LOCAL PHOTO PROJECTION FAILED', localErr); }
                     } else {
                         console.info('[Rekenan SYNC] ATTACHMENT RESUME METADATA', {recordId: item.recordId, fileId: att.fileId});
-                        try {
-                            const localDt = String(item.dataType || '').toUpperCase();
-                            if (localDt === 'SHOPPING' || localDt === 'LOAN') rkApplyAttachmentLocal_(localDt, item.recordId, Object.assign({}, att, {pending:false}));
-                        } catch (_) {}
                     }
 
                     const dt = String(item.dataType || '').toUpperCase();
@@ -6028,12 +6006,20 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                         console.info('[Rekenan SYNC] ATTACHMENT LINKED RECORD',{dataType:String(link.dataType).toUpperCase(),recordId:link.recordId,fileId:att.fileId});
                     }
 
-                    rkApplyAttachmentLocal_(dt, item.recordId, Object.assign({}, att, {pending:false}));
-                    try {
-                        if (dt === 'LOAN') { renderEmbeddedAdmin(); if (typeof renderLoanList === 'function') renderLoanList(); }
-                        if (dt === 'SHOPPING' && typeof renderShoppingList === 'function') renderShoppingList();
-                    } catch (_) {}
-                                        uploaded++;
+                    if (dt !== 'LOAN') {
+                        let list = null, storageKey = '';
+                        if (dt === 'SHOPPING') {list = Array.isArray(shoppingItems) ? shoppingItems : null; storageKey = 'rekenan_shopping';}
+                        else if (dt === 'TRANSACTION') {list = Array.isArray(transactions) ? transactions : null; storageKey = 'rekenan_transactions';}
+                        else if (dt === 'NOTE') {list = Array.isArray(notesData) ? notesData : null; storageKey = 'rekenan_notes';}
+                        else if (dt === 'SAVINGS') {list = Array.isArray(savingsList) ? savingsList : null; storageKey = 'rekenan_savings';}
+                        else if (dt === 'CALC_HISTORY') {list = Array.isArray(calcHistory) ? calcHistory : null; storageKey = 'rekenan_calc_history';}
+                        const target = list && list.find(x => String(x?.id) === String(item.recordId));
+                        if (target) {
+                            target.attachment = att; target.attachmentFileId = att.fileId;
+                            target.attachmentUrl = att.url; target.photoUrl = att.url; secureSave(storageKey, list);
+                        }
+                    }
+                    uploaded++;
                     try { rkSetTransferIndicator_('active', `Mengirim foto… ${uploaded}/${processable.length} • Pinjaman tetap bisa di-ACC`); } catch (_) {}
                     console.info('[Rekenan SYNC] ATTACHMENT LINKED', {dataType: dt, recordId: item.recordId, fileId: att.fileId});
                     if (dt === 'LOAN') {
@@ -6781,7 +6767,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                             </div>
                             <button onclick="deleteShoppingItem('${item.id}', this)" class="text-rose-400 hover:text-rose-300 p-2 shrink-0"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
-                        <div class="v101-shopping-proof flex items-center gap-2 flex-wrap">${(() => {const a = parseAttachmentMeta_(item); if (!(a?.url || a?.fileId)) return a?.pending ? '<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-700 text-zinc-300" title="Foto masih dikirim" aria-label="Foto masih dikirim" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>' : '<span class="text-[9px] text-zinc-500">Belum ada foto</span>'; const target = String(a.url || ('https://drive.google.com/file/d/' + a.fileId + '/view')); return `<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black" title="Lihat foto belanja" aria-label="Lihat foto belanja" data-photo-url="${escapeHtmlGlobal_(target)}"><i class="fa-solid fa-image"></i></button>`;})()}<label class="v101-upload-label cursor-pointer" title="Tambah / ganti foto belanja" aria-label="Tambah / ganti foto belanja"><i class="fa-solid fa-camera"></i><input id="shop_photo_${item.id}" type="file" accept="image/*" class="hidden" onchange="handleShoppingPhotoChangeV101('${item.id}',event)"></label>${parseAttachmentMeta_(item) ? '<span class="text-[9px] text-emerald-300 font-bold">Foto tersimpan</span>' : '<span class="text-[9px] text-zinc-500">Tambah foto</span>'}</div>
+                        <div class="v101-shopping-proof flex items-center gap-2 flex-wrap">${(() => {const a = parseAttachmentMeta_(item); if (!(a?.url || a?.fileId)) return a?.pending ? '<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-700 text-zinc-300" title="Foto masih dikirim" aria-label="Foto masih dikirim" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>' : '<span class="text-[9px] text-zinc-500">Belum ada foto</span>'; const target = String(a.url || ('https://drive.google.com/file/d/' + a.fileId + '/view')); const safe = encodeURIComponent(target); return `<button type="button" class="v188-photo-view inline-flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-[10px] font-black" title="Lihat foto belanja" aria-label="Lihat foto belanja" onclick="event.stopPropagation();openAttachmentUrl_(decodeURIComponent('${safe}'))"><i class="fa-solid fa-image"></i></button>`;})()}<label class="v101-upload-label cursor-pointer" title="Tambah / ganti foto belanja" aria-label="Tambah / ganti foto belanja"><i class="fa-solid fa-camera"></i><input id="shop_photo_${item.id}" type="file" accept="image/*" class="hidden" onchange="handleShoppingPhotoChangeV101('${item.id}',event)"></label>${parseAttachmentMeta_(item) ? '<span class="text-[9px] text-emerald-300 font-bold">Foto tersimpan</span>' : '<span class="text-[9px] text-zinc-500">Tambah foto</span>'}</div>
                         <div class="grid grid-cols-3 gap-2">
                             <div class="col-span-1">
                                 <select onchange="updateShoppingItemField('${item.id}', 'category', this.value)"
@@ -7182,7 +7168,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                         ? `<button type="button" class="v106-photo-check v106-photo-empty" title="Foto masih dikirim" aria-label="Foto masih dikirim" disabled><i class="fa-solid fa-cloud-arrow-up animate-pulse"></i></button>`
                         : `<span class="v106-photo-check v106-photo-empty" title="Tidak ada foto/bukti"><i class="fa-regular fa-image"></i></span>`;
                 const loanId = esc(item?.id || '');
-                return `<div class="v37-loan-card p-4 rounded-3xl transition space-y-3" data-loan-id="${loanId}">
+                return `<div class="v37-loan-card p-4 rounded-3xl transition space-y-3">
                     <div class="flex justify-between gap-3">
                         <div class="min-w-0">
                             <div class="text-xs font-black text-white truncate flex items-center gap-1.5">${esc(item?.nama || activeBorrowerUser?.name || 'Peminjam')} ${photoButton}</div>
@@ -10982,7 +10968,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
             const ui = 'V200.38';
-            console.info('[Rekenan BUILD] UI V200.52 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.52 / SERVER API COMPATIBLE');
+            console.info('[Rekenan BUILD] UI V200.45 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.45 / SERVER API COMPATIBLE');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -11785,7 +11771,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 window.REKENAN_BUILD_VERSION='V200.43';
 window.REKENAN_UI_BUILD='V200.38';
 window.REKENAN_SERVER_BUILD='V200.32';
-console.info('[Rekenan BUILD] FINAL CLIENT V200.52 / SERVER API COMPATIBLE');
+console.info('[Rekenan BUILD] FINAL CLIENT V200.45 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
 
 /* Calculator: one authoritative save path, then completely reset the calculator UI. */
@@ -12069,351 +12055,4 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 
-<script id="rekenan-v20046-final-fix">
-/* [Rekenan BUILD] V200.46 PHOTO/ACC HOTFIX
-   Fix malformed script, Shopping image icon, Loan image button, and local attachment projection.
-*/
-(function(){
-  'use strict';
-  console.info('[Rekenan BUILD] V200.46 PHOTO/ACC HOTFIX LOADED');
-
-  function meta_(item){
-    item=item||{}; var a=null;
-    try{ if(typeof parseAttachmentMeta_==='function') a=parseAttachmentMeta_(item); }catch(_){ }
-    a=a||item.attachment||item.bukti||{};
-    var fid=String(a.fileId||a.FileId||a.AttachmentFileId||item.attachmentFileId||item.AttachmentFileId||item.fileId||'').trim();
-    var url=String(a.url||a.URL||a.viewUrl||a.fileUrl||a.AttachmentUrl||item.attachmentUrl||item.AttachmentUrl||item.photoUrl||'').trim();
-    if(!url&&fid) url='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';
-    return {fileId:fid,url:url,pending:!!(a.pending||item.attachmentPending)};
-  }
-  function open_(url){
-    url=String(url||'').trim(); if(!url) return false;
-    try{ if(typeof openAttachmentUrl_==='function'){openAttachmentUrl_(url);return true;} }catch(e){console.warn('[Rekenan V200.46] viewer failed',e);}
-    try{window.open(url,'_blank','noopener,noreferrer');return true;}catch(_){return false;}
-  }
-
-  /* When Drive commits an attachment, immediately project the final file link into Local. */
-  try{
-    var baseApply=window.rkApplyAttachmentLocal_;
-    if(typeof baseApply==='function'&&!window.__rkV20046ApplyWrapped){
-      window.__rkV20046ApplyWrapped=true;
-      window.rkApplyAttachmentLocal_=function(dt,id,att){
-        try{baseApply.apply(this,arguments);}catch(e){console.warn('[Rekenan V200.46] base attachment apply',e);}
-        var key=String(dt||'').toUpperCase(), rid=String(id||'');
-        if(key!=='SHOPPING'&&key!=='LOAN') return;
-        var lists=[];
-        if(key==='SHOPPING'&&Array.isArray(window.shoppingItems)) lists.push(window.shoppingItems);
-        if(key==='LOAN'){
-          if(Array.isArray(window.loansData)) lists.push(window.loansData);
-          if(Array.isArray(window.embeddedAdminLoans)) lists.push(window.embeddedAdminLoans);
-        }
-        lists.forEach(function(list){
-          var x=list.find(function(v){return String(v&&v.id||'')===rid;});
-          if(!x)return;
-          var old=x.attachment&&typeof x.attachment==='object'?x.attachment:{};
-          x.attachment=Object.assign({},old,att||{}, {pending:false});
-          x.attachmentFileId=String((att&&att.fileId)||'');
-          x.attachmentUrl=String((att&&att.url)||'');
-          x.photoUrl=String((att&&att.url)||'');
-        });
-        try{secureSave(key==='SHOPPING'?'rekenan_shopping':'rekenan_loans', key==='SHOPPING'?window.shoppingItems:window.loansData);}catch(_){ }
-        try{if(key==='SHOPPING'&&typeof window.renderShoppingList==='function')window.renderShoppingList();}catch(_){ }
-        try{if(key==='LOAN'&&typeof window.renderLoanList==='function')window.renderLoanList();}catch(_){ }
-        console.info('[Rekenan FIX] ATTACHMENT LOCAL LINKED',key,rid);
-      };
-    }
-  }catch(e){console.warn('[Rekenan V200.46] local attachment patch failed',e);}
-
-  /* ACC disappears immediately; cloud verification continues in background. */
-  try{
-    var oldVerify=window.verifyEmbeddedLoan;
-    if(typeof oldVerify==='function'&&!window.__rkV20046VerifyWrapped){
-      window.__rkV20046VerifyWrapped=true;
-      window.verifyEmbeddedLoan=async function(id,status,ev){
-        var rid=String(id||'');
-        try{document.querySelectorAll('[data-verify-loan-id]').forEach(function(b){if(String(b.getAttribute('data-verify-loan-id'))===rid)b.remove();});}catch(_){ }
-        console.info('[Rekenan FIX] ACC INSTANT HIDE',rid,status||'Aktif');
-        return oldVerify.apply(this,arguments);
-      };
-    }
-  }catch(e){console.warn('[Rekenan V200.46] ACC patch failed',e);}
-
-  /* V200.53 PHOTO CORE
-     Pinjaman is the reference implementation.
-     Shopping uses the exact same icon, URL contract and viewer path.
-     One delegated click handler per list; no clone, no interval, no duplicate document handler.
-  */
-  function rk53PhotoMeta_(item){
-    item=item||{};
-    var a=null;
-    try{if(typeof parseAttachmentMeta_==='function') a=parseAttachmentMeta_(item);}catch(_){}
-    a=a||item.attachment||item.bukti||{};
-    var fid=String(a.fileId||a.FileId||a.AttachmentFileId||item.attachmentFileId||item.AttachmentFileId||item.fileId||'').trim();
-    var url=String(a.url||a.URL||a.viewUrl||a.fileUrl||a.AttachmentUrl||item.attachmentUrl||item.AttachmentUrl||item.photoUrl||'').trim();
-    if(!url&&fid) url='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';
-    return {url:url,fileId:fid,pending:!!(a.pending||item.attachmentPending)};
-  }
-
-  function rk53OpenPhoto_(url,ev){
-    url=String(url||'').trim();
-    if(!url)return;
-    if(ev){ev.preventDefault();ev.stopPropagation();}
-    try{
-      if(typeof window.openAttachmentUrl_==='function'){
-        window.openAttachmentUrl_(url);
-        return;
-      }
-      if(typeof window.open_==='function'){
-        window.open_(url);
-        return;
-      }
-      window.open(url,'_blank','noopener,noreferrer');
-    }catch(e){console.warn('[Rekenan V200.53] PHOTO OPEN FAILED',e);}
-  }
-
-  function rk53ShoppingItem_(card){
-    if(!card)return null;
-    var id='';
-    var input=card.querySelector('input[id^="shop_photo_"]');
-    if(input) id=input.id.replace(/^shop_photo_/,'');
-    if(!id){
-      var cb=card.querySelector('input[type="checkbox"][onchange*="toggleShoppingItemCheck"]');
-      var m=cb&&String(cb.getAttribute('onchange')||'').match(/toggleShoppingItemCheck\(['"]([^'"]+)/);
-      if(m)id=m[1];
-    }
-    var rows=Array.isArray(window.shoppingItems)?window.shoppingItems:[];
-    return id?rows.find(function(x){return String(x&&x.id||'')===String(id);})||null:null;
-  }
-
-  function rk53LoanItem_(card){
-    if(!card)return null;
-    var id=card.getAttribute('data-loan-id')||'';
-    var rows=Array.isArray(window.loansData)?window.loansData:[];
-    var item=id?rows.find(function(x){return String(x&&x.id||'')===String(id);})||null:null;
-    if(item)return item;
-    var name=String(card.textContent||'');
-    return rows.find(function(x){return name.includes(String(x&&x.nama||''))&&rk53PhotoMeta_(x).url;})||null;
-  }
-
-  function rk53InstallListHandler_(root,id){
-    if(!root||root.__rkV20053PhotoHandler)return;
-    root.__rkV20053PhotoHandler=true;
-    root.addEventListener('click',function(ev){
-      var btn=ev.target&&ev.target.closest?ev.target.closest('button.v106-photo-check'):null;
-      if(!btn||!root.contains(btn)||btn.disabled||btn.classList.contains('v106-photo-empty'))return;
-      var url=String(btn.getAttribute('data-photo-url')||'').trim();
-      if(!url){
-        var card=btn.closest(id==='loan' ? '.v37-loan-card' : '#shoppingCardList > *');
-        var item=id==='loan'?rk53LoanItem_(card):rk53ShoppingItem_(card);
-        url=rk53PhotoMeta_(item).url;
-      }
-      if(url)rk53OpenPhoto_(url,ev);
-    },false);
-  }
-
-  function rk53MakePhotoButton_(url,pending){
-    var b=document.createElement('button');
-    b.type='button';
-    b.className='v106-photo-check'+(pending?' v106-photo-empty':'');
-    b.title=pending?'Foto masih dikirim':'Lihat foto';
-    b.setAttribute('aria-label',pending?'Foto masih dikirim':'Lihat foto');
-    b.setAttribute('data-photo-url',url||'');
-    b.disabled=!url;
-    b.innerHTML=pending
-      ? '<i class="fa-solid fa-cloud-arrow-up animate-pulse"></i>'
-      : '<i class="fa-solid fa-image"></i>';
-    return b;
-  }
-
-  function rk53PatchShopping_(){
-    var root=document.getElementById('shoppingCardList');
-    if(!root)return;
-    root.querySelectorAll(':scope > *').forEach(function(card){
-      var item=rk53ShoppingItem_(card);
-      if(!item)return;
-      var meta=rk53PhotoMeta_(item);
-      var actions=card.querySelector('.v108-shop-actions,.v101-shopping-proof')||card.querySelector('.flex.items-center.gap-2.flex-wrap')||card;
-      actions.querySelectorAll('.v106-photo-check,.rk-v20046-shop-photo,.rk-v20013-shop-photo,.v188-photo-view').forEach(function(x){x.remove();});
-      if(!meta.url&&!meta.pending)return;
-      actions.insertBefore(rk53MakePhotoButton_(meta.url,meta.pending),actions.firstChild);
-    });
-  }
-
-  function rk53PatchLoan_(){
-    var root=document.getElementById('loanCardList');
-    if(!root)return;
-    root.querySelectorAll('.v106-photo-check').forEach(function(btn){
-      if(btn.classList.contains('v106-photo-empty'))return;
-      var card=btn.closest('.v37-loan-card');
-      var meta=rk53PhotoMeta_(rk53LoanItem_(card));
-      if(!meta.url)return;
-      btn.removeAttribute('onclick');
-      btn.removeAttribute('disabled');
-      btn.disabled=false;
-      btn.setAttribute('data-photo-url',meta.url);
-      btn.title='Lihat foto';
-      btn.setAttribute('aria-label','Lihat foto');
-      btn.innerHTML='<i class="fa-solid fa-image"></i>';
-    });
-  }
-
-  function rk53PatchAllPhotos_(){
-    rk53PatchShopping_();
-    rk53PatchLoan_();
-  }
-
-  try{
-    var rs53=window.renderShoppingList;
-    if(typeof rs53==='function'&&!window.__rkV20053ShopWrapped){
-      window.__rkV20053ShopWrapped=true;
-      window.renderShoppingList=function(){
-        var r=rs53.apply(this,arguments);
-        setTimeout(rk53PatchShopping_,0);
-        return r;
-      };
-    }
-    var rl53=window.renderLoanList;
-    if(typeof rl53==='function'&&!window.__rkV20053LoanWrapped){
-      window.__rkV20053LoanWrapped=true;
-      window.renderLoanList=function(){
-        var r=rl53.apply(this,arguments);
-        setTimeout(rk53PatchLoan_,0);
-        return r;
-      };
-    }
-  }catch(e){console.warn('[Rekenan V200.53] render wrappers',e);}
-
-  function rk53InstallObservers_(){
-    var shop=document.getElementById('shoppingCardList');
-    var loan=document.getElementById('loanCardList');
-    rk53InstallListHandler_(shop,'shopping');
-    rk53InstallListHandler_(loan,'loan');
-    if(window.MutationObserver){
-      if(shop&&!shop.__rkV20053Observer){
-        shop.__rkV20053Observer=true;
-        var os=new MutationObserver(function(){clearTimeout(window.__rkV20053ShopTimer);window.__rkV20053ShopTimer=setTimeout(rk53PatchShopping_,30);});
-        os.observe(shop,{childList:true,subtree:true});
-      }
-      if(loan&&!loan.__rkV20053Observer){
-        loan.__rkV20053Observer=true;
-        var ol=new MutationObserver(function(){clearTimeout(window.__rkV20053LoanTimer);window.__rkV20053LoanTimer=setTimeout(rk53PatchLoan_,30);});
-        ol.observe(loan,{childList:true,subtree:true});
-      }
-    }
-    rk53PatchAllPhotos_();
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(rk53InstallObservers_,50);});
-  else setTimeout(rk53InstallObservers_,50);
-
-  window.rekenanV20053PhotoAudit=function(){
-    var shop=document.querySelectorAll('#shoppingCardList .v106-photo-check:not(.v106-photo-empty)');
-    var loan=document.querySelectorAll('#loanCardList .v106-photo-check:not(.v106-photo-empty)');
-    var result={
-      build:'V200.53',
-      shoppingPhotoButtons:shop.length,
-      shoppingClickable:Array.from(shop).filter(function(b){return !b.disabled&&!!b.getAttribute('data-photo-url');}).length,
-      loanPhotoButtons:loan.length,
-      loanClickable:Array.from(loan).filter(function(b){return !b.disabled&&!!b.getAttribute('data-photo-url');}).length,
-      sameClass:true,
-      viewer:typeof window.openAttachmentUrl_==='function',
-      duplicateIntervalRemoved:true,
-      duplicateDocumentPhotoHandlerRemoved:true
-    };
-    console.info('[Rekenan AUDIT V200.53] LOAN PHOTO STANDARD -> SHOPPING',result);
-    return result;
-  };
-  setTimeout(function(){try{window.rekenanV20053PhotoAudit();}catch(_){}},700);
-  console.info('[Rekenan BUILD] V200.54 PHOTO FLOW FINAL | LOAN STANDARD -> SHOPPING');
-})();
-</script>
-
-<script id="v20054-photo-flow-final">
-/* V200.54 PHOTO FLOW FINAL
-   Pinjaman is the reference. One capture-stage click path for both Pinjaman and Belanja.
-   Legacy inline/delegated photo openers are neutralized at render time.
-*/
-(function(){
-  function rk54Meta_(item){
-    item=item||{}; var a=null;
-    try{ if(typeof parseAttachmentMeta_==='function') a=parseAttachmentMeta_(item); }catch(_){ }
-    a=a||item.attachment||item.bukti||{};
-    var fid=String(a.fileId||a.FileId||a.AttachmentFileId||item.attachmentFileId||item.AttachmentFileId||item.fileId||'').trim();
-    var url=String(a.url||a.URL||a.viewUrl||a.fileUrl||a.AttachmentUrl||item.attachmentUrl||item.AttachmentUrl||item.photoUrl||'').trim();
-    if(!url&&fid) url='https://drive.google.com/file/d/'+encodeURIComponent(fid)+'/view';
-    return {url:url,pending:!!(a.pending||item.attachmentPending)};
-  }
-  function rk54Open_(url,e){
-    url=String(url||'').trim(); if(!url)return;
-    if(e){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();}
-    try{ if(typeof window.openAttachmentUrl_==='function') window.openAttachmentUrl_(url); }
-    catch(err){console.warn('[Rekenan V200.54] PHOTO OPEN FAILED',err);}
-  }
-  function rk54ShopItem_(card){
-    if(!card)return null; var id='';
-    var input=card.querySelector('input[id^="shop_photo_"]');
-    if(input) id=input.id.replace(/^shop_photo_/,'');
-    if(!id){var cb=card.querySelector('input[type="checkbox"][onchange*="toggleShoppingItemCheck"]');var m=cb&&String(cb.getAttribute('onchange')||'').match(/toggleShoppingItemCheck\(['"]([^'"]+)/);if(m)id=m[1];}
-    return id?(Array.isArray(window.shoppingItems)?window.shoppingItems:[]).find(function(x){return String(x&&x.id||'')===String(id);})||null:null;
-  }
-  function rk54Button_(url,pending){
-    var b=document.createElement('button'); b.type='button'; b.className='v106-photo-check'+(pending?' v106-photo-empty':'');
-    b.title=pending?'Foto masih dikirim':'Lihat foto'; b.setAttribute('aria-label',b.title); b.setAttribute('data-photo-url',url||''); b.disabled=!url;
-    b.innerHTML=pending?'<i class="fa-solid fa-cloud-arrow-up animate-pulse"></i>':'<i class="fa-solid fa-image"></i>';
-    return b;
-  }
-  function rk54CleanShopping_(){
-    var root=document.getElementById('shoppingCardList')||document.querySelector('#tab-belanja #shoppingCardList'); if(!root)return;
-    root.querySelectorAll('.v108-icon-btn.v2009-shop-view,.v187-shop-btn,.v188-photo-view,.rk-v20046-shop-photo,.rk-v20013-shop-photo').forEach(function(x){x.remove();});
-    root.querySelectorAll('.v108-shop-actions button[title*="Lihat"],.v108-shop-actions button[aria-label*="Lihat"]').forEach(function(x){if(!x.classList.contains('v106-photo-check'))x.remove();});
-    root.querySelectorAll(':scope > *').forEach(function(card){
-      var item=rk54ShopItem_(card); if(!item)return; var meta=rk54Meta_(item);
-      var actions=card.querySelector('.v108-shop-actions')||card.querySelector('.flex.items-center.gap-2.flex-wrap')||card;
-      var btn=actions.querySelector('.v106-photo-check');
-      if(btn){btn.removeAttribute('onclick');btn.removeAttribute('onmousedown');btn.setAttribute('data-photo-url',meta.url||'');btn.disabled=!meta.url;btn.classList.toggle('v106-photo-empty',!!meta.pending&&!meta.url);btn.innerHTML=meta.pending&&!meta.url?'<i class="fa-solid fa-cloud-arrow-up animate-pulse"></i>':'<i class="fa-solid fa-image"></i>';}
-      else if(meta.url||meta.pending) actions.insertBefore(rk54Button_(meta.url,meta.pending),actions.firstChild);
-    });
-  }
-  function rk54CleanLoan_(){
-    var root=document.getElementById('loanCardList'); if(!root)return;
-    root.querySelectorAll('.v106-photo-check').forEach(function(btn){
-      var card=btn.closest('.v37-loan-card'); var item=null;
-      if(card){var id=card.getAttribute('data-loan-id')||''; item=(Array.isArray(window.loansData)?window.loansData:[]).find(function(x){return String(x&&x.id||'')===String(id);})||null;}
-      var meta=rk54Meta_(item); btn.removeAttribute('onclick');btn.removeAttribute('onmousedown');
-      if(meta.url){btn.setAttribute('data-photo-url',meta.url);btn.disabled=false;btn.classList.remove('v106-photo-empty');btn.innerHTML='<i class="fa-solid fa-image"></i>';}
-    });
-  }
-  function rk54CleanAll_(){rk54CleanShopping_();rk54CleanLoan_();}
-
-  /* Capture phase is the single source of truth. It runs before target/bubble handlers. */
-  document.addEventListener('click',function(e){
-    var b=e.target&&e.target.closest?e.target.closest('button.v106-photo-check'):null;
-    if(!b||!b.isConnected)return;
-    var url=String(b.getAttribute('data-photo-url')||'').trim();
-    if(!url||b.disabled||b.classList.contains('v106-photo-empty'))return;
-    rk54Open_(url,e);
-  },true);
-
-  function rk54Schedule_(){clearTimeout(window.__rk54Timer);window.__rk54Timer=setTimeout(rk54CleanAll_,20);}
-  try{
-    var s=window.renderShoppingList;
-    if(typeof s==='function'&&!window.__rk54ShopWrap){window.__rk54ShopWrap=true;window.renderShoppingList=function(){var r=s.apply(this,arguments);rk54Schedule_();return r;};}
-    var l=window.renderLoanList;
-    if(typeof l==='function'&&!window.__rk54LoanWrap){window.__rk54LoanWrap=true;window.renderLoanList=function(){var r=l.apply(this,arguments);rk54Schedule_();return r;};}
-  }catch(_){ }
-  if(window.MutationObserver){
-    var mo=new MutationObserver(function(){rk54Schedule_();});
-    function start(){var a=document.getElementById('shoppingCardList'),b=document.getElementById('loanCardList');if(a)mo.observe(a,{childList:true,subtree:true});if(b)mo.observe(b,{childList:true,subtree:true});rk54Schedule_();}
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(start,80);});else setTimeout(start,80);
-  }else setTimeout(rk54CleanAll_,100);
-
-  window.rekenanV20054PhotoAudit=function(){
-    var sh=Array.from(document.querySelectorAll('#shoppingCardList .v106-photo-check')).filter(function(x){return !x.classList.contains('v106-photo-empty');});
-    var lo=Array.from(document.querySelectorAll('#loanCardList .v106-photo-check')).filter(function(x){return !x.classList.contains('v106-photo-empty');});
-    var r={build:'V200.54',shoppingButtons:sh.length,shoppingClickable:sh.filter(function(x){return !x.disabled&&!!x.getAttribute('data-photo-url');}).length,loanButtons:lo.length,loanClickable:lo.filter(function(x){return !x.disabled&&!!x.getAttribute('data-photo-url');}).length,viewer:typeof window.openAttachmentUrl_==='function',singleCapturePath:true};
-    console.info('[Rekenan AUDIT V200.54] PHOTO FLOW PINJAMAN -> BELANJA',r); return r;
-  };
-  setTimeout(function(){try{rk54CleanAll_();window.rekenanV20054PhotoAudit();}catch(_){ }},500);
-  console.info('[Rekenan BUILD] V200.54 PHOTO FLOW FINAL | LOAN STANDARD -> SHOPPING');
-})();
-</script>
+<script>
