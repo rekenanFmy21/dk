@@ -4,15 +4,15 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V200.84';
+        window.REKENAN_BUILD_VERSION = 'V200.85';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V200.84';
-        console.info('[Rekenan BUILD] UI V200.84');
-        console.info('[Rekenan BUILD] V200.84 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
+        window.REKENAN_UI_BUILD = 'V200.85';
+        console.info('[Rekenan BUILD] UI V200.85');
+        console.info('[Rekenan BUILD] V200.85 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
-                const expected = 'V200.84';
+                const expected = 'V200.85';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V200.84">
+    <meta name="rekenan-build" content="V200.85">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -617,13 +617,13 @@
 
         /* ===== END STAGE 6 ===== */
     
-        /* V200.84 CALCULATOR HISTORY: exactly one newest item visible */
+        /* V200.85 CALCULATOR HISTORY: exactly one newest item visible */
         #v101CalcHistory{display:block;min-width:0}
         #v101CalcHistory .rk-history-dropdown{margin-top:8px}
         #v101CalcHistory .rk-history-older{max-height:260px;overflow-y:auto;padding-right:2px}
         #v101CalcHistory .rk-history-older > *{margin-bottom:8px}
         #v101CalcHistory .rk-history-older > *:last-child{margin-bottom:0}
-        /* V200.84: compact history dropdowns. Latest records stay visible; older records collapse. */
+        /* V200.85: compact history dropdowns. Latest records stay visible; older records collapse. */
         .rk-history-dropdown{margin-top:8px;border-top:1px solid rgba(63,63,70,.7);padding-top:8px}
         .rk-history-toggle{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 10px;border-radius:12px;background:#18181b;color:#a1a1aa;font-size:10px;font-weight:800;border:1px solid #27272a;cursor:pointer;transition:all .18s ease}
         .rk-history-toggle:hover{background:#27272a;color:#e4e4e7}
@@ -2322,7 +2322,7 @@
     </style>
 
 <style id="v1996-shopping-layout-guard">
-/* V200.84: prevent Belanja cards from being transformed/wrapped by legacy UI observers. */
+/* V200.85: prevent Belanja cards from being transformed/wrapped by legacy UI observers. */
 #tab-belanja{position:relative!important;transform:none!important;overflow:visible!important}
 #tab-belanja.active{display:block!important;opacity:1!important;transform:none!important}
 #tab-belanja #shoppingCardList{
@@ -2340,7 +2340,7 @@ margin:0!important;
 <link rel="manifest" href="./manifest.json">
 
 <style id="rekenan-v20069-mobile-calc">
-/* V200.84: Calculator behaves as a normal app page, never as a blocking modal. */
+/* V200.85: Calculator behaves as a normal app page, never as a blocking modal. */
 #v101CalculatorModal.rk-calculator-shell{
   position:fixed!important; inset:0!important; z-index:30!important;
   display:flex!important; align-items:flex-start!important; justify-content:center!important;
@@ -2369,7 +2369,7 @@ margin:0!important;
 }
 </style>
 <style id="rekenan-v20071-calculator-route-final">
-/* V200.84: calculator is a normal route. It must never trap navigation. */
+/* V200.85: calculator is a normal route. It must never trap navigation. */
 #v101CalculatorModal.rk-calculator-shell,
 .v101-modal.rk-calculator-shell {
   position: fixed !important;
@@ -2422,7 +2422,7 @@ margin:0!important;
 </style>
 
 <style id="rekenan-v20072-responsive-final">
-/* REKENAN V200.84 — RESPONSIVE-FIRST FOUNDATION
+/* REKENAN V200.85 — RESPONSIVE-FIRST FOUNDATION
    No device-width hardcoding. Layout fluidly follows the available viewport. */
 :root{
   --rk-shell:100%;
@@ -2596,7 +2596,7 @@ header{
 
 <style id="rekenan-v200-73-universal-responsive">
 /* ================================================================
-   REKENAN V200.84 — UNIVERSAL RESPONSIVE-FIRST SYSTEM
+   REKENAN V200.85 — UNIVERSAL RESPONSIVE-FIRST SYSTEM
    One responsive container for every route:
    Dashboard / Catatan / Belanja / Pinjaman / Admin / Kalkulator
    No device-width assumptions. Fluid viewport-first layout.
@@ -4178,11 +4178,11 @@ nav.fixed.bottom-0 {
     </nav>
     <!-- Main JavaScript Scripts & Logic | SINGLE CLOUD + PURE DARK MODE -->
     <script>
-        // V200.84 STARTUP WARM: every domain is restored from Local immediately.
+        // V200.85 STARTUP WARM: every domain is restored from Local immediately.
         // Menu entry must never be the first moment when Loan/Admin data are loaded.
         function rkWarmAllDomainsOnStartup_() {
             try {
-                console.info('[Rekenan STARTUP] WARM ALL DOMAINS — Local ready before menu entry'); console.info('[Rekenan BUILD] V200.84 | ACC NON-BLOCKING + PHOTO ICONS + CALC HISTORY MERGE + ADMIN LIVE FALLBACK');
+                console.info('[Rekenan STARTUP] WARM ALL DOMAINS — Local ready before menu entry'); console.info('[Rekenan BUILD] V200.85 | ACC NON-BLOCKING + PHOTO ICONS + CALC HISTORY MERGE + ADMIN LIVE FALLBACK');
                 // These arrays are already restored above via secureLoad(). Re-rendering
                 // is deferred so startup stays light; no Cloud request is required to
                 // make Local state available.
@@ -4196,7 +4196,7 @@ nav.fixed.bottom-0 {
                     setTimeout(() => { try { loadAdminPanel(false).catch(() => {}); } catch (_) {} }, 50);
                 }
                 if (activeCloudUser && cloudToken) {
-                    // V200.84: one non-blocking CALC_HISTORY reconciliation after the
+                    // V200.85: one non-blocking CALC_HISTORY reconciliation after the
                     // first paint. It never blocks login/menu entry.
                     setTimeout(() => { try { rkReconcileCalculatorFromCloud_(false).catch(() => {}); } catch (_) {} }, 900);
                     // Loan realtime/version pulse runs even when the user has not opened
@@ -4224,9 +4224,9 @@ nav.fixed.bottom-0 {
         // Local file:// pages use JSONP because browser fetch cannot read a
         // normal cross-origin GAS response without CORS.
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
-        const API_VERSION = 'V200.84-LOCAL-FIRST-CACHED-AUTH-FAST';
-        window.REKENAN_SERVER_BUILD = 'V200.84';
-        console.info('[Rekenan BUILD] CLIENT V200.84 / SERVER API COMPATIBLE');
+        const API_VERSION = 'V200.85-LOCAL-FIRST-CACHED-AUTH-FAST';
+        window.REKENAN_SERVER_BUILD = 'V200.85';
+        console.info('[Rekenan BUILD] CLIENT V200.85 / SERVER API COMPATIBLE');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
             if (!u) return DEFAULT_GAS_URL;
@@ -4437,69 +4437,95 @@ nav.fixed.bottom-0 {
 
         async function cloudRequest(payload, timeoutMs = 30000) {
             const original = Object.assign({}, payload || {});
-            // V200.84: GAS Web App can cold-start or briefly return a redirect/404
-            // while the execution endpoint is warming. Retry read requests instead
-            // of immediately converting a transient condition into WEB_APP_TIMEOUT.
             const readAction = !WRITE_ACTIONS_V83.has(String(original.action || ''));
-            let response;
-            let data;
+            let response = null;
+            let data = null;
             let lastErr = null;
+
+            const isApiError_ = (body, resp) => {
+                if (!resp || !resp.ok) return true;
+                const status = String(body?.status || '').toUpperCase();
+                return body?.success === false || status === 'ERROR' || status === 'SESSION_EXPIRED' || status === 'AUTH_REQUIRED';
+            };
+            const isSessionExpired_ = (body) => {
+                const status = String(body?.status || '').toUpperCase();
+                const msg = String(body?.message || body?.error || '');
+                return status === 'SESSION_EXPIRED'
+                    || /sesi\s+rekening.*(?:tidak valid|berakhir|kedaluwarsa|kadaluwarsa)|sesi.*(?:tidak valid|berakhir|kedaluwarsa|kadaluwarsa)|token.*(?:expired|invalid)/i.test(msg);
+            };
+
+            // First request. A successful HTTP 200 with JSON {status:"error"} is
+            // still an API failure and must enter the recovery path.
             for (let attempt = 0; attempt < (readAction ? 2 : 1); attempt++) {
                 try {
                     response = await cloudBridge(original, timeoutMs);
                     data = await response.json();
-                    if (response.ok) break;
-                    lastErr = new Error(String(data?.message || 'Cloud read gagal.'));
+                    if (!isApiError_(data, response)) break;
+                    lastErr = new Error(String(data?.message || data?.error || 'Cloud request gagal.'));
                 } catch (e) {
                     lastErr = e;
                 }
-                if (attempt === 0 && readAction) await new Promise(r => setTimeout(r, 1200));
+                if (attempt === 0 && readAction) await new Promise(r => setTimeout(r, 1000));
             }
-            if (!response) throw lastErr || new Error('Cloud tidak merespons.');
 
             const action = String(original.action || '');
-            const msg = String(data?.message || '');
-            const sessionExpired = String(data?.status || '').toUpperCase() === 'SESSION_EXPIRED'
-                || /PIN harus tepat 4 digit|sesi.*(?:berakhir|tidak valid)|token.*(?:expired|invalid)/i.test(msg);
-
-            // Jangan re-login untuk login/register itu sendiri.
-            if (!response.ok && action !== 'login' && action !== 'register' && sessionExpired) {
-                // V200.84 AUTH FAST-RECOVERY:
-                // A GAS CacheService token can disappear/lag even though login just
-                // succeeded. The old code refreshed the token and retried with the
-                // new token only; if that token was not readable yet, requireCloud_()
-                // fell through to PIN validation and returned the misleading
-                // "PIN harus tepat 4 digit angka" error because the read request
-                // did not contain a PIN. Recover in one bounded retry by sending the
-                // locally verified 4-digit PIN together with the refreshed token.
+            // IMPORTANT: GAS frequently returns HTTP 200 for application-level
+            // errors. Detect SESSION_EXPIRED from the JSON body, not only HTTP status.
+            if (isSessionExpired_(data) && action !== 'login' && action !== 'register') {
                 const refreshed = await rkRefreshCloudToken_();
                 if (refreshed) {
                     const retryPayload = Object.assign({}, original, {
                         username: activeCloudUser,
                         token: cloudToken
                     });
-                    const localPin = String((typeof appPin !== 'undefined' ? appPin : '') || secureLoad('rekenan_pin', '') || '').trim();
+                    const localPin = String(
+                        (typeof appPin !== 'undefined' ? appPin : '') ||
+                        secureLoad('rekenan_pin', '') || ''
+                    ).trim();
                     if (/^\d{4}$/.test(localPin)) retryPayload.pin = localPin;
-                    response = await cloudBridge(retryPayload, Math.min(Number(timeoutMs) || 12000, 12000));
-                    data = await response.json();
-                }
-                // If the just-refreshed token still cannot be read by GAS, perform
-                // exactly ONE direct credential retry. This is deliberately bounded:
-                // no retry loop and no repeated Cloud hammering.
-                if (!response.ok && /PIN harus tepat 4 digit|AUTH_REQUIRED|SESSION_EXPIRED|token.*(?:expired|invalid)/i.test(String(data?.message || data?.status || ''))) {
-                    const username = String(activeCloudUser || localStorage.getItem('rekenan_active_cloud_user') || '').trim();
-                    const localPin = String((typeof appPin !== 'undefined' ? appPin : '') || secureLoad('rekenan_pin', '') || '').trim();
-                    if (username && /^\d{4}$/.test(localPin)) {
-                        response = await cloudBridge(Object.assign({}, original, {username, pin: localPin, token: ''}), Math.min(Number(timeoutMs) || 12000, 12000));
+                    try {
+                        response = await cloudBridge(retryPayload, Math.min(Number(timeoutMs) || 12000, 12000));
                         data = await response.json();
+                    } catch (e) {
+                        lastErr = e;
+                    }
+                }
+
+                // One bounded direct credential retry. This is needed when the
+                // newly-issued CacheService token has not propagated yet.
+                if (isSessionExpired_(data) || isApiError_(data, response)) {
+                    const username = String(activeCloudUser || localStorage.getItem('rekenan_active_cloud_user') || '').trim();
+                    const localPin = String(
+                        (typeof appPin !== 'undefined' ? appPin : '') ||
+                        secureLoad('rekenan_pin', '') || ''
+                    ).trim();
+                    if (username && /^\d{4}$/.test(localPin)) {
+                        try {
+                            response = await cloudBridge(
+                                Object.assign({}, original, {username, pin: localPin, token: ''}),
+                                Math.min(Number(timeoutMs) || 12000, 12000)
+                            );
+                            data = await response.json();
+                            // If credential auth succeeded, capture the fresh token
+                            // returned by the endpoint for subsequent reads.
+                            const freshToken = String(data?.data?.token || data?.token || '').trim();
+                            if (freshToken) {
+                                cloudToken = freshToken;
+                                localStorage.setItem('rekenan_cloud_token', freshToken);
+                            }
+                        } catch (e) {
+                            lastErr = e;
+                        }
                     }
                 }
             }
 
-            if (!response.ok) {
-                const err = new Error(data && data.message ? String(data.message) : 'Gagal berkomunikasi dengan backend GAS.');
+            if (isApiError_(data, response)) {
+                const err = new Error(
+                    String(data?.message || data?.error || lastErr?.message || 'Gagal berkomunikasi dengan backend GAS.')
+                );
                 err.apiResponse = data;
-                err.httpStatus = response.status;
+                err.httpStatus = response?.status;
                 throw err;
             }
             return data;
@@ -4763,7 +4789,7 @@ nav.fixed.bottom-0 {
                             }
                         }
                         checkCloudAuthModalState();
-                        // V200.84: masuk UI tanpa menjalankan renderer berat / reload tab.
+                        // V200.85: masuk UI tanpa menjalankan renderer berat / reload tab.
                         // Cloud snapshot dan render dilakukan bertahap di background.
                         rkEnterAfterLogin_();
                         setTimeout(() => {
@@ -4843,9 +4869,9 @@ nav.fixed.bottom-0 {
             data = data || {};
             const meta = data.meta || {};
             const authoritativeEmpty = meta.authoritativeEmpty === true;
-            // V200.84: Cloud READ is NEVER blocked by a pending local queue.
+            // V200.85: Cloud READ is NEVER blocked by a pending local queue.
             // Pending mutations only protect their own IDs during reconciliation.
-            // This fixes the V200.84 bootstrap dead-stop where Cloud data was read
+            // This fixes the V200.85 bootstrap dead-stop where Cloud data was read
             // but then discarded because any local queue happened to exist.
             const incomingCount = Object.values(data).filter(v => Array.isArray(v)).reduce((n, v) => n + v.length, 0);
             console.info('[Rekenan LOCAL-FIRST] CLOUD MERGE START', {incomingCount, localPending: !!(rkIsSyncPending_ && rkIsSyncPending_()), authoritativeEmpty});
@@ -4886,7 +4912,7 @@ nav.fixed.bottom-0 {
             return true;
         }
 
-        // V200.84 CALCULATOR CLOUD RECONCILIATION
+        // V200.85 CALCULATOR CLOUD RECONCILIATION
         // Local-first remains authoritative for local CRUD. This helper only imports
         // CALC_HISTORY rows that are missing locally, so an existing local history is
         // never replaced by a partial Cloud snapshot.
@@ -4894,12 +4920,12 @@ nav.fixed.bottom-0 {
         async function rkReconcileCalculatorFromCloud_(force = false) {
             if (rkCalcCloudReadInFlight_ || !activeCloudUser || !cloudToken) return false;
             const localRows = Array.isArray(calcHistory) ? calcHistory : [];
-            // V200.84: Local remains the immediate source of truth, but the first
+            // V200.85: Local remains the immediate source of truth, but the first
             // authenticated startup MUST reconcile CALC_HISTORY once even when Local
             // already contains rows. The old guard returned early when localRows.length
             // was non-zero, which made existing-but-incomplete local history impossible
             // to reconcile from the Sheet.
-            const reconcileKey = 'rekenan_calc_cloud_reconciled_V200.84_' + String(activeCloudUser || '');
+            const reconcileKey = 'rekenan_calc_cloud_reconciled_V200.85_' + String(activeCloudUser || '');
             if (!force) {
                 try { if (sessionStorage.getItem(reconcileKey) === '1') return false; } catch (_) {}
             }
@@ -4911,7 +4937,7 @@ nav.fixed.bottom-0 {
                     token: cloudToken,
                     forceRefresh: true,
                     noCache: true,
-                    __clientBuild: 'V200.84'
+                    __clientBuild: 'V200.85'
                 }, force ? 12000 : 9000);
                 const payload = r?.data || r;
                 if (!(r?.success || r?.status === 'success')) {
@@ -5042,7 +5068,7 @@ nav.fixed.bottom-0 {
             localStorage.setItem('rekenan_active_tab', tabId);
             document.querySelector('.mobile-container')?.scrollTo({top: 0, behavior: 'auto'});
 
-            // V200.84: Kalkulator is a real app route, not a blocking modal.
+            // V200.85: Kalkulator is a real app route, not a blocking modal.
             // Opening it through switchTab keeps every other navigation route authoritative.
             if (tabId === 'kalkulator') {
                 try {
@@ -5060,7 +5086,7 @@ nav.fixed.bottom-0 {
             else if (tabId === 'belanja') renderShoppingList();
             else if (tabId === 'kalkulator') {
                 try { if (typeof renderV101CalcHistory === 'function') renderV101CalcHistory(); } catch (_) {}
-                // V200.84: render Local immediately, then perform one version-scoped
+                // V200.85: render Local immediately, then perform one version-scoped
                 // CALC_HISTORY Sheet reconcile. The session guard is build-specific,
                 // so a new app version cannot inherit a stale "already reconciled" flag.
                 try {
@@ -5407,7 +5433,7 @@ nav.fixed.bottom-0 {
         function registerRekenanPWA_() {
             try {
                 if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-                navigator.serviceWorker.register('./sw.js?v=2084', {scope: './', updateViaCache: 'none'})
+                navigator.serviceWorker.register('./sw.js?v=2085', {scope: './', updateViaCache: 'none'})
                     .then(function (registration) {
                         console.info('[Rekenan PWA] Local Service Worker registered:', registration.scope);
                         try {registration.update();} catch (_) { }
@@ -5417,10 +5443,10 @@ nav.fixed.bottom-0 {
                         console.warn('[Rekenan PWA] Local Service Worker registration failed:', err && err.message ? err.message : err);
                     });
                 navigator.serviceWorker.addEventListener('controllerchange', function () {
-                    // V200.84: never reload the visible login/app shell when a new
+                    // V200.85: never reload the visible login/app shell when a new
                     // Service Worker takes control. The previous implementation caused
                     // a visible login flash/reload several seconds after first paint.
-                    console.info('[Rekenan PWA] controller changed — no forced reload (V200.84)');
+                    console.info('[Rekenan PWA] controller changed — no forced reload (V200.85)');
                 }, {once: true});
             } catch (err) {
                 console.warn('[Rekenan PWA] Registration skipped:', err);
@@ -5495,7 +5521,7 @@ nav.fixed.bottom-0 {
         // 4) menerapkan data Cloud ke UI.
         let rkStartupCloudRestoreInFlight_ = false;
 
-        // V200.84 AUTH STABILITY:
+        // V200.85 AUTH STABILITY:
         // A stale/missing Cloud token can make GAS fall back to requireCloud_(),
         // which then reports "PIN harus tepat 4 digit angka" when no PIN is
         // present in that request. This is an AUTH state, not a data-sync
@@ -5522,7 +5548,7 @@ nav.fixed.bottom-0 {
             // P1 ADMIN: only when an authenticated Admin session exists. A failed
             // Admin read must never prevent the borrower/loan phase from running.
             try {
-                if (sessionStorage.getItem('rekenan_admin_logged') === 'true' && typeof loadAdminPanel === 'function') {
+                if (typeof loadAdminPanel === 'function') {
                     console.info('[Rekenan STARTUP] P1 ADMIN READ START');
                     await Promise.race([
                         Promise.resolve(loadAdminPanel(true)),
@@ -5530,7 +5556,7 @@ nav.fixed.bottom-0 {
                     ]);
                     console.info('[Rekenan STARTUP] P1 ADMIN READ COMPLETE');
                 } else {
-                    console.info('[Rekenan STARTUP] P1 ADMIN SKIP — Admin session not active');
+                    console.info('[Rekenan STARTUP] P1 ADMIN SKIP — Admin loader unavailable');
                 }
             } catch (e) {
                 console.warn('[Rekenan STARTUP] P1 ADMIN READ FAILED — continuing to Pinjaman', e?.message || e);
@@ -5557,7 +5583,7 @@ nav.fixed.bottom-0 {
         }
 
         async function rkRestoreCloudStateOnStartup_() {
-            console.groupCollapsed('[Rekenan STARTUP] TRUE LOCAL-FIRST V200.84');
+            console.groupCollapsed('[Rekenan STARTUP] TRUE LOCAL-FIRST V200.85');
             console.info('Client UI build:', window.REKENAN_BUILD_VERSION);
             console.info('Client API build:', window.REKENAN_SERVER_BUILD);
             console.info('Local authority:', rkLocalAuthority_());
@@ -5570,7 +5596,7 @@ nav.fixed.bottom-0 {
                 if (!username) return;
                 activeCloudUser = username;
 
-                // V200.84: startup is local-first. If Cloud authentication is not
+                // V200.85: startup is local-first. If Cloud authentication is not
                 // currently valid, do not call getData() with an empty/stale token.
                 // That request is interpreted by GAS as a PIN login attempt and can
                 // produce the misleading "PIN harus tepat 4 digit angka" error.
@@ -5602,7 +5628,7 @@ nav.fixed.bottom-0 {
                     return;
                 }
 
-                // P1/P2 have already completed. P3+ reads the remaining Cloud
+                // P1 ADMIN and P2 PINJAMAN are complete/attempted before P3+. The remaining Cloud collections
                 // collections. Local is painted first and Cloud is reconciled into it.
                 await rkPriorityStartupSync_();
                 try { renderAll(); } catch (_) {}
@@ -6176,7 +6202,7 @@ nav.fixed.bottom-0 {
         function rkDeltaCollection_(key, list, previous) {
             if (!Array.isArray(list)) return {value:list, changed: previous !== rkHash_(list), complete:true};
             const prevMap = previous && previous[key] && typeof previous[key] === 'object' ? previous[key] : null;
-            // V200.84: never fall back to a full collection merely because the record
+            // V200.85: never fall back to a full collection merely because the record
             // baseline is missing. Seed the baseline first; the actual user change is
             // then represented by a single record delta. This prevents Calculator,
             // Catatan, Belanja, and other menus from re-uploading 1,000+ rows.
@@ -6268,7 +6294,7 @@ nav.fixed.bottom-0 {
                 rkClearPendingDeletes_(built.payload.deletedIds||[]);
                 console.info('[Rekenan SYNC] ADMIN DATA SHEET VERIFIED — PHOTO QUEUE STARTS IN BACKGROUND');
                 if (rkLoadAttachmentQueue_().length) rkScheduleAttachmentBackground_(selectedScope, 700);
-                // V200.84 SYNC FIX: after Admin write, immediately reconcile the active
+                // V200.85 SYNC FIX: after Admin write, immediately reconcile the active
                 // borrower when the same account is open. This avoids the old 5-minute
                 // borrower refresh window hiding a freshly verified loan/payment.
                 if (activeCloudUser && cloudToken && (selectedScope==='loan' || selectedScope==='all')) {
@@ -6313,7 +6339,7 @@ nav.fixed.bottom-0 {
             rkSavePendingDeletes_(set);
             window.rekenanPendingDeletedIds_ = set;
         }
-        // V200.84: every local-first collection must explicitly carry deletions.
+        // V200.85: every local-first collection must explicitly carry deletions.
         // Delta comparison only detects inserts/updates; removed records disappear
         // from the local array, so the Cloud needs a typed tombstone.
         function rkMarkRecordDeleted_(dataType, id) {
@@ -6340,7 +6366,7 @@ nav.fixed.bottom-0 {
 
         // ================= V195.2 SAVE LOCAL / MANUAL SYNC QUEUE =================
         
-        // ================= V200.84 TRUE LOCAL-FIRST =================
+        // ================= V200.85 TRUE LOCAL-FIRST =================
         // Local state is the runtime source of truth. Cloud is a replication target.
         // A one-time bootstrap is allowed only when this device has never initialized
         // local authority for the account. After that, startup Cloud snapshots MUST NOT
@@ -6383,13 +6409,13 @@ nav.fixed.bottom-0 {
             return value;
         }
         function rkLocalFirstCanBootstrapFromCloud_() {
-            // V200.84: authority is only meaningful while Local actually contains
+            // V200.85: authority is only meaningful while Local actually contains
             // usable account data. A stale flag must not make login show an empty UI.
             return !rkLocalAuthority_() || rkLocalStateIsEmpty_();
         }
         function rkLocalFirstMarkBootstrapComplete_() {
             rkSetLocalAuthority_();
-            try { localStorage.setItem('rekenan_local_first_version','V200.84'); } catch (_) {}
+            try { localStorage.setItem('rekenan_local_first_version','V200.85'); } catch (_) {}
         }
 const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         const RK_SYNC_LAST_KEY = 'rekenan_last_sync_date_v197';
@@ -6398,7 +6424,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         function rkSyncKey_(suffix) {return suffix + ':' + String(activeCloudUser || 'guest').trim().toLowerCase();}
         function rkIsSyncPending_() {
             try {
-                // V200.84: pending MUST mean a real Cloud mutation exists.
+                // V200.85: pending MUST mean a real Cloud mutation exists.
                 // A stale flag alone is never enough to wake the worker. This
                 // prevents the same syncTransactions request from cycling forever.
                 if (rkLoadLoanQueue_().length > 0 || rkLoadPaymentQueue_().length > 0 || rkLoadAdminMutationQueue_().length > 0) return true;
@@ -6424,7 +6450,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         function rkMarkSyncComplete_() {
             const hasQueue = (() => {
                 try {
-                    // V200.84: recompute the real delta. Do not keep a pending
+                    // V200.85: recompute the real delta. Do not keep a pending
                     // marker alive merely because an older request set the flag.
                     if (rkLoadLoanQueue_().length || rkLoadPaymentQueue_().length || rkLoadAdminMutationQueue_().length) return true;
                     return !!rkBuildSelectivePayload_('all', 0)?.payload;
@@ -6452,7 +6478,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             rkScheduleAutoSync_(delay);
         }
         function rkSetAutoSyncIndicator_(state = 'idle', detail = 'Sinkronisasi otomatis') {const el = document.getElementById('rkAutoSyncIndicator'); if (!el) return; el.classList.remove('is-pending', 'is-syncing', 'is-ok', 'is-error'); const icon = el.querySelector('[data-auto-sync-icon]'); if (state === 'syncing') {el.classList.add('is-syncing'); if (icon) icon.className = 'fa-solid fa-rotate text-xs'; el.title = 'Sedang menyinkronkan data otomatis';} else if (state === 'pending') {el.classList.add('is-pending'); if (icon) icon.className = 'fa-solid fa-cloud-arrow-up text-xs'; el.title = 'Ada data/foto menunggu koneksi atau retry';} else if (state === 'ok') {el.classList.add('is-ok'); if (icon) icon.className = 'fa-solid fa-cloud-check text-xs'; el.title = 'Semua data sudah tersinkron';} else if (state === 'error') {el.classList.add('is-error'); if (icon) icon.className = 'fa-solid fa-triangle-exclamation text-xs'; el.title = detail || 'Sinkronisasi menunggu retry';} else {if (icon) icon.className = 'fa-solid fa-cloud text-xs'; el.title = detail;} }
-        // V200.84 SYNC STABILITY: Cloud failures must pause the worker instead of
+        // V200.85 SYNC STABILITY: Cloud failures must pause the worker instead of
         // creating a tight retry loop. Local/queue state remains authoritative.
         let rkSyncPauseUntil_ = 0;
         function rkSyncFailureIsTransient_(e) {
@@ -6478,7 +6504,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             try { rkSetTransferIndicator_('active', window.__rkTransferOperationLabel || 'Sinkronisasi Cloud…'); } catch (_) {}
             console.info('[Rekenan SYNC] AUTO ONLINE START — SINGLE WORKER');
             try {
-                // V200.84: final preflight. If the pending bit is stale but there
+                // V200.85: final preflight. If the pending bit is stale but there
                 // is no actual delta, clear it and stop without contacting GAS.
                 const preflight = (typeof rkBuildSelectivePayload_ === 'function') ? rkBuildSelectivePayload_('all', 0) : null;
                 const hasAuxQueue = rkLoadLoanQueue_().length || rkLoadPaymentQueue_().length || rkLoadAdminMutationQueue_().length;
@@ -6498,7 +6524,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     rkSetAutoSyncIndicator_('error');
                     try { rkSetTransferIndicator_('error','Cloud belum selesai — antrean lokal dipertahankan'); } catch (_) {}
                     console.warn('[Rekenan SYNC] AUTO ONLINE WAIT', msg);
-                    // V200.84: syncDataToCloud returns failures instead of throwing.
+                    // V200.85: syncDataToCloud returns failures instead of throwing.
                     // Pause here too; otherwise the finally block schedules another
                     // request after every timeout and the queue appears stuck.
                     if (rkSyncFailureIsAuth_(err)) {
@@ -6581,7 +6607,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     if (!(data?.success || data?.status === 'success')) throw new Error(data?.message || 'Pengajuan pinjaman ditolak Cloud.');
                     submitted++;
                     console.info('[Rekenan LOAN] UPLOADED', loan.id);
-                    // V200.84: Admin gets the uploaded loan immediately from the
+                    // V200.85: Admin gets the uploaded loan immediately from the
                     // same Local-first operation. ACC never waits for Drive/photo.
                     // Cloud/adminData remains the authoritative reconciliation path.
                     try {
@@ -6603,7 +6629,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             }
             return {submitted, remaining: keep.length};
         }
-        // V200.84 TRUE LOCAL-FIRST: payments use a persistent operation queue.
+        // V200.85 TRUE LOCAL-FIRST: payments use a persistent operation queue.
         // The UI never calls submitPayment directly. Local state is committed first;
         // this worker is the only normal path that writes the payment to Cloud.
         const RK_PAYMENT_QUEUE_KEY_ = 'rekenan_payment_queue_v20028';
@@ -6949,7 +6975,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                         if (!loanResult.remaining && !paymentResult.remaining && !adminMutationResult.remaining) rkMarkSyncComplete_();
                         return {success: true, skipped: true, scope: selectedScope, result: {message: 'Tidak ada perubahan data utama; foto diproses di background.', photoQueued: rkLoadAttachmentQueue_().length}};
                     }
-                    // V200.84 HARD DEDUPE: if the exact fingerprint was already
+                    // V200.85 HARD DEDUPE: if the exact fingerprint was already
                     // accepted by Cloud, never transmit the same syncTransactions
                     // payload again. This is the final guard against a repeating
                     // 5–12s write loop when a stale pending flag survives.
@@ -6975,7 +7001,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     const nowState = rkCollectionState_();
                     const unchanged = Object.keys(built.state).every(k => rkHash_(nowState[k]) === rkHash_(built.state[k]));
                     if (unchanged) {const snap = rkLoadSyncSnapshot_(); Object.keys(built.state).forEach(k => snap[k] = rkHash_(built.state[k])); rkSaveSyncSnapshot_(snap); if (built.maps) rkCommitRecordSnapshot_(built.state,built.maps); rkClearPendingDeletes_(built.payload.deletedIds || []);}
-                    console.info('[Rekenan BUILD] SERVER API V200.84', result.serverSyncVersion || result.data?.serverSyncVersion || 'unknown');
+                    console.info('[Rekenan BUILD] SERVER API V200.85', result.serverSyncVersion || result.data?.serverSyncVersion || 'unknown');
                     console.info('[Rekenan SYNC] DATA SHEET VERIFIED — PHOTO QUEUE MAY START');
                     // IMPORTANT: never await Drive. The main data worker is released immediately.
                     if (rkLoadAttachmentQueue_().length) rkScheduleAttachmentBackground_(selectedScope, 700);
@@ -7319,7 +7345,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             } catch (e) {return rememberAttachmentWarning_(e);}
         }
         async function uploadAttachmentViaPost_(payload, timeoutMs = 45000) {
-            // V200.84: replace iframe/form navigation with a fire-and-confirm POST.
+            // V200.85: replace iframe/form navigation with a fire-and-confirm POST.
             // The iframe response caused a noisy initial 403 even when GAS processed
             // the upload. uploadAttachmentStatus is the authoritative result.
             showUploadCancel_('Mengunggah foto/bukti ke Google Drive...', uploadCancelInputId_);
@@ -7503,7 +7529,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             if (!confirm(`Yakin ingin menghapus "${label}"?`)) return;
             transactions.splice(idx, 1);
             secureSave('rekenan_transactions', transactions);
-            // V200.84: delta sync cannot infer a deletion from the missing local row.
+            // V200.85: delta sync cannot infer a deletion from the missing local row.
             // Queue an explicit TRANSACTION|id tombstone so GAS removes the Sheet row.
             rkMarkRecordDeleted_('TRANSACTION', id);
             renderCatatanList();
@@ -7606,7 +7632,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 const fid = String(a.fileId || a.FileId || a.AttachmentFileId || raw.fileId || item.attachmentFileId || item.fileId || '').trim();
                 const target = url || (fid ? 'https://drive.google.com/file/d/' + encodeURIComponent(fid) + '/view' : '');
                 if (target && typeof window.openAttachmentUrl_ === 'function') window.openAttachmentUrl_(target);
-            } catch (e) { console.warn('[Rekenan V200.84] SHOPPING PHOTO OPEN FAILED', e); }
+            } catch (e) { console.warn('[Rekenan V200.85] SHOPPING PHOTO OPEN FAILED', e); }
         }
 
         function renderShoppingList() {
@@ -7970,7 +7996,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 
         async function fetchLoansFromCloud(force = false) {
             if (!activeCloudUser || !cloudToken || borrowerFetchInFlight_) return;
-            // V200.84 CACHE-FIRST: restore account-scoped cache before any network call.
+            // V200.85 CACHE-FIRST: restore account-scoped cache before any network call.
             try {
                 const owner = String(localStorage.getItem('rekenan_loans_owner') || '').trim();
                 if (owner === String(activeCloudUser).trim()) {
@@ -8418,7 +8444,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             document.getElementById('loanHistoryModal')?.classList.add('hidden');
         }
 
-        // ================= V200.84 HISTORY DROPDOWNS =================
+        // ================= V200.85 HISTORY DROPDOWNS =================
         // Latest records stay visible; older records collapse. Catatan is intentionally excluded.
         function rkHistoryDropdownHtml_(items, renderItem, label) {
             const source = Array.isArray(items) ? items : [];
@@ -8447,7 +8473,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 <div class="rk-history-older">${older}</div>
             </div>`;
         }
-        console.info('[Rekenan BUILD] HISTORY DROPDOWN V200.84 READY | exactly 1 newest visible + all older records collapsible | Catatan excluded');
+        console.info('[Rekenan BUILD] HISTORY DROPDOWN V200.85 READY | exactly 1 newest visible + all older records collapsible | Catatan excluded');
 
         function rkToggleHistoryDropdown_(btn) {
             const wrap = btn && btn.closest ? btn.closest('[data-rk-history-dropdown]') : null;
@@ -8560,7 +8586,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         }
 
         // ================= SETTINGS & BACKUP MODULE =================
-        // ================= SETTINGS & BACKUP MODULE V200.84 =================
+        // ================= SETTINGS & BACKUP MODULE V200.85 =================
         // Large backup files must never be pushed to Cloud synchronously from the
         // file-input handler.  Import is LOCAL-FIRST; the existing single auto
         // worker picks the pending snapshot up when the browser is online.
@@ -8739,7 +8765,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         function fullBackupJSON() {
             try {
                 const backupData = {
-                    backupVersion: 'V200.84',
+                    backupVersion: 'V200.85',
                     exportedAt: new Date().toISOString(),
                     activeCloudUser,
                     transactions: Array.isArray(transactions) ? transactions : [],
@@ -9325,7 +9351,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         function startAdminBackgroundSync_() {
             if (adminSyncTimer_) { clearInterval(adminSyncTimer_); adminSyncTimer_ = null; }
             if (sessionStorage.getItem('rekenan_admin_logged') !== 'true') return;
-            // V200.84: loanSyncState is only a lightweight pulse. If JSONP/pulse
+            // V200.85: loanSyncState is only a lightweight pulse. If JSONP/pulse
             // fails, Admin must still notice a newly uploaded loan without the
             // user reopening the Admin menu. A throttled adminData refresh is the
             // fallback; it never blocks the UI because cached data is painted first.
@@ -9451,7 +9477,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         }
         function logoutEmbeddedAdmin() {sessionStorage.removeItem('rekenan_admin_logged'); sessionStorage.removeItem('rekenan_admin_pin'); sessionStorage.removeItem('rekenan_admin_token'); embeddedAdminLoans = []; embeddedAdminPayments = []; initEmbeddedAdmin(); showToast('Admin berhasil keluar', 'success');}
 
-        // V200.84: ACC queue is deliberately optimistic + serialized.
+        // V200.85: ACC queue is deliberately optimistic + serialized.
         // The UI removes the check button immediately, while Cloud writes are
         // processed one-by-one in click order. A slow first ACC must never
         // block the Admin from clicking the next borrower.
@@ -9459,7 +9485,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         const paymentVerifyInFlight_ = new Set();
         const rkAdminAccQueue_ = [];
         let rkAdminAccWorkerRunning_ = false;
-        // V200.84: stale Admin snapshots must never resurrect an ACC button
+        // V200.85: stale Admin snapshots must never resurrect an ACC button
         // after the user has already clicked it. These sets are cleared only
         // when a verification fails or the record is deleted/reloaded authoritatively.
         const rkAdminHiddenLoanAcc_ = new Set();
@@ -9644,7 +9670,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             finally {hideLoading();}
         }
 
-        // V200.84: Cloud refresh must NEVER resurrect Admin records that are still
+        // V200.85: Cloud refresh must NEVER resurrect Admin records that are still
         // pending in the local mutation queue. This is the same local-authority
         // overlay contract used by Belanja/Catatan. The Cloud snapshot is only a
         // background reconciliation source; pending local deletes remain authoritative.
@@ -9678,7 +9704,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         async function loadAdminPanel(force = false) {
             if (!adminSyncTimer_) startAdminBackgroundSync_();
             if (sessionStorage.getItem('rekenan_admin_logged') !== 'true' || adminFetchInFlight_) return;
-            // V200.84 CACHE-FIRST: paint local snapshot immediately.
+            // V200.85 CACHE-FIRST: paint local snapshot immediately.
             try {renderEmbeddedAdmin();} catch (_) { }
             const age = Date.now() - Number(adminLastFetchAt_ || 0);
             const ADMIN_REFRESH_MS = 5 * 60 * 1000;
@@ -9873,7 +9899,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 embeddedAdminLoans = []; embeddedAdminPayments = [];
                 try { localStorage.removeItem('rekenan_loans'); localStorage.removeItem('rekenan_riwayat_cicilan'); } catch (_) {}
             }
-            // V200.84: Admin local state must be persisted exactly like Belanja/Catatan.
+            // V200.85: Admin local state must be persisted exactly like Belanja/Catatan.
             // The previous build updated the embedded arrays in memory but did not
             // persist them, so a reload could visually revert a local-first Admin mutation.
             try {
@@ -9886,7 +9912,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             try { renderEmbeddedAdmin(); } catch (_) {}
         }
         async function rkDrainAdminMutationQueue_() {
-            // V200.84: snapshot-drain WITHOUT overwriting mutations added while
+            // V200.85: snapshot-drain WITHOUT overwriting mutations added while
             // the worker is processing. The previous implementation loaded q,
             // processed it, then rkSaveAdminMutationQueue_(keep). If the user
             // clicked Delete several times during the Cloud request, newer queue
@@ -10548,7 +10574,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             border-color: #6366f1
         }
 
-        /* V200.84 CALCULATOR APP-SHELL: keep the real app header + bottom menu visible */
+        /* V200.85 CALCULATOR APP-SHELL: keep the real app header + bottom menu visible */
         .v101-modal.rk-calculator-shell {
             z-index: 30 !important;
             background: transparent !important;
@@ -10819,7 +10845,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             window.openV101NoteModal = function (note) {const m = makeModal('v101NoteModal', '<i class="fa-solid fa-note-sticky text-emerald-300 mr-2"></i>Note', `<input id="v101NoteId" type="hidden"><input id="v101NoteTitle" class="v101-input mb-2" placeholder="Judul Note"><textarea id="v101NoteBody" class="v101-input" rows="7" placeholder="Tulis Note..."></textarea><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto Note"><i class="fa-solid fa-camera"></i><input id="v101NoteAttachment" type="file" class="hidden"></label><div class="v101-proof-meta"><b>Foto Note</b><small id="v101NoteAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" class="flex-1 bg-zinc-800 text-zinc-300 py-3 rounded-xl text-xs font-bold" onclick="closeV101Modal('v101NoteModal')">Batal</button><button type="button" id="v101NoteSaveBtn" class="flex-1 bg-emerald-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Note()">Simpan</button></div><div class="mt-4"><div class="text-[10px] text-zinc-500 mb-2">Note tersimpan</div><div id="v101NoteSearchFallback" class="mb-3"><div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i><input id="v101NoteSearchInput" class="v101-input pl-9" placeholder="Cari Note berdasarkan judul atau isi..." autocomplete="off"></div></div><div id="v101NoteList" class="space-y-2"></div></div>`); const n = note || {}; document.getElementById('v101NoteId').value = n.id || ''; document.getElementById('v101NoteTitle').value = n.title || ''; document.getElementById('v101NoteBody').value = n.body || ''; const f = document.getElementById('v101NoteAttachment'); if (f) f.value = ''; const st = document.getElementById('v101NoteAttachmentStatus'); if (st) st.textContent = hasAttachment_(n) ? 'Foto tersimpan — pilih foto baru untuk mengganti' : 'Opsional — boleh dikosongkan'; m.classList.add('show'); renderV101Notes()};
             let noteBusy = false; window.saveV101Note = async function () {if (noteBusy) return; const title = (document.getElementById('v101NoteTitle')?.value || '').trim(), body = (document.getElementById('v101NoteBody')?.value || '').trim(); if (!title && !body) return showToast('Isi Note terlebih dahulu.', 'error'); noteBusy = true; const btn = document.getElementById('v101NoteSaveBtn'); if (btn) {btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Menyimpan...'} try {ensureNotes(); const id = document.getElementById('v101NoteId')?.value || ('note_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7)), now = new Date().toISOString(), old = notesData.find(x => String(x.id) === String(id)) || {}, file = document.getElementById('v101NoteAttachment')?.files?.[0]; let attachment = old.attachment || null; if (file) {attachment = await rkQueueAttachmentFile_(file, 'Note', id, 'NOTE');} const obj = {id, title: title || 'Tanpa Judul', body, date: now, updatedAt: now, ...(attachment ? {attachment} : {})}; const i = notesData.findIndex(x => String(x.id) === String(id)); if (i >= 0) notesData[i] = {...notesData[i], ...obj}; else notesData.unshift(obj); secureSave('rekenan_notes', notesData); renderV101Notes(); rkMarkSyncPending_(); showToast('Note tersimpan di perangkat. Sinkronisasi otomatis berjalan saat internet tersedia.', 'success'); const titleEl = document.getElementById('v101NoteTitle'), bodyEl = document.getElementById('v101NoteBody'), fileEl = document.getElementById('v101NoteAttachment'); if (titleEl) titleEl.value = ''; if (bodyEl) bodyEl.value = ''; if (fileEl) fileEl.value = ''; closeV101Modal('v101NoteModal')} catch (e) {showToast(e?.message || 'Note gagal disimpan.', 'error')} finally {noteBusy = false; if (btn) {btn.disabled = false; btn.textContent = 'Simpan'} } };
             let noteDeleteBusy = false; window.deleteV101Note = async function (id) {if (noteDeleteBusy) return; if (!confirm('Hapus Note ini?')) return; noteDeleteBusy = true; try {ensureNotes(); notesData = notesData.filter(x => String(x.id) !== String(id)); secureSave('rekenan_notes', notesData); rkMarkRecordDeleted_('NOTE', id); renderV101Notes(); rkMarkSyncPending_(); showToast('Note dihapus di perangkat. Sinkronisasi otomatis berjalan saat online tersedia.', 'success')} catch (e) {showToast(e?.message || 'Penghapusan Cloud belum terverifikasi.', 'error')} finally {noteDeleteBusy = false} };
-            window.openV101CalculatorModal = function () {const m = makeModal('v101CalculatorModal', '<i class="fa-solid fa-calculator text-blue-300 mr-2"></i>Kalkulator', `<div class="rk-calc-phone"><div class="rk-calc-display"><div id="v101CalcExpr" class="rk-calc-expression">0</div><div id="v101CalcResult" class="rk-calc-result">0</div></div><div class="rk-calc-grid"><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('C')">AC</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('⌫')">⌫</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('.')">.</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('÷')">÷</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('7')">7</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('8')">8</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('9')">9</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('×')">×</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('4')">4</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('5')">5</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('6')">6</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('−')">−</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('1')">1</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('2')">2</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('3')">3</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('+')">+</button><button type="button" class="v106-calc-key v106-calc-num rk-calc-zero" onclick="v101CalcKey('0')">0</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('00')">00</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('000')">000</button><button type="button" class="v106-calc-key v106-calc-eq" onclick="v101CalcKey('=')">=</button></div><div id="rkCalcHistorySection" class="mt-3"><div class="text-[10px] text-zinc-500 mb-2">Riwayat Kalkulator</div><div id="v101CalcHistory" class="space-y-2"></div></div><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v101CalcAttachment" type="file" accept="image/*" class="hidden"></label><div class="v101-proof-meta"><b>Foto Bukti</b><small id="v101CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" id="v101CalcSaveBtn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Calculator()">Simpan</button></div></div>`); m.classList.add('show'); currentActiveTab = 'kalkulator'; try { localStorage.setItem('rekenan_active_tab','kalkulator'); } catch(_){} rkSetCalculatorNavActive_(true); renderV101CalcHistory(); console.info('[Rekenan CALC] APP-SHELL OPEN V200.84 — HEADER + MENU VISIBLE'); try { rkReconcileCalculatorFromCloud_(true); setTimeout(function(){ try{ rkReconcileCalculatorFromCloud_(true); }catch(_){} }, 1800); } catch(_){}};
+            window.openV101CalculatorModal = function () {const m = makeModal('v101CalculatorModal', '<i class="fa-solid fa-calculator text-blue-300 mr-2"></i>Kalkulator', `<div class="rk-calc-phone"><div class="rk-calc-display"><div id="v101CalcExpr" class="rk-calc-expression">0</div><div id="v101CalcResult" class="rk-calc-result">0</div></div><div class="rk-calc-grid"><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('C')">AC</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('⌫')">⌫</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v101CalcKey('.')">.</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('÷')">÷</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('7')">7</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('8')">8</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('9')">9</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('×')">×</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('4')">4</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('5')">5</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('6')">6</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('−')">−</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('1')">1</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('2')">2</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('3')">3</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v101CalcKey('+')">+</button><button type="button" class="v106-calc-key v106-calc-num rk-calc-zero" onclick="v101CalcKey('0')">0</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('00')">00</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v101CalcKey('000')">000</button><button type="button" class="v106-calc-key v106-calc-eq" onclick="v101CalcKey('=')">=</button></div><div id="rkCalcHistorySection" class="mt-3"><div class="text-[10px] text-zinc-500 mb-2">Riwayat Kalkulator</div><div id="v101CalcHistory" class="space-y-2"></div></div><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v101CalcAttachment" type="file" accept="image/*" class="hidden"></label><div class="v101-proof-meta"><b>Foto Bukti</b><small id="v101CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" id="v101CalcSaveBtn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Calculator()">Simpan</button></div></div>`); m.classList.add('show'); currentActiveTab = 'kalkulator'; try { localStorage.setItem('rekenan_active_tab','kalkulator'); } catch(_){} rkSetCalculatorNavActive_(true); renderV101CalcHistory(); console.info('[Rekenan CALC] APP-SHELL OPEN V200.85 — HEADER + MENU VISIBLE'); try { rkReconcileCalculatorFromCloud_(true); setTimeout(function(){ try{ rkReconcileCalculatorFromCloud_(true); }catch(_){} }, 1800); } catch(_){}};
             window.saveV101Calculator = async function () {const btn = document.getElementById('v101CalcSaveBtn'); if (btn?.dataset.busy === '1') return; const expr = String((document.getElementById('v101CalcExpr')?.value ?? document.getElementById('v101CalcExpr')?.textContent) || '').trim(), out = document.getElementById('v101CalcResult')?.textContent || '0'; if (!expr || out === '...') return showToast('Perhitungan belum valid.', 'error'); if (btn) btn.dataset.busy = '1'; try {const id = 'calc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6), file = document.getElementById('v101CalcAttachment')?.files?.[0]; const item = {id, type: 'calculator', expression: expr, result: parseRupiah(out), date: rkLocalDateTimeYMD_(new Date()), createdAt: new Date().toISOString()}; calcHistory.unshift(item); let attachment = null; if (file) attachment = await rkQueueAttachmentFile_(file, 'Kalkulator', id, 'CALC_HISTORY', item); if (attachment) item.attachment = attachment; secureSave('rekenan_calc_history', calcHistory); renderV101CalcHistory(); rkMarkSyncPending_(); showToast('Kalkulator tersimpan di perangkat. Sinkronisasi otomatis berjalan saat internet tersedia.', 'success'); const exprEl = document.getElementById('v101CalcExpr'), fileEl = document.getElementById('v101CalcAttachment'), resEl = document.getElementById('v101CalcResult'); if (exprEl) exprEl.value = ''; if (fileEl) fileEl.value = ''; if (resEl) resEl.textContent = '0'; const stEl = document.getElementById('v101CalcAttachmentStatus'); if (stEl) stEl.textContent = 'Opsional — boleh dikosongkan';} catch (e) {showToast(e?.message || 'Kalkulator gagal disimpan.', 'error')} finally {if (btn) {delete btn.dataset.busy; btn.textContent = 'Simpan'} } };
             window.renderV101CalcHistoryCore_ = function () {
                 const el = document.getElementById('v101CalcHistory');
@@ -10895,7 +10921,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     return w;
                 } catch (e) {try {w.close()} catch (_) { } if (typeof showToast === 'function') showToast('Laporan gagal dibuat: ' + (e.message || e), 'error'); return null;}
             }
-            /* V200.84 PHOTO PATCH: parent page only */
+            /* V200.85 PHOTO PATCH: parent page only */
 
 (function(){
   'use strict';
@@ -10974,7 +11000,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
     var root=document.body;
     if(root) obs.observe(root,{childList:true,subtree:true});
   }
-  console.info('[Rekenan BUILD] PHOTO V200.84 ADMIN OK / BELANJA OK / PINJAMAN OK');
+  console.info('[Rekenan BUILD] PHOTO V200.85 ADMIN OK / BELANJA OK / PINJAMAN OK');
 })();
 
             let v106PdfBusyState_ = false;
@@ -11232,7 +11258,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 
             /* ================= LOAN PHOTO POSITION ================= */
             function v108MoveLoanPhotoIcons_() {
-                // V200.84 FIX: realtime render can replace the status node between
+                // V200.85 FIX: realtime render can replace the status node between
                 // querySelector() and insertBefore(). Never use a stale reference node.
                 document.querySelectorAll('#loanCardList .v106-photo-check').forEach(function (btn) {
                     try {
@@ -11923,8 +11949,8 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 
     <script id="rekenan-v1948-build-diagnostics">
         (function () {
-            const ui = 'V200.84';
-            console.info('[Rekenan BUILD] UI V200.84 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.84 / SERVER API COMPATIBLE');
+            const ui = 'V200.85';
+            console.info('[Rekenan BUILD] UI V200.85 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.85 / SERVER API COMPATIBLE');
             window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
@@ -12060,7 +12086,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
     <script id="v1961-final-fixes">
         (function () {
             'use strict';
-            console.info('[Rekenan BUILD] V200.84 ARCHITECTURE LOADED');
+            console.info('[Rekenan BUILD] V200.85 ARCHITECTURE LOADED');
             window.rkNormalizePinError_ = function (err) {
                 const raw = String(err?.message || err || '');
                 return /pin/i.test(raw) && /(salah|wrong|invalid|tidak sesuai|incorrect)/i.test(raw) ? 'PIN salah.' : raw;
@@ -12132,7 +12158,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             const oldToast = window.showToast; if (typeof oldToast === 'function') {window.showToast = function (msg, type) {let m = String(msg || ''); if (/PIN|pin/i.test(m) && /(salah|wrong|invalid|incorrect|tidak sesuai)/i.test(m)) m = 'PIN salah.'; return oldToast(m, type);};}
             // -------- clean note container --------
             document.body.classList.add('v1961-note-clean');
-            /* V200.84: photo chooser observer removed to prevent repeated DOM wrapping. */
+            /* V200.85: photo chooser observer removed to prevent repeated DOM wrapping. */
             document.addEventListener('DOMContentLoaded', () => {setTimeout(installAllPhotoChoosers_, 100); setTimeout(installAllPhotoChoosers_, 700);});
         })();
     </script>
@@ -12257,7 +12283,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             }
             // Make Qty genuinely native-keyboard proof.
             function lockQtyInputs() {document.querySelectorAll('#tab-belanja input[id^="shop_qty_"]').forEach(i => {i.readOnly = true; i.inputMode = 'none'; i.setAttribute('autocomplete', 'off'); if (i.dataset.rk1961 !== '1') {i.dataset.rk1961 = '1'; i.addEventListener('keydown', e => e.preventDefault(), true); i.addEventListener('beforeinput', e => e.preventDefault(), true); i.addEventListener('focus', e => {e.preventDefault(); i.blur(); openQtyKeypad(i.id.replace('shop_qty_', ''));}, true);} });}
-            /* V200.84: quantity/photo observer removed. */
+            /* V200.85: quantity/photo observer removed. */
             setTimeout(() => {ensurePhotoChoices(); lockQtyInputs();}, 200); setTimeout(() => {ensurePhotoChoices(); lockQtyInputs();}, 1000);
             // Calculator: no legacy formatter/evaluator dependency.
             window.rkCalcEval1961_ = function (expr) {let s = String(expr || '').replace(/[×x]/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/,/g, '.').replace(/\s+/g, ''); if (!s) throw Error('Masukkan perhitungan.'); if (!/^[0-9+\-*/().]+$/.test(s)) throw Error('Karakter tidak didukung.'); let i = 0; const primary = () => {if (s[i] === '(') {i++; const v = exprFn(); if (s[i] !== ')') throw Error('Kurung tidak berpasangan'); i++; return v;} const st = i; while (i < s.length && /[0-9.]/.test(s[i])) i++; if (st === i) throw Error('Angka tidak valid'); const n = Number(s.slice(st, i)); if (!isFinite(n)) throw Error('Angka tidak valid'); return n;}; const unary = () => {if (s[i] === '-') {i++; return -unary();} if (s[i] === '+') {i++; return unary();} return primary();}; const term = () => {let v = unary(); while (i < s.length && (s[i] === '*' || s[i] === '/')) {const op = s[i++], b = unary(); if (op === '/' && b === 0) throw Error('Tidak bisa membagi dengan 0'); v = op === '*' ? v * b : v / b;} return v;}; const exprFn = () => {let v = term(); while (i < s.length && (s[i] === '+' || s[i] === '-')) {const op = s[i++], b = term(); v = op === '+' ? v + b : v - b;} return v;}; const n = exprFn(); if (i !== s.length || !isFinite(n)) throw Error('Perhitungan tidak valid.'); return n;};
@@ -12294,12 +12320,12 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     });
                 }
                 arm();
-                /* V200.84: universal photo observer removed. */
+                /* V200.85: universal photo observer removed. */
             })();
             window.openLoanAttachment_ = function (fileId, url) {let fid = String(fileId || '').trim(), u = String(url || '').trim(); try {fid = decodeURIComponent(fid); u = decodeURIComponent(u)} catch (_) { } if (!u && fid) u = 'https://drive.google.com/file/d/' + encodeURIComponent(fid) + '/view'; if (!fid && !u) return showToast('Foto belum tersedia.', 'warning'); openAttachmentUrl_(u);};
         })();
     </script>
-    <script id="v2002-admin-auto-detect-disabled">/* V200.84: 60s full Admin polling disabled. Use cache-first menu entry and explicit Reload. */</script>
+    <script id="v2002-admin-auto-detect-disabled">/* V200.85: 60s full Admin polling disabled. Use cache-first menu entry and explicit Reload. */</script>
     <style id="rekenan-v1984-final-fix-css">
         /* V198.4: calculator is a dedicated bottom-nav tool, not a Catatan sub-tool. */
         #tab-belanja .checkout-sticky-bar {
@@ -12393,7 +12419,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
     <script id="rekenan-v1984-final-functional-fix">
         (function () {
             'use strict';
-            console.info('[Rekenan BUILD] V200.84 UNIVERSAL DELTA SYNC + DELETE TOMBSTONES LOADED');
+            console.info('[Rekenan BUILD] V200.85 UNIVERSAL DELTA SYNC + DELETE TOMBSTONES LOADED');
 
             /* ---------- stable calculator formatter ---------- */
             window.v109Fmt = function (v) {
@@ -12546,7 +12572,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             function hardenMoney_() {['loanJumlah', 'payJumlahBayar'].forEach(id => hardenNumericInput_(id, window.openMoneyKeypad));}
             window.openMoneyKeypad = window.openMoneyKeypad || function () { };
             setTimeout(() => {hardenQty_(); hardenMoney_();}, 100);
-            /* V200.84: numeric observer removed. */
+            /* V200.85: numeric observer removed. */
 
             /* ---------- loan image button: support fileId even when URL is absent ---------- */
             window.rkAttachmentViewUrl1984_ = function (att) {
@@ -12608,7 +12634,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 });
             }
             setTimeout(ensureShoppingPhoto1984_, 1000);
-            /* V200.84: shopping photo observer removed. */
+            /* V200.85: shopping photo observer removed. */
 
             /* ---------- stale password/PIN warning normalization ---------- */
             window.rkVerifyLocalPinAgainstUserSheet1984_ = function (sheetPin, localPin) {
@@ -12620,11 +12646,11 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 
 
 <script>
-/* V200.84 PERFORMANCE + ADMIN ACC QUEUE + REALTIME PULSE PATCH */
+/* V200.85 PERFORMANCE + ADMIN ACC QUEUE + REALTIME PULSE PATCH */
 (function(){
- const RK_BUILD='V200.84';
+ const RK_BUILD='V200.85';
  window.REKENAN_BUILD=RK_BUILD;
- console.info('[Rekenan BUILD] V200.84 | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
+ console.info('[Rekenan BUILD] V200.85 | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
  window.rkBusinessNow=function(){ return new Date(); };
  window.rkBusinessDate=function(v){
    const d=v instanceof Date?v:new Date(v==null?Date.now():v);
@@ -12649,13 +12675,13 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
    return oldAdmin.call(this,!!force);
  };
  const oldBorrow=window.fetchLoansFromCloud;
- // V200.84: one authoritative borrower loader. No stale secondary snapshot may
+ // V200.85: one authoritative borrower loader. No stale secondary snapshot may
  // overwrite Local or prevent the Cloud reconciliation above.
  if(typeof oldBorrow==='function') window.fetchLoansFromCloud=async function(force){
    return oldBorrow.call(this,!!force);
  };
 
- // V200.84: borrower realtime ACC pulse. When Admin approves a loan, the
+ // V200.85: borrower realtime ACC pulse. When Admin approves a loan, the
  // backend version changes. We fetch only the authenticated user's compact
  // loan snapshot and apply it immediately, so the Bayar/Cicil button unlocks
  // without waiting for a full menu refresh.
@@ -12710,10 +12736,10 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 <script id="rekenan-v2009-final-repair">
 (function(){
 'use strict';
-window.REKENAN_BUILD_VERSION='V200.84';
-window.REKENAN_UI_BUILD='V200.84';
-window.REKENAN_SERVER_BUILD='V200.84';
-console.info('[Rekenan BUILD] FINAL CLIENT V200.84 / SERVER API COMPATIBLE');
+window.REKENAN_BUILD_VERSION='V200.85';
+window.REKENAN_UI_BUILD='V200.85';
+window.REKENAN_SERVER_BUILD='V200.85';
+console.info('[Rekenan BUILD] FINAL CLIENT V200.85 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
 
 /* Calculator: one authoritative save path, then completely reset the calculator UI. */
@@ -12730,7 +12756,7 @@ function rkCalcReset2008_(){
     if(typeof window.v101CalcKey==='function'){
       /* do not call it: older implementations mix input.value/textContent */
     }
-  }catch(e){console.warn('[V200.84] calculator reset:',e);}
+  }catch(e){console.warn('[V200.85] calculator reset:',e);}
 }
 function rkCalcSavingAnim2008_(btn){
   if(!btn) return;
@@ -12806,7 +12832,7 @@ if(typeof oldCalcSave2008==='function'){
 }
 
 setTimeout(function(){rkPatchShoppingPhotoButtons2008_();rkPatchLoanPhotoButtons2008_();},250);
-window.rekenanV2008Health=function(){return {client:'V200.84',server:window.REKENAN_SERVER_BUILD,calculator:true,shoppingPhoto:true,loanPhoto:true};};
+window.rekenanV2008Health=function(){return {client:'V200.85',server:window.REKENAN_SERVER_BUILD,calculator:true,shoppingPhoto:true,loanPhoto:true};};
 })();
 </script>
 <style id="rekenan-v2009-final-css">
@@ -12817,10 +12843,10 @@ window.rekenanV2008Health=function(){return {client:'V200.84',server:window.REKE
 <script id="rekenan-v20018-transaction-history-fix">
 (function(){
   'use strict';
-  window.REKENAN_BUILD_VERSION='V200.84';
-  window.REKENAN_UI_BUILD='V200.84';
-  window.REKENAN_SERVER_BUILD='V200.84';
-  console.info('[Rekenan BUILD] V200.84 TRANSACTION HISTORY SAFE RENDER');
+  window.REKENAN_BUILD_VERSION='V200.85';
+  window.REKENAN_UI_BUILD='V200.85';
+  window.REKENAN_SERVER_BUILD='V200.85';
+  console.info('[Rekenan BUILD] V200.85 TRANSACTION HISTORY SAFE RENDER');
 
   // Do not alter transaction data. Only restore the canonical local source when
   // the renderer is called while the in-memory array is temporarily unavailable.
@@ -12831,7 +12857,7 @@ window.rekenanV2008Health=function(){return {client:'V200.84',server:window.REKE
       if (Array.isArray(stored) && stored.length){
         window.transactions = stored.slice();
       }
-    }catch(e){ console.warn('[V200.84] transaction restore skipped'); }
+    }catch(e){ console.warn('[V200.85] transaction restore skipped'); }
   }
 
   var baseRenderCatatan = (typeof window.renderCatatanList === 'function') ? window.renderCatatanList : null;
@@ -12852,11 +12878,11 @@ window.rekenanV2008Health=function(){return {client:'V200.84',server:window.REKE
 <script id="rekenan-v20031-final-audit">
 (function(){
 'use strict';
-window.REKENAN_BUILD_VERSION='V200.84';
-window.REKENAN_UI_BUILD='V200.84';
-window.REKENAN_SERVER_BUILD='V200.84';
-console.info('[Rekenan AUDIT V200.84] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
-        console.info('[Rekenan BUILD] V200.84 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
+window.REKENAN_BUILD_VERSION='V200.85';
+window.REKENAN_UI_BUILD='V200.85';
+window.REKENAN_SERVER_BUILD='V200.85';
+console.info('[Rekenan AUDIT V200.85] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
+        console.info('[Rekenan BUILD] V200.85 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
 
 /* One calculator key handler. It deliberately uses textContent because the
    calculator display is a DIV, not an input. */
@@ -12902,24 +12928,24 @@ window.rekenanFullButtonAudit=function(){
  buttons.forEach(b=>{menu[menuOf(b)]++;const x=b.getAttribute('onclick');if(!x)return;direct.push(b);const m=x.match(/^\s*([A-Za-z_$][\w$]*)\s*\(/);if(m&&typeof window[m[1]]!=='function'&&!['open','print'].includes(m[1]))bad.push({function:m[1],text:(b.textContent||'').trim().slice(0,80),onclick:x.slice(0,180)});});
  const calcRequired=['v101CalcExpr','v101CalcResult','v101CalcHistory','v101CalcSaveBtn'];const calcMissing=calcRequired.filter(id=>!document.getElementById(id));
  const result={totalButtons:buttons.length,directHandlers:direct.length,unresolvedHandlers:bad.length,unresolved:bad,menuCounts:menu,calculator:{keyHandler:typeof window.v101CalcKey==='function',evaluator:typeof window.rkCalcEval1961_==='function',save:typeof window.saveV101Calculator==='function',historyRenderer:typeof window.renderV101CalcHistory==='function',missingElements:calcMissing}};
- console.info('[Rekenan AUDIT V200.84] FULL',result);return result;
+ console.info('[Rekenan AUDIT V200.85] FULL',result);return result;
 };
 window.rekenanCalculatorAudit=function(){
  const tests=['2+3','10×2','20÷5','7−4','2+3×4','10÷0','1.2+3.4'];const out=[];
  tests.forEach(expr=>{try{const n=window.rkCalcEval1961_(expr.replaceAll('×','*').replaceAll('÷','/').replaceAll('−','-'));out.push({expr,result:n,pass:Number.isFinite(n)});}catch(e){out.push({expr,result:e.message,pass:expr==='10÷0'});}});
- console.info('[Rekenan AUDIT V200.84] CALCULATOR',out);return out;
+ console.info('[Rekenan AUDIT V200.85] CALCULATOR',out);return out;
 };
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{setTimeout(window.rekenanFullButtonAudit,0);window.rekenanCalculatorAudit();});else setTimeout(window.rekenanFullButtonAudit,0);
 })();
 </script>
 
 <script id="rekenan-v20046-final-fix">
-/* [Rekenan BUILD] V200.84 PHOTO/ACC HOTFIX
+/* [Rekenan BUILD] V200.85 PHOTO/ACC HOTFIX
    Fix malformed script, Shopping image icon, Loan image button, and local attachment projection.
 */
 (function(){
   'use strict';
-  console.info('[Rekenan BUILD] V200.84 PHOTO/ACC HOTFIX LOADED');
+  console.info('[Rekenan BUILD] V200.85 PHOTO/ACC HOTFIX LOADED');
 
   function meta_(item){
     item=item||{}; var a=null;
@@ -12932,7 +12958,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   }
   function open_(url){
     url=String(url||'').trim(); if(!url) return false;
-    try{ if(typeof openAttachmentUrl_==='function'){openAttachmentUrl_(url);return true;} }catch(e){console.warn('[Rekenan V200.84] viewer failed',e);}
+    try{ if(typeof openAttachmentUrl_==='function'){openAttachmentUrl_(url);return true;} }catch(e){console.warn('[Rekenan V200.85] viewer failed',e);}
     try{window.open(url,'_blank','noopener,noreferrer');return true;}catch(_){return false;}
   }
 
@@ -12942,7 +12968,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     if(typeof baseApply==='function'&&!window.__rkV20046ApplyWrapped){
       window.__rkV20046ApplyWrapped=true;
       window.rkApplyAttachmentLocal_=function(dt,id,att){
-        try{baseApply.apply(this,arguments);}catch(e){console.warn('[Rekenan V200.84] base attachment apply',e);}
+        try{baseApply.apply(this,arguments);}catch(e){console.warn('[Rekenan V200.85] base attachment apply',e);}
         var key=String(dt||'').toUpperCase(), rid=String(id||'');
         if(key!=='SHOPPING'&&key!=='LOAN') return;
         var lists=[];
@@ -12966,7 +12992,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         console.info('[Rekenan FIX] ATTACHMENT LOCAL LINKED',key,rid);
       };
     }
-  }catch(e){console.warn('[Rekenan V200.84] local attachment patch failed',e);}
+  }catch(e){console.warn('[Rekenan V200.85] local attachment patch failed',e);}
 
   /* ACC disappears immediately; cloud verification continues in background. */
   try{
@@ -12980,9 +13006,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         return oldVerify.apply(this,arguments);
       };
     }
-  }catch(e){console.warn('[Rekenan V200.84] ACC patch failed',e);}
+  }catch(e){console.warn('[Rekenan V200.85] ACC patch failed',e);}
 
-  console.info('[Rekenan BUILD] V200.84 CALC SHEET READ + PDF HEADER LOGO + APP-SHELL + VERSION ALIGNED');
+  console.info('[Rekenan BUILD] V200.85 CALC SHEET READ + PDF HEADER LOGO + APP-SHELL + VERSION ALIGNED');
 })();
 </script>
 <style id="rk-v20057-shopping-photo-fix-css">
@@ -12995,8 +13021,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <script>
 (function(){
-  console.info('[Rekenan BUILD] V200.84 CALC SHEET READ + PDF HEADER LOGO + APP-SHELL');
-  window.__REKENAN_BUILD__='V200.84';
+  console.info('[Rekenan BUILD] V200.85 CALC SHEET READ + PDF HEADER LOGO + APP-SHELL');
+  window.__REKENAN_BUILD__='V200.85';
 })();
 </script>
 
@@ -13004,9 +13030,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20065-calc-photo-audit-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.84';
-  window.REKENAN_UI_BUILD='V200.84';
-  console.info('[Rekenan BUILD] V200.84 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
+  window.__REKENAN_BUILD__='V200.85';
+  window.REKENAN_UI_BUILD='V200.85';
+  console.info('[Rekenan BUILD] V200.85 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
      CALC_HISTORY-only API. Local stays immediate/authoritative. */
@@ -13017,7 +13043,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         return false;
       }
       if (typeof rkCalcCloudReadInFlight_ !== 'undefined' && rkCalcCloudReadInFlight_) return false;
-      const key='rekenan_calc_cloud_reconciled_V200.84_' + String(activeCloudUser);
+      const key='rekenan_calc_cloud_reconciled_V200.85_' + String(activeCloudUser);
       try { if (!force && sessionStorage.getItem(key) === '1') return false; } catch(_){}
       rkCalcCloudReadInFlight_ = true;
       try {
@@ -13025,7 +13051,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
           action:'getCalcHistory',
           username:activeCloudUser,
           token:cloudToken,
-          __clientBuild:'V200.84',
+          __clientBuild:'V200.85',
           forceRefresh:true,
           noCache:true
         }, 30000);
@@ -13042,7 +13068,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
             token:cloudToken,
             forceRefresh:true,
             noCache:true,
-            __clientBuild:'V200.84'
+            __clientBuild:'V200.85'
           }, 30000);
           payload = r && r.data ? r.data : r;
         }
@@ -13072,17 +13098,17 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         console.info('[Rekenan CALC] SHEET → LOCAL MERGE', {
           cloudRows:payload.calcHistory.length, added:added, updated:updated, totalLocal:calcHistory.length
         });
-        try { sessionStorage.setItem('rekenan_calc_cloud_reconciled_V200.84_' + String(activeCloudUser),'1'); } catch(_){}
+        try { sessionStorage.setItem('rekenan_calc_cloud_reconciled_V200.85_' + String(activeCloudUser),'1'); } catch(_){}
         return true;
       } catch(e) {
         console.warn('[Rekenan CALC] SHEET READ ERROR',e);
         return false;
       } finally { rkCalcCloudReadInFlight_=false; }
     };
-  } catch(e){ console.warn('[Rekenan V200.84] calc reader patch skipped',e); }
+  } catch(e){ console.warn('[Rekenan V200.85] calc reader patch skipped',e); }
 
   /* Schedule AFTER auth/bootstrap has had a chance to establish activeCloudUser.
-     This fixes the V200.84 ordering bug where the 900ms timer was installed
+     This fixes the V200.85 ordering bug where the 900ms timer was installed
      before FIRST BOOTSTRAP populated the active session. */
   window.rekenanForceCalculatorSheetRead = function(){ try { return rkReconcileCalculatorFromCloud_(true); } catch(e){ console.warn('[Rekenan CALC] FORCE READ ERROR',e); return Promise.resolve(false); } };
 
@@ -13139,7 +13165,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       btn.onclick=function(e){
         e.preventDefault(); e.stopPropagation();
         try { openAttachmentUrl_(btn.dataset.rkPhotoUrl); }
-        catch(err){ console.warn('[Rekenan V200.84] LOAN PHOTO OPEN FAILED',err); }
+        catch(err){ console.warn('[Rekenan V200.85] LOAN PHOTO OPEN FAILED',err); }
       };
     });
   }
@@ -13187,28 +13213,28 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const loanBtns=document.querySelectorAll('#loanCardList .v106-photo-check');
     const calcBtns=document.querySelectorAll('#v101CalcHistory [data-v146-photo],#v101CalcHistory [data-rk65-photo]');
     const out={
-      build:'V200.84',
+      build:'V200.85',
       loanPhotoButtons:loanBtns.length,
       loanPhotoClickable:Array.from(loanBtns).filter(b=>b.tagName==='BUTTON'&&!b.disabled&&b.dataset.rkPhotoUrl).length,
       calcPhotoButtons:calcBtns.length,
       calcPhotoClickable:Array.from(calcBtns).filter(b=>typeof b.onclick==='function').length,
       calcHistoryLocal:Array.isArray(calcHistory)?calcHistory.length:0
     };
-    console.info('[Rekenan AUDIT V200.84] LOAN/CALC PHOTO',out);
+    console.info('[Rekenan AUDIT V200.85] LOAN/CALC PHOTO',out);
     return out;
   };
-  console.info('[Rekenan BUILD] V200.84 PHOTO BUTTONS HARDENED');
+  console.info('[Rekenan BUILD] V200.85 PHOTO BUTTONS HARDENED');
 })();
 </script>
 
 <script id="rekenan-v20067-calculator-hard-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.84';
-  window.REKENAN_UI_BUILD='V200.84';
-  window.REKENAN_SERVER_BUILD='V200.84';
-  console.info('[Rekenan BUILD] V200.84 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
+  window.__REKENAN_BUILD__='V200.85';
+  window.REKENAN_UI_BUILD='V200.85';
+  window.REKENAN_SERVER_BUILD='V200.85';
+  console.info('[Rekenan BUILD] V200.85 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
 </script>
 
-<script id="rekenan-v20068-release-marker">console.info('[Rekenan BUILD] RELEASE V200.84 | INDEX/UI/SW/MANIFEST/HOST ALIGNED | CALCULATOR SHEET READ HARDENED');</script>
+<script id="rekenan-v20068-release-marker">console.info('[Rekenan BUILD] RELEASE V200.85 | INDEX/UI/SW/MANIFEST/HOST ALIGNED | CALCULATOR SHEET READ HARDENED');</script>
