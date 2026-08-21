@@ -1,1 +1,20 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#6366f1"><title>Rekenan V200.82</title></head><body style="background:#0d0d0f;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh"><p>Membuka Rekenan V200.82…</p><script>console.info('[Rekenan BUILD] HOST V200.82 -> APP V200.82');location.replace('./admin/index.html?v=2081');</script></body></html>
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#6366f1"><title>Rekenan V200.83</title></head><body style="background:#0d0d0f;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh"><p>Membuka Rekenan V200.83…</p><script>console.info('[Rekenan BUILD] HOST V200.83 -> APP V200.83');location.replace('./admin/index.html?v=2083');</script></body></html>
+
+function rkLocalStateIsEmpty_() {
+  try {
+    const collections = [
+      ['transactions', Array.isArray(window.transactions) ? window.transactions : null],
+      ['shoppingItems', Array.isArray(window.shoppingItems) ? window.shoppingItems : null],
+      ['loansData', Array.isArray(window.loansData) ? window.loansData : null],
+      ['riwayatCicilanData', Array.isArray(window.riwayatCicilanData) ? window.riwayatCicilanData : null],
+      ['notes', Array.isArray(window.notes) ? window.notes : null],
+      ['savings', Array.isArray(window.savings) ? window.savings : null],
+      ['calcHistory', Array.isArray(window.calcHistory) ? window.calcHistory : null]
+    ];
+    return collections.every(([, v]) => !Array.isArray(v) || v.length === 0);
+  } catch (e) {
+    console.warn('[Rekenan LOCAL-FIRST] local state probe failed; treating local as non-empty', e);
+    return false;
+  }
+}
+
