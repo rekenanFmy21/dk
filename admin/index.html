@@ -5453,7 +5453,7 @@ nav.fixed.bottom-0 {
         function registerRekenanPWA_() {
             try {
                 if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-                navigator.serviceWorker.register('./sw.js?v=2090', {scope: './', updateViaCache: 'none'})
+                navigator.serviceWorker.register('./sw.js?v=2095', {scope: './', updateViaCache: 'none'})
                     .then(function (registration) {
                         console.info('[Rekenan PWA] Local Service Worker registered:', registration.scope);
                         try {registration.update();} catch (_) { }
@@ -9445,7 +9445,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 if (adminPulseInFlight_ || sessionStorage.getItem('rekenan_admin_logged') !== 'true') return;
                 adminPulseInFlight_ = true;
                 try {
-                    const d = await cloudRequest({action:'loanSyncState', token:sessionStorage.getItem('rekenan_admin_token') || '', adminPin:sessionStorage.getItem('rekenan_admin_pin') || ''}, 2500);
+                    const d = await cloudRequest({action:'loanSyncState', token:sessionStorage.getItem('rekenan_admin_token') || '', adminPin:sessionStorage.getItem('rekenan_admin_pin') || '', adminProbe:true}, 4000);
                     const v = Number(d?.data?.version ?? d?.version ?? 0);
                     if (v && v !== adminPulseVersion_) {
                         adminPulseVersion_ = v;
@@ -9850,6 +9850,17 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 const statusEl = document.getElementById('adminPanelStatus');
                 if (statusEl) statusEl.textContent = 'Admin aktif • Cache terbaru';
                 return;
+            }
+            // V200.95: force means REAL authoritative read. The Admin payload
+            // has its own 30s cache inside the GAS layer, so bypassing only the
+            // outer adminData response cache was not enough; a newly submitted
+            // loan could remain invisible in Admin until that inner cache expired.
+            if (force) {
+                try {
+                    // Ask GAS to bypass its response cache through forceRefresh.
+                    // Client-side snapshot is still painted first and remains stable.
+                    localStorage.removeItem('rekenan_admin_snapshot_v64_at');
+                } catch (_) {}
             }
             // Background-only: timeout never blocks the already painted UI.
             adminFetchInFlight_ = true;
@@ -12883,7 +12894,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.92';
+window.REKENAN_UI_BUILD='V200.95';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan BUILD] FINAL CLIENT V200.90 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
@@ -12990,7 +13001,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V200.92';
+  window.REKENAN_UI_BUILD='V200.95';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -13025,7 +13036,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.92';
+window.REKENAN_UI_BUILD='V200.95';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13168,7 +13179,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   console.info('[Rekenan BUILD] V200.90 CALC SHEET READ + PDF HEADER LOGO + APP-SHELL');
-  window.__REKENAN_BUILD__='V200.93';
+  window.__REKENAN_BUILD__='V200.95';
 })();
 </script>
 
@@ -13176,8 +13187,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20065-calc-photo-audit-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.93';
-  window.REKENAN_UI_BUILD='V200.92';
+  window.__REKENAN_BUILD__='V200.95';
+  window.REKENAN_UI_BUILD='V200.95';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13376,8 +13387,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="rekenan-v20067-calculator-hard-fix">
 (function(){
   'use strict';
-  window.__REKENAN_BUILD__='V200.93';
-  window.REKENAN_UI_BUILD='V200.92';
+  window.__REKENAN_BUILD__='V200.95';
+  window.REKENAN_UI_BUILD='V200.95';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
@@ -13387,8 +13398,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <script>
 (function(){
-  window.__REKENAN_BUILD__='V200.93';
-  window.REKENAN_UI_BUILD='V200.92';
+  window.__REKENAN_BUILD__='V200.95';
+  window.REKENAN_UI_BUILD='V200.95';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
@@ -13442,8 +13453,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   wrap('renderRiwayatCicilanList','loanHistory',40);
   wrap('renderEmbeddedAdmin','admin',40);
   window.__rkV20092StableRender=true;
-  window.REKENAN_BUILD_VERSION='V200.94';
-  window.REKENAN_CLIENT_BUILD='V200.94 DATA READ REAL + STABLE RENDER';
-  console.info('[Rekenan BUILD] V200.94 DATA READ REAL + ADMIN AUTHORITATIVE REFRESH + NO FLICKER');
+  window.REKENAN_BUILD_VERSION='V200.95';
+  window.REKENAN_CLIENT_BUILD='V200.95 DATA READ UNBLOCKED + ADMIN REALTIME + STABLE RENDER';
+  console.info('[Rekenan BUILD] V200.95 DATA READ UNBLOCKED + ADMIN REALTIME + NO FLICKER');
 })();
 </script>
