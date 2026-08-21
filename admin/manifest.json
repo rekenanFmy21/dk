@@ -1,8 +1,8 @@
 {
   "id": "./admin",
-  "name": "Rekenan V200.78",
-  "short_name": "Rekenan V200.78",
-  "description": "Rekenan V200.78 — keuangan, pinjaman, catatan, belanja dan administrasi",
+  "name": "Rekenan V200.79",
+  "short_name": "Rekenan V200.79",
+  "description": "Rekenan V200.79 — keuangan, pinjaman, catatan, belanja dan administrasi",
   "start_url": "./index.html?v=2076",
   "scope": "./",
   "display": "standalone",
