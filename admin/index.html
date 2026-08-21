@@ -8,7 +8,7 @@
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
         window.REKENAN_UI_BUILD = 'V200.93';
-        console.info('[Rekenan BUILD] UI V200.98');
+        console.info('[Rekenan BUILD] UI V201.00');
         console.info('[Rekenan BUILD] V200.90 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
@@ -5613,34 +5613,40 @@ nav.fixed.bottom-0 {
   }
 
 
-            console.info('[Rekenan STARTUP] PRIORITY SYNC ORDER: ADMIN -> PINJAMAN -> TRANSAKSI/LAINNYA -> FOTO');
+            console.info('[Rekenan STARTUP] NEW PRIORITY ORDER: BELANJA/TRANSAKSI -> PINJAMAN/CICILAN -> ADMIN -> LAINNYA -> FOTO');
 
-            // P1 ADMIN. Admin loader is isolated; failure never blocks P2.
+            // P1 BELANJA + TRANSAKSI: these are the first cloud collections users
+            // normally need after login. Paint Local immediately, then reconcile
+            // the normal user data snapshot without waiting for the heavy Admin panel.
             try {
-                if (typeof loadAdminPanel === 'function') {
-                    console.info('[Rekenan STARTUP] P1 ADMIN READ START — PRE-AUTH WORK MAY ALREADY BE WARM');
-                    await Promise.race([
-                        Promise.resolve(loadAdminPanel(true)),
-                        new Promise(resolve => setTimeout(() => resolve({timeout:true}), 9000))
-                    ]);
-                    console.info('[Rekenan STARTUP] P1 ADMIN READ COMPLETE');
+                console.info('[Rekenan STARTUP] P1 BELANJA/TRANSAKSI READ START');
+                const fresh = await cloudRequest({
+                    action:'getData',
+                    username:activeCloudUser,
+                    token:cloudToken,
+                    forceRefresh:true
+                }, 10000);
+                if (fresh?.success || fresh?.status === 'success') {
+                    const cloudData = fresh.data || fresh;
+                    applyCloudData_(cloudData, true);
+                    try { renderAll(); } catch (_) {}
                 }
+                console.info('[Rekenan STARTUP] P1 BELANJA/TRANSAKSI READ COMPLETE');
             } catch (e) {
-                console.warn('[Rekenan STARTUP] P1 ADMIN READ FAILED — continuing to Pinjaman', e?.message || e);
+                console.warn('[Rekenan STARTUP] P1 BELANJA/TRANSAKSI READ FAILED — Local retained', e?.message || e);
             }
 
-            // P2 PINJAMAN + CICILAN. Never gate this on Local Authority and never
-            // call loanSyncState as a standalone auth probe.
+            // P2 PINJAMAN + CICILAN. This starts only after the lightweight user
+            // snapshot has painted, so the first screen is not held hostage by Admin.
             try {
                 if (typeof fetchLoansFromCloud === 'function') {
                     if (!(rkCloudAuthReady_())) await rkEnsureCloudAuthForSync_();
                     if (rkCloudAuthReady_()) {
                         window.__RK_PRIORITY_LOAN_ACTIVE__ = true;
-    console.info('[Rekenan STARTUP] P2 PINJAMAN READ START — VERIFY CACHE FIRST');
-    console.info('[Rekenan STARTUP] P2 PINJAMAN CACHE PATH', { preAuthLoanReady: !!window.__RK_PREAUTH_LOAN_READY__ });
+                        console.info('[Rekenan STARTUP] P2 PINJAMAN READ START — VERIFY CACHE FIRST');
                         const p2Result = await fetchLoansFromCloud(true);
                         window.__RK_PRIORITY_LOAN_ACTIVE__ = false;
-      console.info('[Rekenan STARTUP] P2 PINJAMAN READ COMPLETE', p2Result || {
+                        console.info('[Rekenan STARTUP] P2 PINJAMAN READ COMPLETE', p2Result || {
                             loans: Array.isArray(loansData) ? loansData.length : 0,
                             payments: Array.isArray(riwayatCicilanData) ? riwayatCicilanData.length : 0
                         });
@@ -5649,7 +5655,22 @@ nav.fixed.bottom-0 {
                     }
                 }
             } catch (e) {
-                console.warn('[Rekenan STARTUP] P2 PINJAMAN READ FAILED — continuing to other data', e?.message || e);
+                window.__RK_PRIORITY_LOAN_ACTIVE__ = false;
+                console.warn('[Rekenan STARTUP] P2 PINJAMAN READ FAILED — continuing to Admin/other data', e?.message || e);
+            }
+
+            // P3 ADMIN: NEVER block first login. Admin snapshot is intentionally
+            // delayed so Belanja/Transaksi/Pinjaman become usable first. Cached Admin
+            // state is already painted locally by rkWarmAllDomainsOnStartup_.
+            if (sessionStorage.getItem('rekenan_admin_logged') === 'true' && typeof loadAdminPanel === 'function') {
+                console.info('[Rekenan STARTUP] P3 ADMIN QUEUED — NON BLOCKING');
+                setTimeout(() => {
+                    try {
+                        loadAdminPanel(true).catch(err => console.warn('[Rekenan STARTUP] ADMIN BACKGROUND FAILED', err?.message || err));
+                    } catch (err) {
+                        console.warn('[Rekenan STARTUP] ADMIN BACKGROUND FAILED', err?.message || err);
+                    }
+                }, 5000);
             }
         }
 
@@ -5657,7 +5678,7 @@ nav.fixed.bottom-0 {
             console.groupCollapsed('[Rekenan STARTUP] TRUE LOCAL-FIRST V200.90');
             console.info('Client UI build:', window.REKENAN_BUILD_VERSION);
             console.info('Client API build:', window.REKENAN_SERVER_BUILD);
-            console.info('Startup priority: ADMIN -> PINJAMAN -> TRANSAKSI/LAINNYA -> FOTO');
+            console.info('Startup priority: BELANJA/TRANSAKSI -> PINJAMAN/CICILAN -> ADMIN -> LAINNYA -> FOTO');
             console.groupEnd();
             if (rkStartupCloudRestoreInFlight_) return;
             rkStartupCloudRestoreInFlight_ = true;
@@ -8283,7 +8304,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 const sig = rkLoanViewSig_();
                 const container = document.getElementById('loanCardList');
 
-                // V200.99 FIX: data fingerprint alone is NOT proof that the DOM
+                // V201.00 FIX: data fingerprint alone is NOT proof that the DOM
                 // is still painted. Tab switches, DOM replacement, browser restore,
                 // or a previous failed render can leave an empty container while
                 // the data signature remains unchanged. Repaint whenever the
@@ -12983,7 +13004,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
    rkBorrowerPulse_();
  }
  startBorrowerRealtimePulse_();
- // V200.99: DOM self-heal for Pinjaman. If the browser/tab restored the
+ // V201.00: DOM self-heal for Pinjaman. If the browser/tab restored the
 // page after the data snapshot was already painted, force one lightweight
 // render when the tab becomes visible again.
 try {
@@ -13014,7 +13035,7 @@ window.rkRenderIncremental=function(items,render,batch){
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.99';
+window.REKENAN_UI_BUILD='V201.00';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan BUILD] FINAL CLIENT V200.90 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
@@ -13121,7 +13142,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V200.99';
+  window.REKENAN_UI_BUILD='V201.00';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -13156,7 +13177,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V200.99';
+window.REKENAN_UI_BUILD='V201.00';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13308,7 +13329,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V200.98';
-  window.REKENAN_UI_BUILD='V200.99';
+  window.REKENAN_UI_BUILD='V201.00';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13508,7 +13529,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V200.98';
-  window.REKENAN_UI_BUILD='V200.99';
+  window.REKENAN_UI_BUILD='V201.00';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
@@ -13519,7 +13540,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   window.__REKENAN_BUILD__='V200.98';
-  window.REKENAN_UI_BUILD='V200.99';
+  window.REKENAN_UI_BUILD='V201.00';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
