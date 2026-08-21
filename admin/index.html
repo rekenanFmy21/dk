@@ -4,15 +4,15 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V201.12';
+        window.REKENAN_BUILD_VERSION = 'V201.13';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         window.v109Fmt = window.rkFormatNumber_;
-        window.REKENAN_UI_BUILD = 'V201.12';
+        window.REKENAN_UI_BUILD = 'V201.13';
         console.info('[Rekenan BUILD] UI V201.00');
         console.info('[Rekenan BUILD] V200.90 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
-                const expected = 'V200.92';
+                const expected = 'V201.13';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -21,7 +21,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V201.12">
+    <meta name="rekenan-build" content="V201.13">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -35,37 +35,30 @@
     <title>
         Rekenan • Keuangan &amp; Pinjaman
     </title>
-    <!-- Tailwind CSS CDN (Official Tailwind Play) -->
-    <script src="https://cdn.tailwindcss.com">
-    </script>
+    <!-- V201.13: non-blocking vendor boot. Login must paint before remote libraries finish. -->
     <script>
-        tailwind.config = {
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
             darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkBg: '#121212',
-                        cardBg: '#1e1e1e',
-                        cardHover: '#252525',
-                        accent: '#6366f1',
-                        accentHover: '#4f46e5',
-                        success: '#10b981',
-                        danger: '#ef4444',
-                        warning: '#f59e0b'
-                    }
-                }
-            }
-        }
+            theme: { extend: { colors: { darkBg:'#121212', cardBg:'#1e1e1e', cardHover:'#252525', accent:'#6366f1', accentHover:'#4f46e5', success:'#10b981', danger:'#ef4444', warning:'#f59e0b' } } }
+        };
     </script>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js">
-    </script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <!-- FontAwesome CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"
         rel="stylesheet" />
+    <style id="rekenan-v20113-login-critical">
+        /* Paint the login shell immediately; heavy app/vendor work may finish later. */
+        #authView{display:block;min-height:100dvh;background:#0d0d0f;color:#fff;}
+        #appView{display:none;}
+        body.rk-app-ready #authView{display:none!important;}
+        body.rk-app-ready #appView{display:block!important;}
+        #authName,#authPin{font-size:16px;}
+    </style>
     <style>
         /* REKENAN CANONICAL DARK LAYOUT */
         :root {
@@ -2924,9 +2917,9 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20108-authoritative-fix">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V201.12';
-  window.REKENAN_CALCULATOR_BUILD='V201.12';
-  console.info('[Rekenan BUILD] V201.11 | DESKTOP AUTO SIDEBAR | CALCULATOR PHOTO NO-OVERLAP');
+  window.REKENAN_UI_BUILD='V201.13';
+  window.REKENAN_CALCULATOR_BUILD='V201.13';
+  console.info('[Rekenan BUILD] V201.13 | DESKTOP AUTO SIDEBAR | CALCULATOR PHOTO NO-OVERLAP');
 
   function dedupeCalculatorPhotoUI_(){
     try{
@@ -2964,8 +2957,8 @@ nav.fixed.bottom-0 {
           }
         });
       }
-      console.info('[Rekenan CALC] V201.09 PHOTO AUDIT', {photoTools:1,cameraButtons:keep.querySelectorAll('label.rk-calc-photo-btn').length,viewButtons:keep.querySelectorAll('#v201CalcPhotoViewBtn').length});
-    }catch(e){console.warn('[Rekenan CALC] V201.09 PHOTO DEDUPE FAILED',e);}
+      console.info('[Rekenan CALC] V201.13 PHOTO AUDIT', {photoTools:1,cameraButtons:keep.querySelectorAll('label.rk-calc-photo-btn').length,viewButtons:keep.querySelectorAll('#v201CalcPhotoViewBtn').length});
+    }catch(e){console.warn('[Rekenan CALC] V201.13 PHOTO DEDUPE FAILED',e);}
   }
   function removeLegacyCalculatorOverlay_(){
     try{
@@ -2974,9 +2967,9 @@ nav.fixed.bottom-0 {
     }catch(_){ }
   }
   function boot_(){dedupeCalculatorPhotoUI_();removeLegacyCalculatorOverlay_();}
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot_,{once:true}); else boot_();
-  window.addEventListener('resize',function(){clearTimeout(window.__rkV208Resize);window.__rkV208Resize=setTimeout(function(){boot_();},120);});
-  if(window.MutationObserver && document.body){
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ if(window.__RK_AUTHENTICATED__ !== true) return; boot_(); },{once:true}); else if(window.__RK_AUTHENTICATED__ === true) boot_();
+  window.addEventListener('resize',function(){ if(window.__RK_AUTHENTICATED__ !== true) return; clearTimeout(window.__rkV208Resize);window.__rkV208Resize=setTimeout(function(){boot_();},120);});
+  if(window.MutationObserver && document.body && window.__RK_AUTHENTICATED__ === true){
     const obs=new MutationObserver(function(){clearTimeout(window.__rkV208PhotoTimer);window.__rkV208PhotoTimer=setTimeout(dedupeCalculatorPhotoUI_,60);});
     obs.observe(document.getElementById('tab-kalkulator')||document.body,{childList:true,subtree:true});
   }
@@ -2985,7 +2978,7 @@ nav.fixed.bottom-0 {
 
 
 <style id="rekenan-v20110-photo-no-overlap">
-/* V201.10: Calculator photo controls have one isolated flex row. */
+/* V201.13: Calculator photo controls have one isolated flex row. */
 #tab-kalkulator .rk-calc-photo-tools{
   position:relative!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;
   gap:10px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;overflow:visible!important;
@@ -3007,9 +3000,9 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20110-photo-dedup">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V201.12';
-  window.REKENAN_CALCULATOR_BUILD='V201.12';
-  console.info('[Rekenan BUILD] V201.11 | CALCULATOR PHOTO NO-OVERLAP');
+  window.REKENAN_UI_BUILD='V201.13';
+  window.REKENAN_CALCULATOR_BUILD='V201.13';
+  console.info('[Rekenan BUILD] V201.13 | CALCULATOR PHOTO NO-OVERLAP');
   function normalizeCalcPhoto_(){
     const tab=document.getElementById('tab-kalkulator'); if(!tab) return;
     const rows=[...tab.querySelectorAll('.rk-calc-photo-tools')];
@@ -3035,11 +3028,21 @@ nav.fixed.bottom-0 {
     const tab=document.getElementById('tab-kalkulator');
     const row=tab?.querySelector('.rk-calc-photo-tools');
     const out={photoRows:tab?.querySelectorAll('.rk-calc-photo-tools').length||0,cameraButtons:row?.querySelectorAll('label.rk-calc-photo-btn').length||0,viewButtons:row?.querySelectorAll('#v201CalcPhotoViewBtn').length||0};
-    console.info('[Rekenan AUDIT] CALC PHOTO V201.10',out); return out;
+    console.info('[Rekenan AUDIT] CALC PHOTO V201.13',out); return out;
   };
   function boot(){normalizeCalcPhoto_();window.rekenanCalcPhotoAuditV20110();}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
   document.addEventListener('click',function(e){if(e.target.closest('[data-cat-tool="calculator"],#tab-kalkulator')) requestAnimationFrame(normalizeCalcPhoto_);},true);
+})();
+</script>
+<script id="rekenan-v20113-login-boot">
+(function(){
+  'use strict';
+  window.REKENAN_UI_BUILD='V201.13';
+  window.__RK_LOGIN_PAINTED_AT__=performance.now();
+  console.info('[Rekenan STARTUP] V201.13 FAST LOGIN — vendor scripts deferred; app boot waits for authentication');
+  function markReady(){ try{ document.body.classList.add('rk-app-ready'); }catch(_){} }
+  window.__rkMarkAppReady_=markReady;
 })();
 </script>
 </head>
@@ -4096,7 +4099,7 @@ nav.fixed.bottom-0 {
                         <div class="text-xs text-zinc-400 font-semibold">Kalkulator</div>
                         <div class="text-lg font-black text-white">Kalkulator Transaksi</div>
                     </div>
-                    <div class="rk-calc-route-badge"><i class="fa-solid fa-calculator"></i> V201.11</div>
+                    <div class="rk-calc-route-badge"><i class="fa-solid fa-calculator"></i> V201.13</div>
                 </div>
                 <div class="rk-calc-route-grid">
                     <section class="rk-calc-main-card">
@@ -5770,10 +5773,12 @@ nav.fixed.bottom-0 {
 
         function rkEnterAfterLogin_() {
             try {
+                window.__RK_AUTHENTICATED__ = true;
                 currentActiveTab = String(localStorage.getItem('rekenan_active_tab') || 'dashboard');
                 const allowed = new Set(['dashboard','catatan','belanja','peminjam','admin']);
                 if (!allowed.has(currentActiveTab)) currentActiveTab = 'dashboard';
                 document.getElementById('authModal')?.classList.add('hidden');
+                try { if (typeof window.__rkMarkAppReady_ === 'function') window.__rkMarkAppReady_(); } catch (_) {}
                 document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
                 document.getElementById('tab-' + currentActiveTab)?.classList.add('active');
                 localStorage.setItem('rekenan_active_tab', currentActiveTab);
@@ -5820,7 +5825,9 @@ nav.fixed.bottom-0 {
                 checkCloudAuthModalState();
                 switchTab(currentActiveTab);
                 initDefaultDates();
-                setTimeout(rkWarmAllDomainsOnStartup_, 0);
+                // V201.13: NEVER warm app domains on the login screen.
+                // Warm-up starts only after successful authentication.
+                if (activeCloudUser && cloudToken) setTimeout(rkWarmAllDomainsOnStartup_, 80);
             } catch (e) {
                 console.error('Rekenan startup recovery:', e);
                 const fallbackTab = document.querySelector('.tab-content');
@@ -12502,7 +12509,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         (function () {
             const ui = 'V200.90';
             console.info('[Rekenan BUILD] UI V200.90 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.90 / SERVER API COMPATIBLE');
-            window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); console.info('[Rekenan CLOUD] V201.09 INDICATOR FIX — orange only when offline; green when connected/idle'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
+            window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); console.info('[Rekenan CLOUD] V201.13 INDICATOR FIX — orange only when offline; green when connected/idle'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
 
@@ -13419,7 +13426,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V201.12';
+  window.REKENAN_UI_BUILD='V201.13';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
@@ -13454,7 +13461,7 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V201.12';
+window.REKENAN_UI_BUILD='V201.13';
 window.REKENAN_SERVER_BUILD='V200.90';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
@@ -13610,7 +13617,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.12';
+  window.REKENAN_UI_BUILD='V201.13';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13810,7 +13817,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.12';
+  window.REKENAN_UI_BUILD='V201.13';
   window.REKENAN_SERVER_BUILD='V200.90';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
@@ -13821,7 +13828,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V201.12';
+  window.REKENAN_UI_BUILD='V201.13';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
@@ -14027,7 +14034,7 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20103-calculator-design-runtime">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V201.12';
+  window.REKENAN_UI_BUILD='V201.13';
   window.rkCalcQuickAmount_=function(amount){
     const i=document.getElementById('v101CalcExpr'); if(!i) return;
     let v=String(i.textContent||i.value||'').trim();
@@ -14054,14 +14061,14 @@ nav.fixed.bottom-0 {
 </script>
 
 <script id="rekenan-v20103-authoritative-build">
-window.REKENAN_UI_BUILD='V201.12';
+window.REKENAN_UI_BUILD='V201.13';
 window.REKENAN_CALCULATOR_BUILD='V201.04';
 console.info('[Rekenan BUILD] UI V201.04 | CALCULATOR V201.04 PRO | 000 KEPT | 00 REMOVED | DESKTOP 2-COLUMN | MOBILE SINGLE-COLUMN | LAYOUT FIX');
 </script>
 
 
 <style id="rekenan-v20112-calculator-single-source">
-/* V201.12: Calculator has ONE route. Legacy calculator modal is never visible. */
+/* V201.13: Calculator has ONE route. Legacy calculator modal is never visible. */
 #v101CalculatorModal,
 #v101CalculatorModal.show,
 #v101CalculatorModal.rk-calculator-shell,
@@ -14075,10 +14082,10 @@ console.info('[Rekenan BUILD] UI V201.04 | CALCULATOR V201.04 PRO | 000 KEPT | 0
 <script id="rekenan-v20112-single-calculator-authority">
 (function(){
   'use strict';
-  window.REKENAN_BUILD_VERSION='V201.12';
-  window.REKENAN_UI_BUILD='V201.12';
-  window.REKENAN_CALCULATOR_BUILD='V201.12';
-  window.__REKENAN_BUILD__='V201.12';
+  window.REKENAN_BUILD_VERSION='V201.13';
+  window.REKENAN_UI_BUILD='V201.13';
+  window.REKENAN_CALCULATOR_BUILD='V201.13';
+  window.__REKENAN_BUILD__='V201.13';
 
   function removeLegacyCalculator_(){
     try{
@@ -14119,7 +14126,7 @@ console.info('[Rekenan BUILD] UI V201.04 | CALCULATOR V201.04 PRO | 000 KEPT | 0
     normalizePhoto_();
     var tab=document.getElementById('tab-kalkulator');
     var row=tab?.querySelector('.rk-calc-photo-tools');
-    console.info('[Rekenan AUDIT] V201.12 CALCULATOR SINGLE SOURCE',{
+    console.info('[Rekenan AUDIT] V201.13 CALCULATOR SINGLE SOURCE',{
       route:!!tab,
       photoRows:tab?.querySelectorAll('.rk-calc-photo-tools').length||0,
       cameraButtons:row?.querySelectorAll('label.rk-calc-photo-btn').length||0,
@@ -14138,6 +14145,6 @@ console.info('[Rekenan BUILD] UI V201.04 | CALCULATOR V201.04 PRO | 000 KEPT | 0
     if(document.getElementById('v101CalculatorModal')) removeLegacyCalculator_();
   });
   obs.observe(document.body,{childList:true,subtree:true});
-  console.info('[Rekenan BUILD] V201.12 | SINGLE CALCULATOR ROUTE | 1 CAMERA + 1 IMAGE | LEGACY MODAL REMOVED');
+  console.info('[Rekenan BUILD] V201.13 | SINGLE CALCULATOR ROUTE | 1 CAMERA + 1 IMAGE | LEGACY MODAL REMOVED');
 })();
 </script>
