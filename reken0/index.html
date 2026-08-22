@@ -5,6 +5,7 @@
 <head><!-- RK_GLOBAL_ADMIN_ERROR_SYSTEM -->
 
 <script>
+/* BORROWERID AUTHORITATIVE USER KEY: Loan/Payment relation uses BorrowerId; Name is display-only. */
 /* ================= V202.12 GLOBAL ADMIN ERROR SYSTEM ================= */
 (function(){
   'use strict';
@@ -10613,7 +10614,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 return;
             }
             container.innerHTML = rows.map(b => {
-                const id = String(b.id || b.ID || b.userId || b.UserID || b.username || b.Username || '');
+                const id = String(b.BorrowerId || b.borrowerId || b.id || b.ID || b.userId || b.UserID || b.username || b.Username || '');
                 const nameRaw = b.nama || b.name || b.Nama || b.Name || '-';
                 const name = escAdminText_(nameRaw);
                 const username = escAdminText_(b.username || b.Username || '');
@@ -14620,17 +14621,25 @@ function rkAdminNormalizeUserKey_(v){
 }
 function rkAdminUserKey_(u){
   u=u||{};
-  return [
+  var primary=[
+    u.BorrowerId,u.borrowerId,
     u.id,u.ID,u.userId,u.UserID,u.username,u.Username
-  ].map(rkAdminNormalizeUserKey_).filter(Boolean);
+  ];
+  return primary.map(rkAdminNormalizeUserKey_).filter(Boolean);
 }
 function findUser(id){
   var sid=rkAdminNormalizeUserKey_(id);
   if(!sid) return null;
   var list=users();
   for(var i=0;i<list.length;i++){
-    var keys=rkAdminUserKey_(list[i]);
-    if(keys.indexOf(sid)>=0) return list[i];
+    var u=list[i]||{};
+    var primary=rkAdminNormalizeUserKey_(u.BorrowerId||u.borrowerId);
+    if(primary && primary===sid) return u;
+  }
+  /* Compatibility fallback for legacy admin payloads that predate BorrowerId. */
+  for(var j=0;j<list.length;j++){
+    var keys=rkAdminUserKey_(list[j]);
+    if(keys.indexOf(sid)>=0) return list[j];
   }
   return null;
 }
@@ -14655,6 +14664,7 @@ window.rkAdminUserAction_=function(kind,id){
         requestedId:__rkId,
         requestedKey:rkAdminNormalizeUserKey_(__rkId),
         borrowerCount:users().length,
+        availableBorrowerIds:users().slice(0,50).map(function(u){return u.BorrowerId||u.borrowerId||'';}),
         availableKeys:users().slice(0,20).map(function(u){return rkAdminUserKey_(u);})
       });
       var __rkUser=(typeof findUser==='function') ? findUser(__rkId) : null;
@@ -14674,7 +14684,13 @@ window.rkAdminUserAction_=function(kind,id){
         oe.code='ADMIN_CENTER_FUNCTION_MISSING';
         throw oe;
       }
-      var __rkKey=__rkUser.id||__rkUser.ID||__rkUser.userId||__rkUser.UserID||__rkUser.username||__rkUser.Username;
+      var __rkKey=__rkUser.BorrowerId||__rkUser.borrowerId||__rkUser.id||__rkUser.ID||__rkUser.userId||__rkUser.UserID||__rkUser.username||__rkUser.Username;
+      if(!__rkKey){
+        var __rkKeyErr=new Error('BorrowerId user kosong.');
+        __rkKeyErr.code='ADMIN_BORROWER_ID_MISSING';
+        throw __rkKeyErr;
+      }
+      console.info('[Rekenan ADMIN] CENTER USER KEY',{BorrowerId:__rkKey,Name:__rkUser.Name||__rkUser.name||__rkUser.nama,Phone:__rkUser.Phone||__rkUser.phone});
       openAdminUserCenter(__rkKey);
       window.__rkAdminActionActive=false;
       return;
