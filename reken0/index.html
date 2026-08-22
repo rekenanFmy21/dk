@@ -1,3 +1,4 @@
+/* RK V202.12 RUNTIME BORROWERID CANONICALIZER */
 <!DOCTYPE html>
 
 <html class="dark" lang="id">
@@ -10631,7 +10632,8 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 return;
             }
             container.innerHTML = rows.map(b => {
-                const id = String(b.BorrowerId || b.borrowerId || b.id || b.ID || b.userId || b.UserID || b.username || b.Username || '');
+                rkAdminCanonicalizeBorrowers_();
+                const id = String(b.BorrowerId || b.borrowerId || '');
                 const nameRaw = b.nama || b.name || b.Nama || b.Name || '-';
                 const name = escAdminText_(nameRaw);
                 const username = escAdminText_(b.username || b.Username || '');
@@ -10658,6 +10660,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         }
 
         function getAdminBorrowerById_(borrowerId) {
+            rkAdminCanonicalizeBorrowers_();
             return (embeddedAdminBorrowers || []).find(b => String(b.BorrowerId || b.borrowerId || b.id || b.ID || b.userId || b.UserID || b.username || b.Username || '') === String(borrowerId)) || null;
         }
 
@@ -14625,8 +14628,66 @@ console.info('[Rekenan BUILD] UI V202.12 | CALCULATOR UNIVERSAL | NO CURRENCY | 
 (function(){
 'use strict';
 const TARGET_KEY='rekenan_admin_target_user_v20212';
+function rkAdminCanonicalizeBorrowers_(){
+  var list=Array.isArray(window.embeddedAdminBorrowers)?window.embeddedAdminBorrowers:[];
+  var loans=Array.isArray(window.embeddedAdminLoans)?window.embeddedAdminLoans:[];
+  var pays=Array.isArray(window.embeddedAdminPayments)?window.embeddedAdminPayments:[];
+  var meta=[];
+
+  function norm(v){
+    try{return String(v==null?'':v).trim().toLowerCase();}catch(_){return '';}
+  }
+  function add(r){
+    r=r||{};
+    var bid=String(r.BorrowerId||r.borrowerId||r.borrowerID||'').trim();
+    if(!bid) return;
+    var name=String(r.Name||r.name||r.nama||r.Nama||'').trim();
+    var user=String(r.Username||r.username||'').trim();
+    var phone=String(r.Phone||r.phone||'').trim();
+    var m=meta.find(function(x){return norm(x.id)===norm(bid);});
+    if(!m){m={id:bid,names:[],usernames:[],phone:phone};meta.push(m);}
+    if(name && m.names.indexOf(norm(name))<0)m.names.push(norm(name));
+    if(user && m.usernames.indexOf(norm(user))<0)m.usernames.push(norm(user));
+    if(!m.phone && phone)m.phone=phone;
+  }
+  loans.forEach(add); pays.forEach(add);
+
+  list.forEach(function(b){
+    if(!b || typeof b!=='object') return;
+    var current=String(b.BorrowerId||b.borrowerId||'').trim();
+    var name=String(b.Name||b.name||b.nama||b.Nama||'').trim();
+    var username=String(b.Username||b.username||'').trim();
+
+    /* If current id is merely the display name (legacy snapshots), do not trust it. */
+    var currentLooksLikeName=current && (
+      norm(current)===norm(name) ||
+      norm(current)===norm(b.Name) ||
+      norm(current)===norm(b.nama)
+    );
+
+    var found=null;
+    if(current && !currentLooksLikeName){
+      found=meta.find(function(m){return norm(m.id)===norm(current);})||null;
+    }
+    if(!found && name){
+      found=meta.find(function(m){return m.names.indexOf(norm(name))>=0;})||null;
+    }
+    if(!found && username){
+      found=meta.find(function(m){return m.usernames.indexOf(norm(username))>=0 || m.names.indexOf(norm(username))>=0;})||null;
+    }
+
+    if(found){
+      b.BorrowerId=found.id;
+      b.borrowerId=found.id;
+      b.id=found.id;
+      if(!b.phone && found.phone)b.phone=found.phone;
+      b._rkCanonicalBorrowerId=true;
+    }
+  });
+  return list;
+}
 function users(){
-  return Array.isArray(window.embeddedAdminBorrowers)?window.embeddedAdminBorrowers:[];
+  return rkAdminCanonicalizeBorrowers_();
 }
 function rkAdminNormalizeUserKey_(v){
   try{
@@ -14653,11 +14714,6 @@ function findUser(id){
     var primary=rkAdminNormalizeUserKey_(u.BorrowerId||u.borrowerId);
     if(primary && primary===sid) return u;
   }
-  /* Compatibility fallback for legacy admin payloads that predate BorrowerId. */
-  for(var j=0;j<list.length;j++){
-    var keys=rkAdminUserKey_(list[j]);
-    if(keys.indexOf(sid)>=0) return list[j];
-  }
   return null;
 }
 function operator(){
@@ -14682,6 +14738,7 @@ window.rkAdminUserAction_=function(kind,id){
         requestedKey:rkAdminNormalizeUserKey_(__rkId),
         borrowerCount:users().length,
         availableBorrowerIds:users().slice(0,50).map(function(u){return u.BorrowerId||u.borrowerId||'';}),
+        canonicalSourceCount:(window.embeddedAdminLoans||[]).filter(function(x){return x&&String(x.BorrowerId||x.borrowerId||x.borrowerId||'').trim();}).length + (window.embeddedAdminPayments||[]).filter(function(x){return x&&String(x.BorrowerId||x.borrowerId||'').trim();}).length,
         availableKeys:users().slice(0,20).map(function(u){return rkAdminUserKey_(u);})
       });
       var __rkUser=(typeof findUser==='function') ? findUser(__rkId) : null;
