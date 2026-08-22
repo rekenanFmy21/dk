@@ -1,8 +1,8 @@
 {
   "id": "rekenan-app2-v202.00",
-  "name": "Rekenan V202.05 — APP 2 USER",
+  "name": "Rekenan V202.06 — APP 2 USER",
   "short_name": "Rekenan User",
-  "description": "Rekenan V202.05 — APP 2 User-only tanpa akses Menu Admin, menggunakan API Rekenan yang sama",
+  "description": "Rekenan V202.06 — APP 2 User-only tanpa akses Menu Admin, menggunakan API Rekenan yang sama",
   "start_url": "./index.html?v=2201",
   "scope": "./",
   "display": "standalone",

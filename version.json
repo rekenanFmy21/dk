@@ -1,6 +1,12 @@
 {
-  "build": "V202.04",
+  "build": "V202.06",
   "entry": "index.html",
   "canonical": "./",
-  "updated": "2026-08-22"
+  "updated": "2026-08-22",
+  "features": [
+    "admin-data-user-from-limit-source",
+    "admin-user-center",
+    "name-cashier-separation",
+    "cross-app-sync"
+  ]
 }
