@@ -4,17 +4,17 @@
 
 <head>
     <script>
-        window.REKENAN_BUILD_VERSION = 'V201.24';
+        window.REKENAN_BUILD_VERSION = 'V201.25';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
         // V201.24: calculator is universal; never attach a currency symbol.
         window.rkCalcFormatUniversal_ = function (n) { const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat(undefined, {maximumFractionDigits: 10}).format(num); };
         window.v109Fmt = window.rkCalcFormatUniversal_;
-        window.REKENAN_UI_BUILD = 'V201.24';
-        console.info('[Rekenan BUILD] UI V201.24');
+        window.REKENAN_UI_BUILD = 'V201.25';
+        console.info('[Rekenan BUILD] UI V201.25');
         console.info('[Rekenan BUILD] V200.90 UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
-                const expected = 'V201.24';
+                const expected = 'V201.25';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -23,7 +23,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-    <meta name="rekenan-build" content="V201.24">
+    <meta name="rekenan-build" content="V201.25">
     <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -3159,10 +3159,59 @@ body.rk-authenticated #authModal{display:none!important;}
 body:not(.rk-authenticated) #authModal{display:flex!important;}
 </style>
 
+
 </head>
 
 <body class="bg-black text-gray-100 flex justify-center min-h-screen rk-style-pending">
-<script>console.info('[Rekenan BUILD] V201.24 | FAST LOGIN | CRITICAL UI SHELL | NO FIRST-PAINT FLASH');</script>
+<script id="rekenan-v20125-session-role">
+/* V201.25 SESSION -> ROLE -> PERMISSION
+   USER  : normal application only
+   OWNER : verified Admin session, full Admin authority
+*/
+(function(){
+  const SESSION_KEY='rekenan_session_v20125';
+  const ROLE={OWNER:'OWNER',USER:'USER'};
+  const read=()=>{try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||localStorage.getItem(SESSION_KEY)||'null')}catch(_){return null}};
+  const write=(s)=>{try{sessionStorage.setItem(SESSION_KEY,JSON.stringify(s));}catch(_){}
+    try{localStorage.setItem(SESSION_KEY,JSON.stringify(s));}catch(_){}
+  };
+  const admin=()=>sessionStorage.getItem('rekenan_admin_logged')==='true' && !!sessionStorage.getItem('rekenan_admin_token');
+  window.rkSessionRole_=function(){ return admin()?ROLE.OWNER:(read()?.role===ROLE.OWNER?ROLE.OWNER:ROLE.USER); };
+  window.rkSession_=function(){
+    const s=read()||{};
+    return {username:String(s.username||window.activeCloudUser||localStorage.getItem('rekenan_active_cloud_user')||''),role:window.rkSessionRole_(),authenticated:!!(window.activeCloudUser||localStorage.getItem('rekenan_active_cloud_user')),loginAt:s.loginAt||''};
+  };
+  window.rkSetSessionRole_=function(role,username){
+    role=role===ROLE.OWNER?ROLE.OWNER:ROLE.USER;
+    write({username:String(username||window.activeCloudUser||localStorage.getItem('rekenan_active_cloud_user')||''),role,loginAt:new Date().toISOString()});
+    document.documentElement.dataset.rkRole=role;
+    document.body?.setAttribute('data-rk-role',role);
+    window.rkApplyRolePermissions_();
+  };
+  window.rkApplyRolePermissions_=function(){
+    const role=window.rkSessionRole_();
+    document.documentElement.dataset.rkRole=role;
+    document.body?.setAttribute('data-rk-role',role);
+    const nav=document.getElementById('nav-admin'),tab=document.getElementById('tab-admin');
+    const visible=role===ROLE.OWNER;
+    if(nav){nav.hidden=!visible;nav.setAttribute('aria-hidden',String(!visible));nav.style.display=visible?'':'none';}
+    if(tab){tab.hidden=!visible;tab.setAttribute('aria-hidden',String(!visible));if(!visible)tab.style.display='none';}
+    const badge=document.getElementById('rkRoleBadge');
+    if(badge){badge.textContent=role;badge.className='rk-role-badge '+(role===ROLE.OWNER?'rk-role-admin':'');}
+    if(role!==ROLE.OWNER && window.currentActiveTab==='admin'){
+      if(typeof window.switchTab==='function') window.switchTab('dashboard');
+    }
+  };
+  window.rkCan_=function(permission){
+    const p=String(permission||'').toLowerCase();
+    if(p==='admin' || p==='admin:read' || p==='admin:write' || p==='admin:delete') return window.rkSessionRole_()===ROLE.OWNER;
+    return true;
+  };
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>window.rkApplyRolePermissions_(),0));
+})();
+</script>
+
+<script>console.info('[Rekenan BUILD] V201.25 | FAST LOGIN | CRITICAL UI SHELL | NO FIRST-PAINT FLASH');</script>
     <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] hidden items-center justify-center p-6"
         id="globalLoadingOverlay">
         <div class="bg-[#1e1e1e] border border-zinc-700 rounded-3xl px-6 py-5 text-center shadow-2xl min-w-[220px]">
@@ -3253,6 +3302,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
                             v3.1
                             Pro
                         </span>
+                        <span id="rkRoleBadge" class="rk-role-badge">USER</span>
                     </h1>
                     <p class="text-[10px] text-zinc-400 font-medium truncate min-w-0">
                         Akun Aktif
@@ -4612,6 +4662,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
             });
         });
 
+        try { if (typeof rkApplyRolePermissions_==='function') rkApplyRolePermissions_(); } catch (_) {};
         window.REKENAN_PWA_HOST = true;
         window.REKENAN_PWA_APP = 'admin';
 
@@ -4819,6 +4870,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
                 if (!token) return false;
 
                 activeCloudUser = username;
+                        if (typeof rkSetSessionRole_==='function') rkSetSessionRole_('USER', activeCloudUser);
                 cloudToken = token;
                 localStorage.setItem('rekenan_active_cloud_user', username);
                 localStorage.setItem('rekenan_cloud_token', token);
@@ -5589,6 +5641,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         }
 
         function switchTab(tabId) {
+            if (String(tabId)==='admin' && typeof window.rkCan_==='function' && !window.rkCan_('admin')) { try { showToast('Akses Admin hanya untuk OWNER.', 'error'); } catch (_) {} return false; }
             try { const calcModal = document.getElementById('v101CalculatorModal'); if (calcModal) calcModal.classList.remove('show'); } catch (_) {}
             try { if (typeof rkSetCalculatorNavActive_ === 'function') rkSetCalculatorNavActive_(false); } catch (_) {}
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -6024,8 +6077,8 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         async function rkPriorityStartupSync_() {
   // V201.24: USER-FIRST startup. Admin is never a startup gate.
   window.__RK_STRICT_PRIORITY_STARTUP__ = false;
-  window.__RK_STARTUP_V201_00__ = true;
-  console.info('[Rekenan STARTUP] V201.24 USER-FIRST — BELANJA/TRANSAKSI + PINJAMAN/CICILAN + LAINNYA FIRST; ADMIN BACKGROUND');
+  window.__RK_STARTUP_V201_00__ = true; window.__RK_SESSION_ROLE_V201_25__ = true;
+  console.info('[Rekenan STARTUP] V201.25 SESSION-ROLE USER-FIRST — BELANJA/TRANSAKSI + PINJAMAN/CICILAN + LAINNYA FIRST; ADMIN BACKGROUND');
 
   // Paint local state immediately.
   try { if (typeof rkLoadAllLocalData_ === 'function') rkLoadAllLocalData_(); } catch (_) {}
@@ -10045,6 +10098,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     // V137: keep the Admin PIN only for the current browser tab/session.
                     // It is used to transparently renew an expired Admin token.
                     sessionStorage.setItem('rekenan_admin_pin', pin);
+                    if (typeof rkSetSessionRole_==='function') rkSetSessionRole_('OWNER', activeCloudUser || localStorage.getItem('rekenan_active_cloud_user') || '');
                     // V200.93: a successful Admin login is an explicit identity
                     // boundary. Never let a previous 5-minute local snapshot satisfy
                     // the first read for this session. Paint local immediately, then
@@ -10056,7 +10110,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 } else showToast(/PIN|pin/i.test(String(data?.message || '')) ? 'PIN salah.' : (data.message || 'PIN admin tidak valid.'), 'error');
             } catch (e) {const msg = e?.apiResponse?.message || e?.message || 'Login Admin gagal.'; showToast(String(msg), 'error'); console.error('[V146] Admin login:', e);} finally {hideLoading(); rkActionButtonUnlock_(btn, 'Masuk');}
         }
-        function logoutEmbeddedAdmin() {sessionStorage.removeItem('rekenan_admin_logged'); sessionStorage.removeItem('rekenan_admin_pin'); sessionStorage.removeItem('rekenan_admin_token'); embeddedAdminLoans = []; embeddedAdminPayments = []; initEmbeddedAdmin(); showToast('Admin berhasil keluar', 'success');}
+        function logoutEmbeddedAdmin() {sessionStorage.removeItem('rekenan_admin_logged'); sessionStorage.removeItem('rekenan_admin_pin'); sessionStorage.removeItem('rekenan_admin_token'); if(typeof rkSetSessionRole_==='function') rkSetSessionRole_('USER', activeCloudUser || localStorage.getItem('rekenan_active_cloud_user') || ''); embeddedAdminLoans = []; embeddedAdminPayments = []; initEmbeddedAdmin(); showToast('Admin berhasil keluar', 'success');}
 
         // V200.90: ACC queue is deliberately optimistic + serialized.
         // The UI removes the check button immediately, while Cloud writes are
@@ -12649,6 +12703,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                             sessionStorage.setItem('rekenan_admin_logged', 'true');
                             sessionStorage.setItem('rekenan_admin_token', token);
                             sessionStorage.setItem('rekenan_admin_pin', pin);
+                    if (typeof rkSetSessionRole_==='function') rkSetSessionRole_('OWNER', activeCloudUser || localStorage.getItem('rekenan_active_cloud_user') || '');
                             closeAdminLogin(); initEmbeddedAdmin();
                             restoreAdminDataFromCloud_().then(() => reloadCurrentTab()).catch(() => { });
                             showToast('Login admin berhasil', 'success');
