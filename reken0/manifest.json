@@ -1,9 +1,9 @@
 {
   "id": "rekenan-app1-v202.00",
-  "name": "Rekenan V202.08 — APP 1 OWNER",
+  "name": "Rekenan V202.09 — APP 1 OWNER",
   "short_name": "Rekenan Admin",
-  "description": "Rekenan V202.08 — APP 1 Owner/Admin, keuangan, pinjaman, catatan, belanja dan administrasi",
-  "start_url": "./index.html?v=20208",
+  "description": "Rekenan V202.09 — APP 1 OWNER, Local-First + Cloud Reconciliation",
+  "start_url": "./index.html?v=20209",
   "scope": "./",
   "display": "standalone",
   "display_override": [

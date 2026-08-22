@@ -1,13 +1,14 @@
 {
-  "build": "V202.08",
+  "build": "V202.09",
   "entry": "index.html",
   "canonical": "./",
   "updated": "2026-08-22",
   "features": [
-    "admin-user-center-from-limit-list",
-    "admin-user-actions-limit-loan-payment-history",
-    "legacy-admin-verification-menus-hidden",
-    "cross-app-loan-sync-pulse",
+    "bantuan-user-local-first",
+    "admin-snapshot-version-gate",
+    "cloud-sync-only-when-newer",
+    "cross-app-loan-limit-sync",
+    "incremental-reconciliation-pulse",
     "shared-gas-api",
     "pwa-cache-version-bump"
   ]
