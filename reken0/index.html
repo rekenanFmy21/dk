@@ -8428,29 +8428,14 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 showToast("Kategori sudah ada", "error");
                 return;
             }
-            const previousCategories = shoppingCategories.slice();
+            // LOCAL-FIRST: commit ke perangkat terlebih dahulu. Jangan menunggu Cloud.
             shoppingCategories.push(name);
             secureSave('rekenan_shopping_categories', shoppingCategories);
+            rkLocalFirstMutation_('shopping-category-add', name);
             if (input) input.value = '';
             renderShoppingCategoryList();
             if (typeof renderShoppingList === 'function') renderShoppingList();
-            rkMarkSyncPending_();
-
-            // V202.04 CATEGORY FIX: do not leave Master Data waiting for the
-            // background worker. Push this small configuration change now and
-            // only report Cloud success after the server has verified the Sheet.
-            try {
-                const syncResult = await syncDataToCloud(false, false, 'data');
-                if (!syncResult || syncResult.success !== true) throw (syncResult?.error || new Error('Sinkronisasi kategori gagal.'));
-                showToast(`Kategori "${name}" tersimpan di Cloud.`, 'success');
-            } catch (e) {
-                shoppingCategories = previousCategories;
-                secureSave('rekenan_shopping_categories', shoppingCategories);
-                renderShoppingCategoryList();
-                if (typeof renderShoppingList === 'function') renderShoppingList();
-                rkMarkSyncPending_();
-                showToast('Kategori gagal disimpan ke Cloud. Perubahan dibatalkan dan antrean sinkronisasi dipertahankan.', 'error');
-            }
+            showToast(`Kategori belanja "${name}" tersimpan di perangkat. Cloud akan disinkronkan otomatis.`, "success");
         }
 
         async function deleteShoppingCategory(idx) {
@@ -8467,28 +8452,13 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     ? {...item, category: fallback}
                     : item
             );
-            const previousCategories = shoppingCategories.slice();
-            const previousItems = JSON.parse(JSON.stringify(shoppingItems || []));
             shoppingCategories.splice(idx, 1);
             secureSave('rekenan_shopping_categories', shoppingCategories);
             secureSave('rekenan_shopping', shoppingItems);
+            rkLocalFirstMutation_('shopping-category-delete', removed);
             renderShoppingCategoryList();
             if (typeof renderShoppingList === 'function') renderShoppingList();
-            rkMarkSyncPending_();
-            try {
-                const syncResult = await syncDataToCloud(false, false, 'data');
-                if (!syncResult || syncResult.success !== true) throw (syncResult?.error || new Error('Sinkronisasi kategori gagal.'));
-                showToast(`Kategori "${removed}" dihapus dan perubahan tersimpan di Cloud.`, 'success');
-            } catch (e) {
-                shoppingCategories = previousCategories;
-                shoppingItems = previousItems;
-                secureSave('rekenan_shopping_categories', shoppingCategories);
-                secureSave('rekenan_shopping', shoppingItems);
-                renderShoppingCategoryList();
-                if (typeof renderShoppingList === 'function') renderShoppingList();
-                rkMarkSyncPending_();
-                showToast('Penghapusan kategori gagal disimpan ke Cloud. Perubahan dibatalkan.', 'error');
-            }
+            showToast(`Kategori \"${removed}\" dihapus di perangkat. Cloud akan disinkronkan otomatis.`, "success");
         }
 
         // ================= PEMINJAM MODULE (CLOUD - INDEPENDENT) =================
