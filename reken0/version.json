@@ -1,5 +1,5 @@
 {
-  "build": "V202.10",
+  "build": "V202.12",
   "entry": "index.html",
   "canonical": "./",
   "updated": "2026-08-22",
@@ -10,6 +10,9 @@
     "cross-app-loan-limit-sync",
     "incremental-reconciliation-pulse",
     "shared-gas-api",
-    "pwa-cache-version-bump"
+    "pwa-cache-version-bump",
+    "admin-user-center-action-fix",
+    "service-worker-hard-version-alignment",
+    "admin-center-runtime-diagnostics"
   ]
 }
