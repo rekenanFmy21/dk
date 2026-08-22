@@ -8428,14 +8428,29 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 showToast("Kategori sudah ada", "error");
                 return;
             }
+            const previousCategories = shoppingCategories.slice();
             shoppingCategories.push(name);
             secureSave('rekenan_shopping_categories', shoppingCategories);
             if (input) input.value = '';
             renderShoppingCategoryList();
             if (typeof renderShoppingList === 'function') renderShoppingList();
-            showToast("Kategori belanja ditambahkan", "success");
             rkMarkSyncPending_();
-            showToast("Kategori belanja tersimpan di perangkat. Sinkronisasi otomatis berjalan saat internet tersedia.", "success");
+
+            // V202.04 CATEGORY FIX: do not leave Master Data waiting for the
+            // background worker. Push this small configuration change now and
+            // only report Cloud success after the server has verified the Sheet.
+            try {
+                const syncResult = await syncDataToCloud(false, false, 'data');
+                if (!syncResult || syncResult.success !== true) throw (syncResult?.error || new Error('Sinkronisasi kategori gagal.'));
+                showToast(`Kategori "${name}" tersimpan di Cloud.`, 'success');
+            } catch (e) {
+                shoppingCategories = previousCategories;
+                secureSave('rekenan_shopping_categories', shoppingCategories);
+                renderShoppingCategoryList();
+                if (typeof renderShoppingList === 'function') renderShoppingList();
+                rkMarkSyncPending_();
+                showToast('Kategori gagal disimpan ke Cloud. Perubahan dibatalkan dan antrean sinkronisasi dipertahankan.', 'error');
+            }
         }
 
         async function deleteShoppingCategory(idx) {
@@ -8452,13 +8467,28 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     ? {...item, category: fallback}
                     : item
             );
+            const previousCategories = shoppingCategories.slice();
+            const previousItems = JSON.parse(JSON.stringify(shoppingItems || []));
             shoppingCategories.splice(idx, 1);
             secureSave('rekenan_shopping_categories', shoppingCategories);
             secureSave('rekenan_shopping', shoppingItems);
             renderShoppingCategoryList();
             if (typeof renderShoppingList === 'function') renderShoppingList();
-            showToast(`Kategori \"${removed}\" dihapus. Item terkait dipindahkan ke \"${fallback}\".`, "success");
             rkMarkSyncPending_();
+            try {
+                const syncResult = await syncDataToCloud(false, false, 'data');
+                if (!syncResult || syncResult.success !== true) throw (syncResult?.error || new Error('Sinkronisasi kategori gagal.'));
+                showToast(`Kategori "${removed}" dihapus dan perubahan tersimpan di Cloud.`, 'success');
+            } catch (e) {
+                shoppingCategories = previousCategories;
+                shoppingItems = previousItems;
+                secureSave('rekenan_shopping_categories', shoppingCategories);
+                secureSave('rekenan_shopping', shoppingItems);
+                renderShoppingCategoryList();
+                if (typeof renderShoppingList === 'function') renderShoppingList();
+                rkMarkSyncPending_();
+                showToast('Penghapusan kategori gagal disimpan ke Cloud. Perubahan dibatalkan.', 'error');
+            }
         }
 
         // ================= PEMINJAM MODULE (CLOUD - INDEPENDENT) =================
@@ -9698,27 +9728,8 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                             inserted += Number(result?.data?.rowCount || result?.data?.inserted || 0);
                         }
                     };
-                    const calcAll = Array.isArray(pendingPayload?.calcHistory) && pendingPayload.calcHistory.length
-                        ? pendingPayload.calcHistory : (Array.isArray(calcHistory) ? calcHistory : []);
-                    const notesAll = Array.isArray(pendingPayload?.notes) && pendingPayload.notes.length
-                        ? pendingPayload.notes : (Array.isArray(notesData) ? notesData : []);
-                    const savingsAll = Array.isArray(pendingPayload?.savingsList) && pendingPayload.savingsList.length
-                        ? pendingPayload.savingsList : (Array.isArray(savingsList) ? savingsList : []);
-                    const catShopping = Array.isArray(pendingPayload?.shoppingCategories)
-                        ? pendingPayload.shoppingCategories : (Array.isArray(shoppingCategories) ? shoppingCategories : []);
-                    const catCatatan = pendingPayload?.catatanCategories != null
-                        ? pendingPayload.catatanCategories : (Array.isArray(catatanCategories) ? catatanCategories : []);
-                    // syncImportedBatch supports every Cloud collection. Send all
-                    // available collections, not only TRANSACTION/SHOPPING. This
-                    // prevents import/restore paths from leaving Budget, Notes,
-                    // Calculator or category data local-only.
                     await send(tx, 'transactions');
                     await send(shop, 'shoppingItems');
-                    await send(calcAll, 'calcHistory');
-                    await send(notesAll, 'notes');
-                    await send(savingsAll, 'savingsList');
-                    await send([catShopping], 'shoppingCategories');
-                    await send([catCatatan], 'catatanCategories');
                     writeResult = {success: true, inserted};
                 } catch (err) {
                     customWriteError = err;
@@ -9750,16 +9761,9 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                         .filter(x => String(x?.dataType || 'TRANSACTION').toUpperCase() === 'TRANSACTION')
                         .map(x => String(x?.id || '')));
                     const cloudShopIds = new Set((cloudData.shoppingItems || []).map(x => String(x?.id || '')));
-                    const cloudCalcIds = new Set((cloudData.calcHistory || []).map(x => String(x?.id || '')));
-                    const cloudNoteIds = new Set((cloudData.notes || []).map(x => String(x?.id || '')));
-                    const cloudSavingsIds = new Set((cloudData.savingsList || []).map(x => String(x?.id || '')));
-                    const missing = refs.filter(ref => {
-                        if (ref.dataType === 'SHOPPING') return !cloudShopIds.has(ref.id);
-                        if (ref.dataType === 'CALC_HISTORY') return !cloudCalcIds.has(ref.id);
-                        if (ref.dataType === 'NOTE') return !cloudNoteIds.has(ref.id);
-                        if (ref.dataType === 'SAVINGS') return !cloudSavingsIds.has(ref.id);
-                        return !cloudTxIds.has(ref.id);
-                    });
+                    const missing = refs.filter(ref => ref.dataType === 'SHOPPING'
+                        ? !cloudShopIds.has(ref.id)
+                        : !cloudTxIds.has(ref.id));
                     if (missing.length) {
                         throw new Error(`Verifikasi Sheet gagal: ${missing.length} data CSV belum ditemukan di Cloud.`);
                     }
