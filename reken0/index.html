@@ -2,7 +2,24 @@
 
 <html class="dark" lang="id">
 
-<head><!-- RK_GLOBAL_ADMIN_ERROR_SYSTEM -->
+<head>
+<script>
+/* RK BORROWERID RENDERER FIX */
+(function(){
+  if(window.rkAdminBorrowerId_) return;
+  window.rkAdminBorrowerId_=function(b){
+    b=b||{};
+    return String(
+      b.BorrowerId ||
+      b.borrowerId ||
+      b.BORROWERID ||
+      b.borrowerID ||
+      ''
+    ).trim();
+  };
+})();
+</script>
+<!-- RK_GLOBAL_ADMIN_ERROR_SYSTEM -->
 
 <script>
 /* BORROWERID AUTHORITATIVE USER KEY: Loan/Payment relation uses BorrowerId; Name is display-only. */
@@ -14833,5 +14850,39 @@ setTimeout(()=>{pulse();setInterval(pulse,3000);},1500);
   }
   if(!install()) setTimeout(install,0);
   setTimeout(install,100);
+})();
+</script>
+
+<script>
+(function(){
+  if(window.rkAdminRequireBorrowerId_) return;
+  window.rkAdminRequireBorrowerId_=function(b){
+    var id=window.rkAdminBorrowerId_?window.rkAdminBorrowerId_(b):'';
+    if(!id){
+      var e=new Error('BorrowerId kosong. Tombol Kelola User diblokir.');
+      e.code='ADMIN_BORROWER_ID_MISSING';
+      if(typeof rkAdminErrorReport_==='function'){
+        rkAdminErrorReport_('RENDER_USER',e,{functionName:'rkAdminBorrowerId_'});
+      }
+      return '';
+    }
+    return id;
+  };
+})();
+</script>
+
+<script>
+/* RK: last-mile guard for Kelola User */
+(function(){
+  if(window.__rkBorrowerIdClickGuard__) return;
+  window.__rkBorrowerIdClickGuard__=true;
+  document.addEventListener('click',function(ev){
+    var el=ev.target && ev.target.closest ? ev.target.closest('.rk-admin-user-action') : null;
+    if(!el) return;
+    var raw=el.getAttribute('data-borrower-id')||'';
+    if(raw) return;
+    /* Do not block legacy templates that don't expose data-borrower-id;
+       the renderer validation above is authoritative. */
+  },true);
 })();
 </script>
