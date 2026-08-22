@@ -5572,7 +5572,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         function registerRekenanPWA_() {
             try {
                 if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-                navigator.serviceWorker.register('./sw.js?v=20212', {scope: './', updateViaCache: 'none'})
+                navigator.serviceWorker.register('./sw.js?v=20213', {scope: './', updateViaCache: 'none'})
                     .then(function (registration) {
                         console.info('[Rekenan PWA] Local Service Worker registered:', registration.scope);
                         try {registration.update();} catch (_) { }
@@ -6253,7 +6253,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         // tidak membaca array yang sudah berubah oleh aksi berikutnya.
         // V202.13: notify the sibling app after every verified Cloud mutation.
         // BroadcastChannel is instant when both apps are open; localStorage is the fallback.
-        const RK_DUAL_APP_SYNC_CHANNEL_ = 'rekenan-dual-app-sync-v202';
+        const RK_DUAL_APP_SYNC_CHANNEL_ = 'rekenan-dual-app-sync-v203';
         function rkBroadcastDualAppSync_(scope) {
             try {
                 const msg = {type:'CLOUD_VERIFIED', scope:String(scope||'data'), at:Date.now(), user:String(activeCloudUser||'')};
@@ -6261,7 +6261,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
                     const ch = new BroadcastChannel(RK_DUAL_APP_SYNC_CHANNEL_);
                     ch.postMessage(msg); ch.close();
                 }
-                localStorage.setItem('rekenan_dual_app_sync_signal_v202', JSON.stringify(msg));
+                localStorage.setItem('rekenan_dual_app_sync_signal_v203', JSON.stringify(msg));
             } catch (_) {}
         }
         async function rkReceiveDualAppSync_(msg) {
@@ -6282,7 +6282,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
                 rkDualAppChannel_.onmessage = e => rkReceiveDualAppSync_(e.data);
             }
             window.addEventListener('storage', e => {
-                if (e.key === 'rekenan_dual_app_sync_signal_v202' && e.newValue) {
+                if (e.key === 'rekenan_dual_app_sync_signal_v203' && e.newValue) {
                     try { rkReceiveDualAppSync_(JSON.parse(e.newValue)); } catch (_) {}
                 }
             });
@@ -13874,8 +13874,8 @@ console.info('[Rekenan BUILD] UI V202.13 | CALCULATOR UNIVERSAL | NO CURRENCY | 
   function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function bind(){
     const list=document.getElementById('adminLimitList');
-    if(!list || list.dataset.v20213Bound==="1") return;
-    list.dataset.v20213Bound="1";
+    if(!list || list.dataset.v20307Bound==="1") return;
+    list.dataset.v20307Bound="1";
 
     list.addEventListener('click', function(ev){
       const btn=ev.target.closest('[data-open-admin-user]');
@@ -13914,7 +13914,7 @@ console.info('[Rekenan BUILD] UI V202.13 | CALCULATOR UNIVERSAL | NO CURRENCY | 
 
   // Works even when the Atur Limit list is rendered/re-rendered asynchronously.
   const originalRender=window.renderAdminLimitList;
-  if(typeof originalRender==='function' && !originalRender.__v20213Wrapped){
+  if(typeof originalRender==='function' && !originalRender.__v20307Wrapped){
     const wrapped=function(){
       const out=originalRender.apply(this,arguments);
       setTimeout(function(){
@@ -13938,7 +13938,7 @@ console.info('[Rekenan BUILD] UI V202.13 | CALCULATOR UNIVERSAL | NO CURRENCY | 
       },0);
       return out;
     };
-    wrapped.__v20213Wrapped=true;
+    wrapped.__v20307Wrapped=true;
     window.renderAdminLimitList=wrapped;
   }
 
@@ -13952,7 +13952,7 @@ console.info('[Rekenan BUILD] UI V202.13 | CALCULATOR UNIVERSAL | NO CURRENCY | 
 
 
 <!-- V202.13 AUTHORITATIVE ADMIN USER CENTER + CROSS APP SYNC -->
-<style id="rekenan-v20213-admin-center">
+<style id="rekenan-v20312-admin-center">
 #adminLimitList{display:flex!important;flex-direction:column!important;gap:12px!important}
 .rk-admin-user-card{background:linear-gradient(180deg,#17191f,#111318)!important;border:1px solid rgba(148,163,184,.15)!important}
 .rk-user-badge{font-size:9px;font-weight:900;letter-spacing:.08em;color:#a5b4fc;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);padding:6px 8px;border-radius:999px}
@@ -13967,10 +13967,10 @@ console.info('[Rekenan BUILD] UI V202.13 | CALCULATOR UNIVERSAL | NO CURRENCY | 
 #adminLoanList,#adminPaymentList{display:none!important}
 @media(max-width:380px){.rk-admin-user-actions{grid-template-columns:1fr!important}.rk-admin-limit-editor{flex-direction:column!important}.rk-admin-limit-save{min-height:42px!important}}
 </style>
-<script id="rekenan-v20213-admin-center">
+<script id="rekenan-v20312-admin-center">
 (function(){
 'use strict';
-const TARGET_KEY='rekenan_admin_target_user_v20213';
+const TARGET_KEY='rekenan_admin_target_user_v20312';
 function users(){
   return Array.isArray(window.embeddedAdminBorrowers)?window.embeddedAdminBorrowers:[];
 }
@@ -14032,19 +14032,19 @@ function patchListAfterRender(){
 function boot(){
   hideLegacyAdminRooms(); patchListAfterRender();
   const panel=document.getElementById('adminPanelContent');
-  if(panel&&!panel.__v20213Observer){
-    panel.__v20213Observer=new MutationObserver(()=>{hideLegacyAdminRooms();});
-    panel.__v20213Observer.observe(panel,{childList:true,subtree:true});
+  if(panel&&!panel.__v20312Observer){
+    panel.__v20312Observer=new MutationObserver(()=>{hideLegacyAdminRooms();});
+    panel.__v20312Observer.observe(panel,{childList:true,subtree:true});
   }
   setTimeout(patchListAfterRender,300);setTimeout(patchListAfterRender,1200);setTimeout(patchListAfterRender,2500);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 </script>
-<script id="rekenan-v20213-cross-app-sync">
+<script id="rekenan-v20312-cross-app-sync">
 (function(){
 'use strict';
-let last=Number(localStorage.getItem('rekenan_cross_app_sync_version_v20213')||0);
+let last=Number(localStorage.getItem('rekenan_cross_app_sync_version_v20312')||0);
 let busy=false;
 async function pulse(){
   if(busy||typeof window.cloudRequest!=='function')return;
@@ -14059,9 +14059,9 @@ async function pulse(){
     if(!(d&&(d.status==='success'||d.success)))return;
     const v=Number(d?.data?.version??d?.version??0);
     if(!v){return;}
-    if(!last){last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20213',String(v));return;}
+    if(!last){last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20312',String(v));return;}
     if(v===last)return;
-    last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20213',String(v));
+    last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20312',String(v));
     if(admin){
       if(typeof window.loadAdminPanel==='function') window.loadAdminPanel(true).catch(()=>{});
     }else{

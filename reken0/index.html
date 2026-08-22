@@ -3183,7 +3183,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
     .catch(function(){ /* keep folder URL usable if version file is temporarily unavailable */ });
 })();
 </script>
-<style id="rekenan-v20213-admin-center">
+<style id="rekenan-v20312-admin-center">
 #adminQuickActions{display:none!important}
 #adminUserCenter{display:block}
 #adminUserCenter.hidden{display:none!important}
@@ -4200,12 +4200,6 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
                             <button onclick="adminUserCenterAction('history')" class="bg-zinc-700 text-white p-3 rounded-xl text-xs font-bold">Riwayat</button>
                         </div>
                         <div id="adminUserCenterDataHint" class="text-[10px] text-zinc-500">Pilih tindakan di atas. Data pinjaman dan cicilan User terpilih dikelola di pusat ini.</div>
-                        <div class="flex items-center justify-between gap-2">
-                            <span id="adminUserCenterSyncStatus" class="text-[10px] text-zinc-500">Sinkronisasi otomatis aktif</span>
-                            <button type="button" onclick="syncAdminUserCenterNow()" class="bg-indigo-700 hover:bg-indigo-600 text-white px-3 py-2 rounded-xl text-[10px] font-bold">
-                                <i class="fa-solid fa-arrows-rotate mr-1"></i>Sync Sekarang
-                            </button>
-                        </div>
                         <div id="adminUserCenterLimitEditor" class="pt-1"></div>
                     </div>
                     <div class="bg-[#1e1e1e] p-5 rounded-3xl border border-rose-500/20 shadow-xl space-y-3">
@@ -6028,7 +6022,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         function registerRekenanPWA_() {
             try {
                 if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-                navigator.serviceWorker.register('./sw.js?v=20212', {scope: './', updateViaCache: 'none'})
+                navigator.serviceWorker.register('./sw.js?v=20213', {scope: './', updateViaCache: 'none'})
                     .then(function (registration) {
                         console.info('[Rekenan PWA] Local Service Worker registered:', registration.scope);
                         try {registration.update();} catch (_) { }
@@ -6709,7 +6703,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         // tidak membaca array yang sudah berubah oleh aksi berikutnya.
         // V202.13: notify the sibling app after every verified Cloud mutation.
         // BroadcastChannel is instant when both apps are open; localStorage is the fallback.
-        const RK_DUAL_APP_SYNC_CHANNEL_ = 'rekenan-dual-app-sync-v202';
+        const RK_DUAL_APP_SYNC_CHANNEL_ = 'rekenan-dual-app-sync-v203';
         function rkBroadcastDualAppSync_(scope) {
             try {
                 const msg = {type:'CLOUD_VERIFIED', scope:String(scope||'data'), at:Date.now(), user:String(activeCloudUser||'')};
@@ -6717,7 +6711,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
                     const ch = new BroadcastChannel(RK_DUAL_APP_SYNC_CHANNEL_);
                     ch.postMessage(msg); ch.close();
                 }
-                localStorage.setItem('rekenan_dual_app_sync_signal_v202', JSON.stringify(msg));
+                localStorage.setItem('rekenan_dual_app_sync_signal_v203', JSON.stringify(msg));
             } catch (_) {}
         }
         async function rkReceiveDualAppSync_(msg) {
@@ -6738,7 +6732,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
                 rkDualAppChannel_.onmessage = e => rkReceiveDualAppSync_(e.data);
             }
             window.addEventListener('storage', e => {
-                if (e.key === 'rekenan_dual_app_sync_signal_v202' && e.newValue) {
+                if (e.key === 'rekenan_dual_app_sync_signal_v203' && e.newValue) {
                     try { rkReceiveDualAppSync_(JSON.parse(e.newValue)); } catch (_) {}
                 }
             });
@@ -10530,7 +10524,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 const base = Number(b.baseLoanLimit ?? b.loanLimit ?? b.limit ?? 5000000);
                 const used = Number(b.outstanding || 0);
                 const available = Math.max(0, Number(b.availableLoanLimit ?? b.available ?? (base - used)));
-                return `<div class="rk-admin-user-card bg-[#171717] border border-zinc-800 rounded-2xl p-3 space-y-3 cursor-pointer" data-admin-user-id="${escAdminText_(id)}" onclick="openAdminUserCenter('${escAdminText_(id)}')">
+                return `<div class="rk-admin-user-card bg-[#171717] border border-zinc-800 rounded-2xl p-3 space-y-3 cursor-pointer" data-admin-user-id="${escAdminText_(id)}" role="button" tabindex="0">
                     <div class="flex items-center justify-between gap-3">
                         <div class="min-w-0">
                             <div class="text-sm font-bold text-white truncate">${name}</div>
@@ -10541,22 +10535,46 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     </div>
                     <div class="flex items-center justify-between gap-2 pt-1">
                         <span class="text-[10px] text-zinc-500">Pilih User untuk membuka pusat bantuan</span>
-                        <button type="button" class="rk-admin-user-action" onclick="event.stopPropagation();openAdminUserCenter('${escAdminText_(id)}')">
+                        <button type="button" class="rk-admin-user-action" data-admin-user-id="${escAdminText_(id)}">
                             <i class="fa-solid fa-arrow-right"></i><span>Kelola User</span>
                         </button>
                     </div>
                                 </div>`;
             }).join('');
+            if (!container.__rkAdminUserCenterBound) {
+                const openFromTarget = (el, ev) => {
+                    const target = el?.closest?.('[data-admin-user-id]');
+                    const id = target?.getAttribute('data-admin-user-id');
+                    if (!id) return;
+                    ev?.preventDefault?.();
+                    ev?.stopPropagation?.();
+                    openAdminUserCenter(id);
+                };
+                container.addEventListener('click', ev => {
+                    const action = ev.target.closest?.('.rk-admin-user-action');
+                    if (action) return openFromTarget(action, ev);
+                    if (ev.target.closest?.('button,input,a,select,textarea')) return;
+                    openFromTarget(ev.target, ev);
+                });
+                container.addEventListener('keydown', ev => {
+                    if (ev.key === 'Enter' || ev.key === ' ') openFromTarget(ev.target, ev);
+                });
+                container.__rkAdminUserCenterBound = true;
+            }
         }
 
+        function adminBorrowerId_(b) {
+            return String(b?.id || b?.ID || b?.userId || b?.UserID || b?.username || b?.Username || '').trim();
+        }
         function getAdminBorrowerById_(borrowerId) {
-            return (embeddedAdminBorrowers || []).find(b => String(b.id || b.ID || '') === String(borrowerId)) || null;
+            const wanted = String(borrowerId ?? '').trim();
+            return (embeddedAdminBorrowers || []).find(b => adminBorrowerId_(b) === wanted) || null;
         }
 
         function openAdminUserCenter(borrowerId) {
             const b = getAdminBorrowerById_(borrowerId);
             if (!b) { showToast('Data user tidak ditemukan.', 'error'); return; }
-            const target = {id: String(b.id || b.ID || b.userId || ''), nama: b.nama || b.name || b.Nama || '-', raw: b};
+            const target = {id: adminBorrowerId_(b), nama: b.nama || b.name || b.Nama || '-', raw: b};
             window.selectedTargetUser = b;
             window.adminAssistTarget = b;
             try { localStorage.setItem('rekenan_admin_target_user', JSON.stringify(target)); } catch (_) {}
@@ -10618,27 +10636,6 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 operatorId: operator.id || operator.ID || operator.userId || null,
                 assistedByAdmin: true
             };
-        }
-
-        async function syncAdminUserCenterNow() {
-            const status = document.getElementById('adminUserCenterSyncStatus');
-            if (status) status.textContent = 'Mengecek versi Cloud…';
-            try {
-                await loadAdminPanel(true);
-                const v = Number(localStorage.getItem('rekenan_admin_snapshot_v64_version') || 0);
-                if (status) status.textContent = v ? `Sinkron V202.13 • versi data ${v}` : 'Lokal aktif • Cloud belum tersedia';
-                const targetId = String(window.selectedTargetUser?.id || window.selectedTargetUser?.ID || '');
-                if (targetId) {
-                    const fresh = getAdminBorrowerById_(targetId);
-                    if (fresh) {
-                        window.selectedTargetUser = fresh;
-                        window.adminAssistTarget = fresh;
-                        openAdminUserCenter(targetId);
-                    }
-                }
-            } catch (e) {
-                if (status) status.textContent = 'Sync gagal • data lokal tetap dipakai';
-            }
         }
 
         function adminUserCenterAction(kind) {
@@ -14519,7 +14516,7 @@ console.info('[Rekenan BUILD] UI V202.13 | CALCULATOR UNIVERSAL | NO CURRENCY | 
 </script>
 
 <!-- V202.13 AUTHORITATIVE ADMIN USER CENTER + CROSS APP SYNC -->
-<style id="rekenan-v20213-admin-center">
+<style id="rekenan-v20312-admin-center">
 #adminLimitList{display:flex!important;flex-direction:column!important;gap:12px!important}
 .rk-admin-user-card{background:linear-gradient(180deg,#17191f,#111318)!important;border:1px solid rgba(148,163,184,.15)!important}
 .rk-user-badge{font-size:9px;font-weight:900;letter-spacing:.08em;color:#a5b4fc;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);padding:6px 8px;border-radius:999px}
@@ -14534,10 +14531,10 @@ console.info('[Rekenan BUILD] UI V202.13 | CALCULATOR UNIVERSAL | NO CURRENCY | 
 #adminLoanList,#adminPaymentList{display:none!important}
 @media(max-width:380px){.rk-admin-user-actions{grid-template-columns:1fr!important}.rk-admin-limit-editor{flex-direction:column!important}.rk-admin-limit-save{min-height:42px!important}}
 </style>
-<script id="rekenan-v20213-admin-center">
+<script id="rekenan-v20312-admin-center">
 (function(){
 'use strict';
-const TARGET_KEY='rekenan_admin_target_user_v20213';
+const TARGET_KEY='rekenan_admin_target_user_v20312';
 function users(){
   return Array.isArray(window.embeddedAdminBorrowers)?window.embeddedAdminBorrowers:[];
 }
@@ -14600,19 +14597,19 @@ function boot(){
   console.info('[Rekenan ADMIN] V202.13 USER CENTER READY', {swBuild: navigator.serviceWorker?.controller ? 'controlled' : 'uncontrolled', users: users().length});
   hideLegacyAdminRooms(); patchListAfterRender();
   const panel=document.getElementById('adminPanelContent');
-  if(panel&&!panel.__v20213Observer){
-    panel.__v20213Observer=new MutationObserver(()=>{hideLegacyAdminRooms();});
-    panel.__v20213Observer.observe(panel,{childList:true,subtree:true});
+  if(panel&&!panel.__v20312Observer){
+    panel.__v20312Observer=new MutationObserver(()=>{hideLegacyAdminRooms();});
+    panel.__v20312Observer.observe(panel,{childList:true,subtree:true});
   }
   setTimeout(patchListAfterRender,300);setTimeout(patchListAfterRender,1200);setTimeout(patchListAfterRender,2500);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 </script>
-<script id="rekenan-v20213-cross-app-sync">
+<script id="rekenan-v20312-cross-app-sync">
 (function(){
 'use strict';
-let last=Number(localStorage.getItem('rekenan_cross_app_sync_version_v20213')||0);
+let last=Number(localStorage.getItem('rekenan_cross_app_sync_version_v20312')||0);
 let busy=false;
 async function pulse(){
   if(busy||typeof window.cloudRequest!=='function')return;
@@ -14627,16 +14624,16 @@ async function pulse(){
     if(!(d&&(d.status==='success'||d.success)))return;
     const v=Number(d?.data?.version??d?.version??0);
     if(!v){return;}
-    if(!last){last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20213',String(v));return;}
+    if(!last){last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20312',String(v));return;}
     if(v===last)return;
-    last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20213',String(v));
+    last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20312',String(v));
     if(admin){
       if(typeof window.loadAdminPanel==='function') window.loadAdminPanel(false).catch(()=>{});
     }else{
       if(typeof window.fetchLoansFromCloud==='function' && window.activeBorrowerUser) window.fetchLoansFromCloud(true).catch(()=>{});
       if(typeof window.renderAll==='function') window.renderAll();
     }
-    if(typeof window.showToast==='function')window.showToast('Data Bantuan User tersinkron dari aplikasi lain.','success');
+    if(typeof window.showToast==='function')window.showToast('Data pinjaman tersinkron dari aplikasi lain.','success');
   }catch(e){}finally{busy=false;}
 }
 setTimeout(()=>{pulse();setInterval(pulse,3000);},1500);
