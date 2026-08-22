@@ -10620,7 +10620,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 const base = Number(b.baseLoanLimit ?? b.loanLimit ?? b.limit ?? 5000000);
                 const used = Number(b.outstanding || 0);
                 const available = Math.max(0, Number(b.availableLoanLimit ?? b.available ?? (base - used)));
-                return `<div class="rk-admin-user-card bg-[#171717] border border-zinc-800 rounded-2xl p-3 space-y-3 cursor-pointer" data-admin-user-id="${escAdminText_(id)}" onclick="rkAdminUserAction_('center','${escAdminText_(id)}')">
+                return `<div class="rk-admin-user-card bg-[#171717] border border-zinc-800 rounded-2xl p-3 space-y-3 cursor-pointer" data-admin-user-id="${escAdminText_(id)}" onclick="rkAdminUserAction_('center',${JSON.stringify(id).replace(/"/g,'&quot;')})">
                     <div class="flex items-center justify-between gap-3">
                         <div class="min-w-0">
                             <div class="text-sm font-bold text-white truncate">${name}</div>
@@ -10631,7 +10631,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     </div>
                     <div class="flex items-center justify-between gap-2 pt-1">
                         <span class="text-[10px] text-zinc-500">Pilih User untuk membuka pusat bantuan</span>
-                        <button type="button" class="rk-admin-user-action" onclick="event.stopPropagation();rkAdminUserAction_('center','${escAdminText_(id)}')">
+                        <button type="button" class="rk-admin-user-action" onclick="event.stopPropagation();rkAdminUserAction_('center',${JSON.stringify(id).replace(/"/g,'&quot;')})">
                             <i class="fa-solid fa-arrow-right"></i><span>Kelola User</span>
                         </button>
                     </div>
@@ -14610,9 +14610,29 @@ const TARGET_KEY='rekenan_admin_target_user_v20212';
 function users(){
   return Array.isArray(window.embeddedAdminBorrowers)?window.embeddedAdminBorrowers:[];
 }
+function rkAdminNormalizeUserKey_(v){
+  try{
+    var s=String(v==null?'':v).trim();
+    var ta=document.createElement('textarea');
+    ta.innerHTML=s;
+    return String(ta.value||'').trim().toLowerCase();
+  }catch(_){ return String(v==null?'':v).trim().toLowerCase(); }
+}
+function rkAdminUserKey_(u){
+  u=u||{};
+  return [
+    u.id,u.ID,u.userId,u.UserID,u.username,u.Username
+  ].map(rkAdminNormalizeUserKey_).filter(Boolean);
+}
 function findUser(id){
-  const sid=String(id||'');
-  return users().find(u=>String(u.id||u.ID||u.userId||u.UserID||u.username||u.Username)===sid)||null;
+  var sid=rkAdminNormalizeUserKey_(id);
+  if(!sid) return null;
+  var list=users();
+  for(var i=0;i<list.length;i++){
+    var keys=rkAdminUserKey_(list[i]);
+    if(keys.indexOf(sid)>=0) return list[i];
+  }
+  return null;
 }
 function operator(){
   const c=window.activeCloudUser||window.currentUser||window.userSession||{};
@@ -14631,6 +14651,12 @@ window.rkAdminUserAction_=function(kind,id){
       if(!__rkId) throw new Error('ID user kosong atau tidak dikirim.');
 
       __rkStage='FIND_USER';
+      console.info('[Rekenan ADMIN] FIND_USER DEBUG',{
+        requestedId:__rkId,
+        requestedKey:rkAdminNormalizeUserKey_(__rkId),
+        borrowerCount:users().length,
+        availableKeys:users().slice(0,20).map(function(u){return rkAdminUserKey_(u);})
+      });
       var __rkUser=(typeof findUser==='function') ? findUser(__rkId) : null;
       if(!__rkUser) {
         var nf=new Error('Data user tidak ditemukan.');
