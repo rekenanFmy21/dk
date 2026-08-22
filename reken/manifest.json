@@ -1,0 +1,58 @@
+{
+  "id": "rekenan-app2-v202.00",
+  "name": "Rekenan V202.00 — APP 2 USER",
+  "short_name": "Rekenan User",
+  "description": "Rekenan V202.00 — APP 2 User-only tanpa akses Menu Admin, menggunakan API Rekenan yang sama",
+  "start_url": "./index.html?v=2200",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "prefer_related_applications": false,
+  "background_color": "#0d0d0f",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./icons/rekenan-admin-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/rekenan-admin-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Belanja",
+      "short_name": "Belanja",
+      "url": "./#belanja?v=2200",
+      "icons": [
+        {
+          "src": "./icons/rekenan-admin-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Catatan",
+      "short_name": "Catatan",
+      "url": "./#catatan?v=2200",
+      "icons": [
+        {
+          "src": "./icons/rekenan-admin-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
