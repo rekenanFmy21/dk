@@ -3183,39 +3183,6 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
     .catch(function(){ /* keep folder URL usable if version file is temporarily unavailable */ });
 })();
 </script>
-
-<style id="rekenan-note-ui-v20204">
-/* NOTE UI polish - V202.04 */
-#noteModal .note-editor,
-.note-modal .note-editor{display:grid;gap:12px}
-#noteModal .note-editor textarea,
-.note-modal .note-editor textarea{min-height:150px;resize:vertical;line-height:1.55}
-#noteModal .note-char-count,
-.note-modal .note-char-count{text-align:right;font-size:12px;opacity:.65;margin-top:-7px}
-#noteModal .note-save-state,
-.note-modal .note-save-state{font-size:12px;opacity:.75;min-height:18px}
-#noteModal .note-photo-row,
-.note-modal .note-photo-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-#noteModal .note-list,
-.note-modal .note-list{display:grid;gap:10px;margin-top:12px}
-#noteModal .note-search,
-.note-modal .note-search{position:sticky;top:0;z-index:2}
-.rekenan-note-card{position:relative;padding:14px 42px 14px 14px;border:1px solid rgba(127,127,127,.18);border-radius:14px;background:rgba(127,127,127,.055);transition:transform .15s,box-shadow .15s}
-.rekenan-note-card:hover{transform:translateY(-1px);box-shadow:0 7px 20px rgba(0,0,0,.08)}
-.rekenan-note-title{font-weight:750;margin-bottom:5px;word-break:break-word}
-.rekenan-note-preview{opacity:.78;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
-.rekenan-note-meta{font-size:11px;opacity:.58;margin-top:9px;display:flex;gap:8px;flex-wrap:wrap}
-.rekenan-note-menu{position:absolute;right:8px;top:8px;border:0;background:transparent;border-radius:9px;padding:6px;cursor:pointer;font-size:18px;line-height:1}
-.rekenan-note-menu:hover{background:rgba(127,127,127,.13)}
-.rekenan-note-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
-.rekenan-note-toolbar input{flex:1;min-width:180px}
-.rekenan-note-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 7px;border-radius:999px;background:rgba(16,185,129,.12)}
-@media(max-width:560px){
-  #noteModal .note-editor,.note-modal .note-editor{gap:10px}
-  .rekenan-note-card{padding-right:38px}
-}
-</style>
-
 </head>
 
 <body class="bg-black text-gray-100 flex justify-center min-h-screen rk-style-pending">
