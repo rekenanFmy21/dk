@@ -3168,6 +3168,39 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
     .catch(function(){ /* keep folder URL usable if version file is temporarily unavailable */ });
 })();
 </script>
+
+<style id="rekenan-note-ui-v20204">
+/* NOTE UI polish - V202.04 */
+#noteModal .note-editor,
+.note-modal .note-editor{display:grid;gap:12px}
+#noteModal .note-editor textarea,
+.note-modal .note-editor textarea{min-height:150px;resize:vertical;line-height:1.55}
+#noteModal .note-char-count,
+.note-modal .note-char-count{text-align:right;font-size:12px;opacity:.65;margin-top:-7px}
+#noteModal .note-save-state,
+.note-modal .note-save-state{font-size:12px;opacity:.75;min-height:18px}
+#noteModal .note-photo-row,
+.note-modal .note-photo-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#noteModal .note-list,
+.note-modal .note-list{display:grid;gap:10px;margin-top:12px}
+#noteModal .note-search,
+.note-modal .note-search{position:sticky;top:0;z-index:2}
+.rekenan-note-card{position:relative;padding:14px 42px 14px 14px;border:1px solid rgba(127,127,127,.18);border-radius:14px;background:rgba(127,127,127,.055);transition:transform .15s,box-shadow .15s}
+.rekenan-note-card:hover{transform:translateY(-1px);box-shadow:0 7px 20px rgba(0,0,0,.08)}
+.rekenan-note-title{font-weight:750;margin-bottom:5px;word-break:break-word}
+.rekenan-note-preview{opacity:.78;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.rekenan-note-meta{font-size:11px;opacity:.58;margin-top:9px;display:flex;gap:8px;flex-wrap:wrap}
+.rekenan-note-menu{position:absolute;right:8px;top:8px;border:0;background:transparent;border-radius:9px;padding:6px;cursor:pointer;font-size:18px;line-height:1}
+.rekenan-note-menu:hover{background:rgba(127,127,127,.13)}
+.rekenan-note-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.rekenan-note-toolbar input{flex:1;min-width:180px}
+.rekenan-note-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 7px;border-radius:999px;background:rgba(16,185,129,.12)}
+@media(max-width:560px){
+  #noteModal .note-editor,.note-modal .note-editor{gap:10px}
+  .rekenan-note-card{padding-right:38px}
+}
+</style>
+
 </head>
 <body class="bg-black text-gray-100 flex justify-center min-h-screen rk-style-pending">
 <script>console.info('[Rekenan BUILD] V202.04 | FAST LOGIN | CRITICAL UI SHELL | NO FIRST-PAINT FLASH');</script>
@@ -9272,8 +9305,27 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                             inserted += Number(result?.data?.rowCount || result?.data?.inserted || 0);
                         }
                     };
+                    const calcAll = Array.isArray(pendingPayload?.calcHistory) && pendingPayload.calcHistory.length
+                        ? pendingPayload.calcHistory : (Array.isArray(calcHistory) ? calcHistory : []);
+                    const notesAll = Array.isArray(pendingPayload?.notes) && pendingPayload.notes.length
+                        ? pendingPayload.notes : (Array.isArray(notesData) ? notesData : []);
+                    const savingsAll = Array.isArray(pendingPayload?.savingsList) && pendingPayload.savingsList.length
+                        ? pendingPayload.savingsList : (Array.isArray(savingsList) ? savingsList : []);
+                    const catShopping = Array.isArray(pendingPayload?.shoppingCategories)
+                        ? pendingPayload.shoppingCategories : (Array.isArray(shoppingCategories) ? shoppingCategories : []);
+                    const catCatatan = pendingPayload?.catatanCategories != null
+                        ? pendingPayload.catatanCategories : (Array.isArray(catatanCategories) ? catatanCategories : []);
+                    // syncImportedBatch supports every Cloud collection. Send all
+                    // available collections, not only TRANSACTION/SHOPPING. This
+                    // prevents import/restore paths from leaving Budget, Notes,
+                    // Calculator or category data local-only.
                     await send(tx, 'transactions');
                     await send(shop, 'shoppingItems');
+                    await send(calcAll, 'calcHistory');
+                    await send(notesAll, 'notes');
+                    await send(savingsAll, 'savingsList');
+                    await send([catShopping], 'shoppingCategories');
+                    await send([catCatatan], 'catatanCategories');
                     writeResult = {success: true, inserted};
                 } catch (err) {
                     customWriteError = err;
@@ -9305,9 +9357,16 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                         .filter(x => String(x?.dataType || 'TRANSACTION').toUpperCase() === 'TRANSACTION')
                         .map(x => String(x?.id || '')));
                     const cloudShopIds = new Set((cloudData.shoppingItems || []).map(x => String(x?.id || '')));
-                    const missing = refs.filter(ref => ref.dataType === 'SHOPPING'
-                        ? !cloudShopIds.has(ref.id)
-                        : !cloudTxIds.has(ref.id));
+                    const cloudCalcIds = new Set((cloudData.calcHistory || []).map(x => String(x?.id || '')));
+                    const cloudNoteIds = new Set((cloudData.notes || []).map(x => String(x?.id || '')));
+                    const cloudSavingsIds = new Set((cloudData.savingsList || []).map(x => String(x?.id || '')));
+                    const missing = refs.filter(ref => {
+                        if (ref.dataType === 'SHOPPING') return !cloudShopIds.has(ref.id);
+                        if (ref.dataType === 'CALC_HISTORY') return !cloudCalcIds.has(ref.id);
+                        if (ref.dataType === 'NOTE') return !cloudNoteIds.has(ref.id);
+                        if (ref.dataType === 'SAVINGS') return !cloudSavingsIds.has(ref.id);
+                        return !cloudTxIds.has(ref.id);
+                    });
                     if (missing.length) {
                         throw new Error(`Verifikasi Sheet gagal: ${missing.length} data CSV belum ditemukan di Cloud.`);
                     }
@@ -13727,4 +13786,29 @@ console.info('[Rekenan BUILD] UI V202.04 | CALCULATOR UNIVERSAL | NO CURRENCY | 
   console.info('[Rekenan BUILD] V202.04 | SINGLE CALCULATOR ROUTE | 1 CAMERA + 1 IMAGE | LEGACY MODAL REMOVED');
 })();
 </script>
+
+<script id="rekenan-note-ui-hooks-v20204">
+(function(){
+  function q(s){return document.querySelector(s)}
+  function bindNoteUI(){
+    var ta=q('#noteContent')||q('#noteText')||q('[name="noteContent"]')||q('[name="content"]');
+    if(ta && !ta.dataset.noteUiBound){
+      ta.dataset.noteUiBound='1';
+      var wrap=ta.parentElement;
+      if(wrap){
+        var c=document.createElement('div');
+        c.className='note-char-count';
+        c.textContent='0/2000';
+        wrap.appendChild(c);
+        var update=function(){c.textContent=(ta.value||'').length+'/2000'};
+        ta.addEventListener('input',update); update();
+      }
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindNoteUI);
+  else bindNoteUI();
+  new MutationObserver(bindNoteUI).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+
 </body></html>
