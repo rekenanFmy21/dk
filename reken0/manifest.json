@@ -1,9 +1,9 @@
 {
   "id": "rekenan-app1-v202.00",
-  "name": "Rekenan V202.07 — APP 1 OWNER",
+  "name": "Rekenan V202.08 — APP 1 OWNER",
   "short_name": "Rekenan Admin",
-  "description": "Rekenan V202.07 — APP 1 Owner/Admin, keuangan, pinjaman, catatan, belanja dan administrasi",
-  "start_url": "./index.html?v=2201",
+  "description": "Rekenan V202.08 — APP 1 Owner/Admin, keuangan, pinjaman, catatan, belanja dan administrasi",
+  "start_url": "./index.html?v=20208",
   "scope": "./",
   "display": "standalone",
   "display_override": [
@@ -33,7 +33,7 @@
     {
       "name": "Belanja",
       "short_name": "Belanja",
-      "url": "./#belanja?v=2201",
+      "url": "./#belanja?v=20208",
       "icons": [
         {
           "src": "./icons/rekenan-admin-192.png",
@@ -45,7 +45,7 @@
     {
       "name": "Catatan",
       "short_name": "Catatan",
-      "url": "./#catatan?v=2201",
+      "url": "./#catatan?v=20208",
       "icons": [
         {
           "src": "./icons/rekenan-admin-192.png",

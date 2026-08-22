@@ -1,9 +1,9 @@
 {
   "id": "rekenan-app2-v202.00",
-  "name": "Rekenan V202.07 — APP 2 USER",
+  "name": "Rekenan V202.08 — APP 2 USER",
   "short_name": "Rekenan User",
-  "description": "Rekenan V202.07 — APP 2 User-only tanpa akses Menu Admin, menggunakan API Rekenan yang sama",
-  "start_url": "./index.html?v=2201",
+  "description": "Rekenan V202.08 — APP 2 User-only tanpa akses Menu Admin, menggunakan API Rekenan yang sama",
+  "start_url": "./index.html?v=20208",
   "scope": "./",
   "display": "standalone",
   "display_override": [
@@ -33,7 +33,7 @@
     {
       "name": "Belanja",
       "short_name": "Belanja",
-      "url": "./#belanja?v=2201",
+      "url": "./#belanja?v=20208",
       "icons": [
         {
           "src": "./icons/rekenan-admin-192.png",
@@ -45,7 +45,7 @@
     {
       "name": "Catatan",
       "short_name": "Catatan",
-      "url": "./#catatan?v=2201",
+      "url": "./#catatan?v=20208",
       "icons": [
         {
           "src": "./icons/rekenan-admin-192.png",
