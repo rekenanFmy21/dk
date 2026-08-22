@@ -2,6 +2,7 @@
 
 <html class="dark" lang="id">
 <head>
+<meta name="rekenan-build-version" content="V202.03">
 <script>
         window.REKENAN_BUILD_VERSION = 'V202.03';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
@@ -8475,7 +8476,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             }
             window.lastAttachmentWarning_ = '';
             const loanFile = document.getElementById('loanAttachment')?.files?.[0];
-            const newLoan = {id: loanRetryId_, nama: activeBorrowerUser.name, jumlah, tenorMonths, tenor: tenorMonths + ' Bulan', catatan, date: normalizeBusinessDateTime_(new Date()), phone: activeBorrowerUser.phone, deviceId: currentDeviceId, kasir: (rkOperatorName_() || activeCloudUser), operatorName: (rkOperatorName_() || activeCloudUser)};
+            const newLoan = {id: loanRetryId_, nama: activeBorrowerUser.name, jumlah, tenorMonths, tenor: tenorMonths + ' Bulan', catatan, date: normalizeBusinessDateTime_(new Date()), phone: activeBorrowerUser.phone, deviceId: currentDeviceId};
             const submitStartedAt = performance.now();
             showLoading(loanFile ? 'Mengajukan pinjaman...' : 'Sedang memproses data...');
             try {
@@ -10479,7 +10480,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     ×
                 </button>
 </div>
-<select id="loanTargetBorrower" class="w-full bg-[#171717] text-white p-3 rounded-xl border border-zinc-700"><option value="">Pilih peminjam (Admin)</option></select><input id="loanNama" type="hidden"/>
+<input id="loanNama" type="hidden"/>
 <input autocomplete="off" class="w-full bg-[#171717] text-white p-3 rounded-xl border border-zinc-700" id="loanJumlah" inputmode="none" onclick="event.preventDefault();openMoneyKeypad('loanJumlah')" oninput="formatCurrencyInput(this)" placeholder="Jumlah pinjaman" readonly="" required=""/>
 <select class="w-full bg-[#171717] text-white p-3 rounded-xl border border-zinc-700" id="loanTenorMonths" onchange="updateLoanTenorDesc()">
 <option value="1">
@@ -13718,4 +13719,4 @@ console.info('[Rekenan BUILD] UI V202.03 | CALCULATOR UNIVERSAL | NO CURRENCY | 
   console.info('[Rekenan BUILD] V202.03 | SINGLE CALCULATOR ROUTE | 1 CAMERA + 1 IMAGE | LEGACY MODAL REMOVED');
 })();
 </script>
-<script>(function(){window.rkOperatorName_=function(){return String(sessionStorage.getItem("rekenan_admin_name")||window.activeCloudUser||"").trim()};window.rkApplyAdminTarget_=function(){var e=document.getElementById("loanTargetBorrower");if(!e||!e.value)return;var b=(window.embeddedAdminBorrowers||[]).find(function(x){return String(x.id||x.username||x.name)===String(e.value)});if(b){window.activeBorrowerUser={id:b.id||b.username||b.name,name:b.name||b.nama||b.username,phone:b.phone||""};document.getElementById("loanNama").value=activeBorrowerUser.name}};var o=window.openLoanModal;if(o)window.openLoanModal=function(){var r=o.apply(this,arguments);setTimeout(function(){var e=document.getElementById("loanTargetBorrower"),a=window.embeddedAdminBorrowers||[];if(e&&a.length){e.innerHTML="<option value="">Pilih peminjam</option>"+a.map(function(b){return "<option value=""+(b.id||b.username||b.name)+"">"+(b.name||b.nama||b.username)+"</option>"}).join("");e.onchange=rkApplyAdminTarget_}},30);return r};var sv=window.saveLoanTransaction;if(sv)window.saveLoanTransaction=function(e){rkApplyAdminTarget_();return sv.apply(this,arguments)}})();</script></body></html>
+</body></html>

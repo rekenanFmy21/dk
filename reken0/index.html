@@ -3,6 +3,7 @@
 <html class="dark" lang="id">
 
 <head>
+<meta name="rekenan-build-version" content="V202.03">
     <script>
         window.REKENAN_BUILD_VERSION = 'V202.03';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
@@ -8902,7 +8903,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             }
             window.lastAttachmentWarning_ = '';
             const loanFile = document.getElementById('loanAttachment')?.files?.[0];
-            const newLoan = {id: loanRetryId_, nama: activeBorrowerUser.name, jumlah, tenorMonths, tenor: tenorMonths + ' Bulan', catatan, date: normalizeBusinessDateTime_(new Date()), phone: activeBorrowerUser.phone, deviceId: currentDeviceId, kasir: (rkOperatorName_() || activeCloudUser), operatorName: (rkOperatorName_() || activeCloudUser)};
+            const newLoan = {id: loanRetryId_, nama: activeBorrowerUser.name, jumlah, tenorMonths, tenor: tenorMonths + ' Bulan', catatan, date: normalizeBusinessDateTime_(new Date()), phone: activeBorrowerUser.phone, deviceId: currentDeviceId};
             const submitStartedAt = performance.now();
             showLoading(loanFile ? 'Mengajukan pinjaman...' : 'Sedang memproses data...');
             try {
