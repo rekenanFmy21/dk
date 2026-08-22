@@ -1,18 +1,14 @@
 {
-  "build": "V202.12",
+  "build": "V202.08",
   "entry": "index.html",
   "canonical": "./",
   "updated": "2026-08-22",
   "features": [
-    "bantuan-user-local-first",
-    "admin-snapshot-version-gate",
-    "cloud-sync-only-when-newer",
-    "cross-app-loan-limit-sync",
-    "incremental-reconciliation-pulse",
+    "admin-user-center-from-limit-list",
+    "admin-user-actions-limit-loan-payment-history",
+    "legacy-admin-verification-menus-hidden",
+    "cross-app-loan-sync-pulse",
     "shared-gas-api",
-    "pwa-cache-version-bump",
-    "admin-user-center-action-fix",
-    "service-worker-hard-version-alignment",
-    "admin-center-runtime-diagnostics"
+    "pwa-cache-version-bump"
   ]
 }

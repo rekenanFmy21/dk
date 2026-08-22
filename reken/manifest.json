@@ -1,9 +1,9 @@
 {
   "id": "rekenan-app2-v202.00",
-  "name": "Rekenan V202.12 — APP 2 USER",
+  "name": "Rekenan V202.08 — APP 2 USER",
   "short_name": "Rekenan User",
-  "description": "Rekenan V202.12 — APP 2 USER, Local-First + Cloud Reconciliation",
-  "start_url": "./index.html?v=20212",
+  "description": "Rekenan V202.08 — APP 2 User-only tanpa akses Menu Admin, menggunakan API Rekenan yang sama",
+  "start_url": "./index.html?v=20208",
   "scope": "./",
   "display": "standalone",
   "display_override": [
