@@ -5629,18 +5629,40 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
     }
   } catch (_) { window.__RK_PRIORITY_LOAN_ACTIVE__ = false; }
 
-  // Belanja/Transaksi/other collections refresh at the same time.
+  // Belanja/Transaksi/other collections: LOCAL-FIRST rule is strict.
+  // Never read Cloud into Local while there is an unsynced local mutation,
+  // because an older Cloud snapshot could overwrite the local change before
+  // the sync worker gets a chance to upload it.
   try {
     if (typeof cloudRequest === 'function') {
-      console.info('[Rekenan STARTUP] CORE TRANSAKSI/BELANJA/LAINNYA READ START');
-      coreTasks.push(Promise.resolve(cloudRequest({
-        action:'getData', username:activeCloudUser, token:cloudToken, forceRefresh:true
-      }, 12000)).then(fresh => {
-        if (fresh?.success || fresh?.status === 'success') {
-          applyCloudData_(fresh.data || fresh, true);
-          console.info('[Rekenan STARTUP] CORE TRANSAKSI/BELANJA/LAINNYA READY');
-        } else console.warn('[Rekenan STARTUP] CORE GENERAL READ FAILED — local retained');
-      }).catch(e => console.warn('[Rekenan STARTUP] CORE GENERAL READ FAILED — local retained', e?.message || e)));
+      const pendingBeforeRead = !!(typeof rkBuildSelectivePayload_ === 'function' && rkBuildSelectivePayload_('all', 0)?.payload);
+      if (pendingBeforeRead && typeof syncDataToCloud === 'function') {
+        console.info('[Rekenan STARTUP] LOCAL-FIRST PENDING DETECTED — SYNC BEFORE CLOUD READ');
+        coreTasks.push(Promise.resolve(syncDataToCloud(true, false, 'all')).then(syncResult => {
+          if (!syncResult?.success) {
+            console.warn('[Rekenan STARTUP] LOCAL-FIRST SYNC FAILED — CLOUD READ SKIPPED; LOCAL RETAINED');
+            return null;
+          }
+          return cloudRequest({action:'getData', username:activeCloudUser, token:cloudToken, forceRefresh:true}, 12000)
+            .then(fresh => {
+              if (fresh?.success || fresh?.status === 'success') {
+                applyCloudData_(fresh.data || fresh, true);
+                console.info('[Rekenan STARTUP] LOCAL-FIRST SYNC + CLOUD READ READY');
+              } else console.warn('[Rekenan STARTUP] CLOUD READ FAILED AFTER SYNC — local retained');
+              return fresh;
+            });
+        }).catch(e => console.warn('[Rekenan STARTUP] LOCAL-FIRST SYNC/READ FAILED — local retained', e?.message || e)));
+      } else {
+        console.info('[Rekenan STARTUP] CORE TRANSAKSI/BELANJA/LAINNYA READ START');
+        coreTasks.push(Promise.resolve(cloudRequest({
+          action:'getData', username:activeCloudUser, token:cloudToken, forceRefresh:true
+        }, 12000)).then(fresh => {
+          if (fresh?.success || fresh?.status === 'success') {
+            applyCloudData_(fresh.data || fresh, true);
+            console.info('[Rekenan STARTUP] CORE TRANSAKSI/BELANJA/LAINNYA READY');
+          } else console.warn('[Rekenan STARTUP] CORE GENERAL READ FAILED — local retained');
+        }).catch(e => console.warn('[Rekenan STARTUP] CORE GENERAL READ FAILED — local retained', e?.message || e)));
+      }
     }
   } catch (_) {}
 
