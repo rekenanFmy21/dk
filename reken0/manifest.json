@@ -1,8 +1,8 @@
 {
   "id": "rekenan-app1-v202.00",
-  "name": "Rekenan V202.04 — APP 1 OWNER",
+  "name": "Rekenan V202.03 — APP 1 OWNER",
   "short_name": "Rekenan Admin",
-  "description": "Rekenan V202.04 — APP 1 Owner/Admin, keuangan, pinjaman, catatan, belanja dan administrasi",
+  "description": "Rekenan V202.03 — APP 1 Owner/Admin, keuangan, pinjaman, catatan, belanja dan administrasi",
   "start_url": "./index.html?v=2201",
   "scope": "./",
   "display": "standalone",
