@@ -1,6 +1,12 @@
 {
-  "build": "V202.04",
+  "build": "V202.05",
   "entry": "index.html",
   "canonical": "./",
-  "updated": "2026-08-22"
+  "updated": "2026-08-22",
+  "features": [
+    "admin-user-list",
+    "admin-assist-mode",
+    "name-cashier-separation",
+    "cross-app-sync"
+  ]
 }
