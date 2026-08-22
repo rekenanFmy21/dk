@@ -10658,13 +10658,13 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         }
 
         function getAdminBorrowerById_(borrowerId) {
-            return (embeddedAdminBorrowers || []).find(b => String(b.id || b.ID || b.userId || b.UserID || b.username || b.Username || '') === String(borrowerId)) || null;
+            return (embeddedAdminBorrowers || []).find(b => String(b.BorrowerId || b.borrowerId || b.id || b.ID || b.userId || b.UserID || b.username || b.Username || '') === String(borrowerId)) || null;
         }
 
         function openAdminUserCenter(borrowerId) {
             const b = getAdminBorrowerById_(borrowerId);
             if (!b) { showToast('Data user tidak ditemukan.', 'error'); return; }
-            const target = {id: String(b.id || b.ID || b.userId || b.UserID || b.username || b.Username || ''), nama: b.nama || b.name || b.Nama || '-', raw: b};
+            const target = {id: String(b.BorrowerId || b.borrowerId || b.id || b.ID || b.userId || b.UserID || b.username || b.Username || ''), nama: b.nama || b.name || b.Nama || '-', raw: b};
             window.selectedTargetUser = b;
             window.adminAssistTarget = b;
             try { localStorage.setItem('rekenan_admin_target_user', JSON.stringify(target)); } catch (_) {}
@@ -14665,7 +14665,7 @@ function operator(){
   return c.name||c.Nama||c.username||c.Username||'Admin';
 }
 function context(u){
-  return {targetUserId:u.id||u.ID||u.userId||u.UserID,targetUsername:u.username||u.Username||'',targetName:u.nama||u.name||u.Nama||u.Name||'',Name:u.nama||u.name||u.Nama||u.Name||'',Nama:u.nama||u.name||u.Nama||u.Name||'',borrowerName:u.nama||u.name||u.Nama||u.Name||'',cashierName:operator(),Kasir:operator(),operatorName:operator(),assistedByAdmin:true};
+  return {targetUserId:u.BorrowerId||u.borrowerId||u.id||u.ID||u.userId||u.UserID,targetUsername:u.username||u.Username||'',targetName:u.nama||u.name||u.Nama||u.Name||'',Name:u.nama||u.name||u.Nama||u.Name||'',Nama:u.nama||u.name||u.Nama||u.Name||'',borrowerName:u.nama||u.name||u.Nama||u.Name||'',cashierName:operator(),Kasir:operator(),operatorName:operator(),assistedByAdmin:true};
 }
 window.rkAdminUserAction_=function(kind,id){
   window.__rkAdminActionActive=true;
