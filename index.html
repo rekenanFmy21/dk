@@ -21,4 +21,87 @@
     .catch(function(){ /* keep folder URL usable if version file is temporarily unavailable */ });
 })();
 </script>
-</head><body style="background:#0d0d0f;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh"><p>Membuka Rekenan V202.01…</p><script>console.info('[Rekenan BUILD] HOST V202.01 -> APP1 OWNER/ADMIN');location.replace('./admin/index.html?v=2201');</script></body></html>
+</head><body style="background:#0d0d0f;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh"><p>Membuka Rekenan V202.01…</p><script>console.info('[Rekenan BUILD] HOST V202.01 -> APP1 OWNER/ADMIN');location.replace('./admin/index.html?v=2201');</script>
+<!-- V202.07 ADMIN USER BUTTON BINDING -->
+<script>
+(function(){
+  function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function bind(){
+    const list=document.getElementById('adminLimitList');
+    if(!list || list.dataset.v20207Bound==="1") return;
+    list.dataset.v20207Bound="1";
+
+    list.addEventListener('click', function(ev){
+      const btn=ev.target.closest('[data-open-admin-user]');
+      if(!btn) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const id=btn.getAttribute('data-open-admin-user');
+      const users=window.embeddedAdminBorrowers || [];
+      const user=users.find(u=>String(u.id||u.ID||u.userId||u.UserID)===String(id));
+      if(!user){
+        if(typeof window.showToast==='function') window.showToast('Data user belum siap. Silakan tunggu sinkronisasi selesai.','error');
+        return;
+      }
+      window.selectedTargetUser=user;
+      window.adminAssistTarget=user;
+      localStorage.setItem('rekenan_admin_target_user',JSON.stringify({
+        id:String(user.id||user.ID||user.userId||user.UserID||''),
+        nama:user.nama||user.name||user.Nama||user.Name||'-',
+        selectedAt:Date.now()
+      }));
+
+      const panel=document.getElementById('adminUserCenter');
+      const title=document.getElementById('adminUserCenterTitle');
+      const meta=document.getElementById('adminUserCenterMeta');
+      if(panel){
+        panel.classList.remove('hidden');
+        if(title) title.textContent='👤 '+(user.nama||user.name||user.Nama||user.Name||'-');
+        if(meta) meta.textContent='UserID: '+id;
+        panel.scrollIntoView({behavior:'smooth',block:'center'});
+      } else if(typeof window.openAdminUserCenter==='function'){
+        window.openAdminUserCenter(id);
+      }
+    });
+  }
+
+  // Works even when the Atur Limit list is rendered/re-rendered asynchronously.
+  const originalRender=window.renderAdminLimitList;
+  if(typeof originalRender==='function' && !originalRender.__v20207Wrapped){
+    const wrapped=function(){
+      const out=originalRender.apply(this,arguments);
+      setTimeout(function(){
+        const list=document.getElementById('adminLimitList');
+        if(!list) return;
+        [...list.querySelectorAll('button')].forEach(function(b){
+          const onclick=b.getAttribute('onclick')||'';
+          if(onclick.includes('saveAdminBorrowerLimit') && !b.parentElement.querySelector('[data-open-admin-user]')){
+            const m=onclick.match(/saveAdminBorrowerLimit\('([^']+)'\)/);
+            if(m){
+              const x=document.createElement('button');
+              x.type='button';
+              x.setAttribute('data-open-admin-user',m[1]);
+              x.className='bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3 rounded-xl text-sm font-bold';
+              x.textContent='Buka User';
+              b.insertAdjacentElement('afterend',x);
+            }
+          }
+        });
+        bind();
+      },0);
+      return out;
+    };
+    wrapped.__v20207Wrapped=true;
+    window.renderAdminLimitList=wrapped;
+  }
+
+  document.addEventListener('DOMContentLoaded',function(){
+    bind();
+    setTimeout(bind,500);
+    setTimeout(bind,1500);
+  });
+})();
+</script>
+
+</body></html>

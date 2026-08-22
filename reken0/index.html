@@ -10496,7 +10496,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                     <div class="flex gap-2">
                         <input id="adminLimit_${id}" inputmode="none" readonly onclick="openLimitKeypad('${id}')" value="${new Intl.NumberFormat('id-ID').format(base)}" class="flex-1 bg-[#111111] text-white text-sm px-3 py-3 rounded-xl border border-zinc-700 outline-none focus:border-teal-500 cursor-pointer" aria-label="Limit ${name}">
                         <button onclick="saveAdminBorrowerLimit('${id}')" class="bg-teal-600 hover:bg-teal-500 text-white px-4 py-3 rounded-xl text-sm font-bold">Simpan</button>
-                        <button type="button" data-admin-open-user="${id}" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3 rounded-xl text-sm font-bold">Buka User</button>
+                        <button onclick="openAdminUserCenter('${id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3 rounded-xl text-sm font-bold">Buka User</button>
                     </div>
                 </div>`;
             }).join('');
@@ -10509,27 +10509,21 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
 
         function openAdminUserCenter(borrowerId) {
             const b = getAdminBorrowerById_(borrowerId);
-            if (!b) { showToast('Data user tidak ditemukan. Refresh data Admin lalu coba lagi.', 'error'); return false; }
-            const target = { id: String(b.id || b.ID || ''), nama: b.nama || b.name || '-', raw: b };
+            if (!b) { showToast('Data user tidak ditemukan.', 'error'); return; }
+            const target = {
+                id: String(b.id || b.ID || ''),
+                nama: b.nama || b.name || '-',
+                raw: b
+            };
             window.selectedTargetUser = b;
             window.adminAssistTarget = b;
-            try { localStorage.setItem('rekenan_admin_target_user', JSON.stringify(target)); } catch (_) {}
-            const panel = document.getElementById('adminUserCenter');
-            const title = document.getElementById('adminUserCenterTitle');
-            const meta = document.getElementById('adminUserCenterMeta');
-            if (!panel || !title || !meta) {
-                console.error('[Rekenan ADMIN] USER CENTER DOM missing');
-                showToast('Panel Data User belum siap. Silakan buka ulang menu Admin.', 'error');
-                return false;
-            }
-            title.textContent = '👤 ' + target.nama;
-            const op = window.activeCloudUser || {};
-            meta.textContent = 'UserID: ' + target.id + ' • Operator: ' + (op.nama || op.name || op.username || 'Admin');
-            panel.classList.remove('hidden');
-            panel.style.display = 'block';
-            panel.scrollIntoView({behavior:'smooth',block:'start'});
-            console.info('[Rekenan ADMIN] USER SELECTED', {id:target.id,nama:target.nama});
-            return true;
+            localStorage.setItem('rekenan_admin_target_user', JSON.stringify(target));
+            document.getElementById('adminUserCenterTitle').textContent = '👤 ' + target.nama;
+            document.getElementById('adminUserCenterMeta').textContent =
+                'UserID: ' + target.id + ' • Operator: ' +
+                (activeCloudUser?.nama || activeCloudUser?.name || activeCloudUser?.username || 'Admin');
+            document.getElementById('adminUserCenter').classList.remove('hidden');
+            document.getElementById('adminUserCenter').scrollIntoView({behavior:'smooth',block:'start'});
         }
 
         function adminAssistContext_() {
@@ -10562,11 +10556,11 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             // Use the application's existing navigation/forms where available.
             if (kind === 'loan') {
                 if (typeof showLoanForm === 'function') return showLoanForm(ctx);
-                if (typeof switchTab === 'function') return switchTab('pinjaman'); document.querySelector('#nav-pinjaman, [data-menu="pinjaman"], #navPinjaman, #menuPinjaman')?.click();
+                document.querySelector('[data-menu="pinjaman"], #navPinjaman, #menuPinjaman')?.click();
             }
             if (kind === 'payment') {
                 if (typeof openPaymentModal === 'function') return openPaymentModal(ctx);
-                if (typeof switchTab === 'function') return switchTab('pinjaman'); document.querySelector('#nav-pinjaman, [data-menu="pinjaman"], #navPinjaman, #menuPinjaman')?.click();
+                document.querySelector('[data-menu="pinjaman"], #navPinjaman, #menuPinjaman')?.click();
             }
             if (kind === 'history') {
                 const rows = (embeddedAdminLoans || []).filter(x => String(x.borrowerId || x.userId || x.idPeminjam || '') === ctx.targetUserId || String(x.nama || '').toLowerCase() === String(ctx.Nama).toLowerCase());
@@ -10574,20 +10568,6 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 document.getElementById('adminLoanList')?.scrollIntoView({behavior:'smooth',block:'start'});
             }
         }
-
-
-        // V202.07: reliable Admin Data User button handler.
-        document.addEventListener('click', function(e) {
-            const btn = e.target && e.target.closest ? e.target.closest('[data-admin-open-user]') : null;
-            if (!btn) return;
-            e.preventDefault();
-            e.stopPropagation();
-            const id = btn.getAttribute('data-admin-open-user');
-            console.info('[Rekenan ADMIN] OPEN USER CLICK', {id});
-            openAdminUserCenter(id);
-        });
-        window.openAdminUserCenter = openAdminUserCenter;
-        window.adminUserCenterAction = adminUserCenterAction;
 
         function escAdminText_(v) {
             return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
