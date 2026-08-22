@@ -1,5 +1,5 @@
 {
-  "build": "V202.13",
+  "build": "V202.12",
   "entry": "index.html",
   "canonical": "./",
   "updated": "2026-08-22",
@@ -13,9 +13,6 @@
     "pwa-cache-version-bump",
     "admin-user-center-action-fix",
     "service-worker-hard-version-alignment",
-    "admin-center-runtime-diagnostics",
-    "admin-user-center-event-delegation",
-    "canonical-user-id-resolution",
-    "cross-app-broadcast-refresh"
+    "admin-center-runtime-diagnostics"
   ]
 }
