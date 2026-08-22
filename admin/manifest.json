@@ -3,7 +3,7 @@
   "name": "Rekenan V201.21",
   "short_name": "Rekenan",
   "description": "Rekenan V201.21 — keuangan, pinjaman, catatan, belanja dan administrasi",
-  "start_url": "./index.html?v=2121",
+  "start_url": "./index.html?v=2122",
   "scope": "./",
   "display": "standalone",
   "display_override": [
