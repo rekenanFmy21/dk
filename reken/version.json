@@ -1,8 +1,8 @@
 {
-  "build": "V202.12",
+  "build": "V202.13",
   "entry": "index.html",
   "canonical": "./",
-  "updated": "2026-08-22",
+  "updated": "2026-08-24",
   "features": [
     "bantuan-user-local-first",
     "admin-snapshot-version-gate",
@@ -13,6 +13,9 @@
     "pwa-cache-version-bump",
     "admin-user-center-action-fix",
     "service-worker-hard-version-alignment",
-    "admin-center-runtime-diagnostics"
+    "admin-center-runtime-diagnostics",
+    "reset-cloud-verified",
+    "category-reset-local-cloud",
+    "sync-baseline-invalidation"
   ]
 }
