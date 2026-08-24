@@ -2,19 +2,19 @@
 
 <html class="dark" lang="id">
 <head>
-<meta name="rekenan-build-version" content="V202.12">
+<meta name="rekenan-build-version" content="V202.13">
 <script>
-        window.REKENAN_BUILD_VERSION = 'V202.12';
+        window.REKENAN_BUILD_VERSION = 'V202.13';
         window.rkFormatNumber_ = function (n) {const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat('id-ID', {maximumFractionDigits: 10}).format(num);};
-        // V202.12: calculator is universal; never attach a currency symbol.
+        // V202.13: calculator is universal; never attach a currency symbol.
         window.rkCalcFormatUniversal_ = function (n) { const num = Number(n); if (!Number.isFinite(num)) throw new Error('Hasil tidak valid.'); return new Intl.NumberFormat(undefined, {maximumFractionDigits: 10}).format(num); };
         window.v109Fmt = window.rkCalcFormatUniversal_;
-        window.REKENAN_UI_BUILD = 'V202.12';
-        console.info('[Rekenan BUILD] UI V202.12');
-        console.info('[Rekenan BUILD] V202.12 DUAL-APP CROSS-SYNC + UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
+        window.REKENAN_UI_BUILD = 'V202.13';
+        console.info('[Rekenan BUILD] UI V202.13');
+        console.info('[Rekenan BUILD] V202.13 DUAL-APP CROSS-SYNC + UNIVERSAL LOCAL-FIRST + ALL-MENU LOCAL COMMIT + AUTO-ONLINE QUEUE + SINGLE WORKER + VERIFIED ADMIN CRUD + DELETE TOMBSTONES + LOAN PAYMENT ONLY + ADMIN AUTHORITATIVE CRUD');
         (function () {
             try {
-                const expected = 'V202.12';
+                const expected = 'V202.13';
                 const key = 'rekenan_expected_build';
                 const current = document.querySelector('meta[name="rekenan-build"]')?.content || expected;
                 localStorage.setItem(key, expected);
@@ -23,7 +23,7 @@
             } catch (e) {console.warn('[Rekenan DEPLOY] gate warning', e);}
         })();
     </script>
-<meta content="V202.12" name="rekenan-build"/>
+<meta content="V202.13" name="rekenan-build"/>
 <!-- REKENAN V146 CLEAN: consolidated Note/Kalkulator, no global MutationObserver, no UI polling. -->
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -37,7 +37,7 @@
 <title>
         Rekenan • Keuangan &amp; Pinjaman
     </title>
-<!-- V202.12 CRITICAL CSS: login and shell geometry must render correctly before Tailwind arrives. -->
+<!-- V202.13 CRITICAL CSS: login and shell geometry must render correctly before Tailwind arrives. -->
 <style id="rekenan-v20120-critical">
       html,body{margin:0;padding:0;min-height:100%;background:#0d0d0f;color:#fff;font-family:Arial,sans-serif;}
       body{overflow-x:hidden;}
@@ -58,7 +58,7 @@
       .rk-auth-fallback p{margin:4px 0;color:#a1a1aa;font-size:12px;}
       @media(min-width:1100px){.mobile-container{padding-left:220px;box-sizing:border-box;}.mobile-container>nav.fixed.bottom-0{left:220px!important;width:calc(100% - 220px)!important;}.mobile-container>main{max-width:1500px;margin:0 auto;width:100%;}}
     </style>
-<!-- V202.12: non-blocking vendor boot. Login must paint before remote libraries finish. -->
+<!-- V202.13: non-blocking vendor boot. Login must paint before remote libraries finish. -->
 <script>
         window.tailwind = window.tailwind || {};
         window.tailwind.config = {
@@ -73,7 +73,7 @@
 <!-- Google Fonts: Plus Jakarta Sans -->
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <style id="rekenan-v20120-login-critical">
-/* V202.12: fully standalone LOGIN shell. It must not depend on Tailwind/FONTAWESOME/Google Fonts for first paint. */
+/* V202.13: fully standalone LOGIN shell. It must not depend on Tailwind/FONTAWESOME/Google Fonts for first paint. */
 html,body{margin:0!important;padding:0!important;min-height:100%!important;background:#0d0d0f!important;color:#fff!important;}
 body{overflow-x:hidden!important;}
 .mobile-container{width:100%!important;min-height:100vh!important;display:flex!important;flex-direction:column!important;position:relative!important;}
@@ -105,9 +105,9 @@ body{overflow-x:hidden!important;}
 <style id="rekenan-v20120-login-critical">
         /* Paint the login shell immediately; heavy app/vendor work may finish later. */
         #authModal{display:flex;min-height:100dvh;background:#0d0d0f;color:#fff;}
-        /* V202.12: authModal lives inside .mobile-container, so the shell itself must remain mounted. */
+        /* V202.13: authModal lives inside .mobile-container, so the shell itself must remain mounted. */
         .mobile-container{display:flex;visibility:visible;opacity:1;}
-        /* V202.12: login stays visible; app chrome stays hidden until the full style layer is ready. */
+        /* V202.13: login stays visible; app chrome stays hidden until the full style layer is ready. */
         body:not(.rk-authenticated) .mobile-container>header,
         body:not(.rk-authenticated) .mobile-container>main,
         body:not(.rk-authenticated) .mobile-container>nav{visibility:hidden!important;pointer-events:none!important;}
@@ -2874,7 +2874,7 @@ nav.fixed.bottom-0 {
 }
 </style>
 <style id="rekenan-v20105-calculator-route">
-/* V202.12: Calculator is a REAL ROUTE. No fixed overlay, no viewport-trapped panel, one app-shell scroll. */
+/* V202.13: Calculator is a REAL ROUTE. No fixed overlay, no viewport-trapped panel, one app-shell scroll. */
 #tab-kalkulator{display:none!important;width:100%!important;max-width:none!important;min-width:0!important;overflow:visible!important;transform:none!important}
 #tab-kalkulator.active{display:block!important;opacity:1!important;visibility:visible!important;height:auto!important;min-height:0!important;overflow:visible!important}
 .rk-calc-route-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
@@ -2966,9 +2966,9 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20108-authoritative-fix">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V202.12';
-  window.REKENAN_CALCULATOR_BUILD='V202.12';
-  console.info('[Rekenan BUILD] V202.12 | DESKTOP AUTO SIDEBAR | CALCULATOR PHOTO NO-OVERLAP');
+  window.REKENAN_UI_BUILD='V202.13';
+  window.REKENAN_CALCULATOR_BUILD='V202.13';
+  console.info('[Rekenan BUILD] V202.13 | DESKTOP AUTO SIDEBAR | CALCULATOR PHOTO NO-OVERLAP');
 
   function dedupeCalculatorPhotoUI_(){
     try{
@@ -3006,8 +3006,8 @@ nav.fixed.bottom-0 {
           }
         });
       }
-      console.info('[Rekenan CALC] V202.12 PHOTO AUDIT', {photoTools:1,cameraButtons:keep.querySelectorAll('label.rk-calc-photo-btn').length,viewButtons:keep.querySelectorAll('#v201CalcPhotoViewBtn').length});
-    }catch(e){console.warn('[Rekenan CALC] V202.12 PHOTO DEDUPE FAILED',e);}
+      console.info('[Rekenan CALC] V202.13 PHOTO AUDIT', {photoTools:1,cameraButtons:keep.querySelectorAll('label.rk-calc-photo-btn').length,viewButtons:keep.querySelectorAll('#v201CalcPhotoViewBtn').length});
+    }catch(e){console.warn('[Rekenan CALC] V202.13 PHOTO DEDUPE FAILED',e);}
   }
   function removeLegacyCalculatorOverlay_(){
     try{
@@ -3018,11 +3018,11 @@ nav.fixed.bottom-0 {
   function boot_(){dedupeCalculatorPhotoUI_();removeLegacyCalculatorOverlay_();}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ if(window.__RK_AUTHENTICATED__ !== true) return; boot_(); },{once:true}); else if(window.__RK_AUTHENTICATED__ === true) boot_();
   window.addEventListener('resize',function(){ if(window.__RK_AUTHENTICATED__ !== true) return; clearTimeout(window.__rkV208Resize);window.__rkV208Resize=setTimeout(function(){boot_();},120);});
-  /* V202.12: calculator photo normalization is explicit, no MutationObserver loop. */
+  /* V202.13: calculator photo normalization is explicit, no MutationObserver loop. */
 })();
 </script>
 <style id="rekenan-v20110-photo-no-overlap">
-/* V202.12: Calculator photo controls have one isolated flex row. */
+/* V202.13: Calculator photo controls have one isolated flex row. */
 #tab-kalkulator .rk-calc-photo-tools{
   position:relative!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;
   gap:10px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;overflow:visible!important;
@@ -3044,9 +3044,9 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20110-photo-dedup">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V202.12';
-  window.REKENAN_CALCULATOR_BUILD='V202.12';
-  console.info('[Rekenan BUILD] V202.12 | CALCULATOR PHOTO NO-OVERLAP');
+  window.REKENAN_UI_BUILD='V202.13';
+  window.REKENAN_CALCULATOR_BUILD='V202.13';
+  console.info('[Rekenan BUILD] V202.13 | CALCULATOR PHOTO NO-OVERLAP');
   function normalizeCalcPhoto_(){
     const tab=document.getElementById('tab-kalkulator'); if(!tab) return;
     const rows=[...tab.querySelectorAll('.rk-calc-photo-tools')];
@@ -3072,7 +3072,7 @@ nav.fixed.bottom-0 {
     const tab=document.getElementById('tab-kalkulator');
     const row=tab?.querySelector('.rk-calc-photo-tools');
     const out={photoRows:tab?.querySelectorAll('.rk-calc-photo-tools').length||0,cameraButtons:row?.querySelectorAll('label.rk-calc-photo-btn').length||0,viewButtons:row?.querySelectorAll('#v201CalcPhotoViewBtn').length||0};
-    console.info('[Rekenan AUDIT] CALC PHOTO V202.12',out); return out;
+    console.info('[Rekenan AUDIT] CALC PHOTO V202.13',out); return out;
   };
   function boot(){normalizeCalcPhoto_();window.rekenanCalcPhotoAuditV20110();}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
@@ -3082,9 +3082,9 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20113-login-boot">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V202.12';
+  window.REKENAN_UI_BUILD='V202.13';
   window.__RK_LOGIN_PAINTED_AT__=performance.now();
-  console.info('[Rekenan STARTUP] V202.12 FAST LOGIN + CRITICAL SHELL + STYLE-GATED APP REVEAL — no layout flash / no global photo observers');
+  console.info('[Rekenan STARTUP] V202.13 FAST LOGIN + CRITICAL SHELL + STYLE-GATED APP REVEAL — no layout flash / no global photo observers');
   function utilitiesReady_(){
     try{
       const probe=document.createElement('div'); probe.className='hidden'; probe.style.position='absolute'; probe.style.pointerEvents='none';
@@ -3096,7 +3096,7 @@ nav.fixed.bottom-0 {
     try{
       document.body.classList.add('rk-ui-ready','rk-app-ready');
       const app=document.getElementById('appView'); if(app) app.classList.remove('rk-awaiting-css');
-      console.info('[Rekenan STARTUP] V202.12 UI STYLE GATE OPEN');
+      console.info('[Rekenan STARTUP] V202.13 UI STYLE GATE OPEN');
     }catch(_){}
   }
   let styleReady_=false;
@@ -3133,13 +3133,13 @@ nav.fixed.bottom-0 {
 })();
 </script>
 <style id="rekenan-v20120-stability">
-/* V202.12: structural stability while Tailwind hydrates. */
+/* V202.13: structural stability while Tailwind hydrates. */
 html,body{min-height:100%;}
 .mobile-container{min-width:0;}
 #tab-belanja,#tab-kalkulator,#tab-peminjam,#tab-admin,#tab-catatan,#tab-dashboard{min-width:0;}
 </style>
 <style id="rk-v20120-handoff">
-/* V202.12: Login/app handoff uses the real DOM. CSS never depends on Tailwind. */
+/* V202.13: Login/app handoff uses the real DOM. CSS never depends on Tailwind. */
 body.rk-style-pending .mobile-container{visibility:visible!important;opacity:1!important;}
 body.rk-authenticated .mobile-container{visibility:visible!important;opacity:1!important;}
 body.rk-authenticated #authModal{display:none!important;}
@@ -3170,7 +3170,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
 </script>
 </head>
 <body class="bg-black text-gray-100 flex justify-center min-h-screen rk-style-pending">
-<script>console.info('[Rekenan BUILD] V202.12 | FAST LOGIN | CRITICAL UI SHELL | NO FIRST-PAINT FLASH');</script>
+<script>console.info('[Rekenan BUILD] V202.13 | FAST LOGIN | CRITICAL UI SHELL | NO FIRST-PAINT FLASH');</script>
 <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] hidden items-center justify-center p-6" id="globalLoadingOverlay">
 <div class="bg-[#1e1e1e] border border-zinc-700 rounded-3xl px-6 py-5 text-center shadow-2xl min-w-[220px]">
 <div class="w-10 h-10 border-4 border-zinc-700 border-t-indigo-500 rounded-full animate-spin mx-auto mb-3">
@@ -3886,7 +3886,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
 <div class="text-xs text-zinc-400 font-semibold">Kalkulator</div>
 <div class="text-lg font-black text-white">Kalkulator Transaksi</div>
 </div>
-<div class="rk-calc-route-badge"><i class="fa-solid fa-calculator"></i> V202.12</div>
+<div class="rk-calc-route-badge"><i class="fa-solid fa-calculator"></i> V202.13</div>
 </div>
 <div class="rk-calc-route-grid">
 <section class="rk-calc-main-card">
@@ -4206,8 +4206,8 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         });
 
         window.REKENAN_PWA_HOST = true;
-        window.REKENAN_RELEASE = 'REKENAN_DUAL_APP_ONE_API_V202.12';
-        window.REKENAN_RELEASE = 'REKENAN_DUAL_APP_ONE_API_V202.12';
+        window.REKENAN_RELEASE = 'REKENAN_DUAL_APP_ONE_API_V202.13';
+        window.REKENAN_RELEASE = 'REKENAN_DUAL_APP_ONE_API_V202.13';
         window.REKENAN_PWA_APP = 'user';
         window.REKENAN_APP_ID = 'APP2_USER';
         window.REKENAN_USER_ONLY = true;
@@ -4219,7 +4219,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         // normal cross-origin GAS response without CORS.
         const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzxJsEQpMSYs9CmQ8_G3yHYEzwe2IZfJBIGxU5s_FYdMGGFx8HHwfx-7QHCKN80qsb3ag/exec';
         const API_VERSION = 'V200.90-LOCAL-FIRST-CACHED-AUTH-FAST';
-        window.REKENAN_SERVER_BUILD = 'V202.12';
+        window.REKENAN_SERVER_BUILD = 'V202.13';
         console.info('[Rekenan BUILD] CLIENT V200.90 / SERVER API COMPATIBLE');
         function normalizeGasUrl_(value) {
             let u = String(value || '').trim();
@@ -4615,10 +4615,24 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         }
         shoppingCategories = normalizeShoppingCategories_(shoppingCategories);
 
+        const DEFAULT_CATATAN_CATEGORIES = {
+            pengeluaran: ['Makanan & Minuman', 'Transportasi', 'Belanja Bulanan', 'Tagihan & Utilitas', 'Hiburan', 'Lainnya'],
+            pemasukan: ['Gaji', 'Bonus', 'Hasil Usaha', 'Investasi', 'Budget Kebutuhan', 'Budget Keinginan', 'Lainnya']
+        };
+        function normalizeCatatanCategories_(value) {
+            const src = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+            const clean = key => {
+                const arr = Array.isArray(src[key]) ? src[key].map(v => String(v || '').trim()).filter(Boolean) : [];
+                return arr.length ? [...new Set(arr)] : DEFAULT_CATATAN_CATEGORIES[key].slice();
+            };
+            return {pengeluaran: clean('pengeluaran'), pemasukan: clean('pemasukan')};
+        }
+
         let catatanCategories = secureLoad('rekenan_catatan_categories', {
             pengeluaran: ["Makanan & Minuman", "Transportasi", "Belanja Bulanan", "Tagihan & Utilitas", "Hiburan", "Lainnya"],
             pemasukan: ["Gaji", "Bonus", "Hasil Usaha", "Investasi", "Budget Kebutuhan", "Budget Keinginan", "Lainnya"]
         });
+        catatanCategories = normalizeCatatanCategories_(catatanCategories);
 
         let loansData = secureLoad('rekenan_loans', []);
         let riwayatCicilanData = secureLoad('rekenan_riwayat_cicilan', []);
@@ -4708,7 +4722,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
             return false;
         }
 
-        /* V202.12: restore the global toast API required by login and legacy actions. */
+        /* V202.13: restore the global toast API required by login and legacy actions. */
         (function installRekenanToast_(){
             if (typeof window.showToast === 'function') return;
             function ensureStack_(){
@@ -4740,7 +4754,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
                     setTimeout(()=>{try{toast.style.opacity='0';toast.style.transform='translateY(-8px)';setTimeout(()=>toast.remove(),250);}catch(_){toast.remove?.();}},2600);
                 }catch(err){ console.warn('[Rekenan TOAST] '+String(message??''),err); }
             };
-            console.info('[Rekenan BUILD] V202.12 GLOBAL TOAST API READY');
+            console.info('[Rekenan BUILD] V202.13 GLOBAL TOAST API READY');
         })();
 
         async function handleCloudAuth(action, e) {
@@ -4798,7 +4812,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
                     }
                 } else if (action === 'login') {
                     if (result.status === 'success' || result.success || result.data) {
-                        // V202.12 LOGIN FAST-PATH: authentication success must open the app immediately.
+                        // V202.13 LOGIN FAST-PATH: authentication success must open the app immediately.
                         // CSV reconciliation, getData, merge, and rendering are background-only.
                         activeBorrowerUser = null;
                         loansData = [];
@@ -4820,7 +4834,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
                         checkCloudAuthModalState();
                         rkEnterAfterLogin_();
                         showToast("Login berhasil!", "success");
-                        console.info('[Rekenan AUTH] V202.12 LOGIN SUCCESS → APP ENTER IMMEDIATELY');
+                        console.info('[Rekenan AUTH] V202.13 LOGIN SUCCESS → APP ENTER IMMEDIATELY');
 
                         setTimeout(() => {
                             (async () => {
@@ -4970,7 +4984,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
             }
             if (data.masterItems !== undefined) { masterItems = data.masterItems; if (persist) secureSave('rekenan_master_items', masterItems); }
             if (data.shoppingCategories !== undefined) { shoppingCategories = normalizeShoppingCategories_(data.shoppingCategories); if (persist) secureSave('rekenan_shopping_categories', shoppingCategories); }
-            if (data.catatanCategories !== undefined) { catatanCategories = data.catatanCategories; if (persist) secureSave('rekenan_catatan_categories', catatanCategories); }
+            if (data.catatanCategories !== undefined) { catatanCategories = normalizeCatatanCategories_(data.catatanCategories); if (persist) secureSave('rekenan_catatan_categories', catatanCategories); }
 
             console.info('[Rekenan LOCAL-FIRST] CLOUD MERGE COMPLETE', {
                 transactions: Array.isArray(transactions) ? transactions.length : 0,
@@ -4980,7 +4994,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
                 savingsList: Array.isArray(savingsList) ? savingsList.length : 0
             });
 
-            // V202.12: the first Belanja paint used to happen before the Cloud
+            // V202.13: the first Belanja paint used to happen before the Cloud
             // merge completed. When Belanja was the initial tab, the container
             // therefore stayed empty until the user switched tabs and came back.
             // Repaint the currently visible data view immediately after merge.
@@ -5090,7 +5104,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         // renderAll_ ini sengaja defensif: setiap renderer dijalankan terpisah,
         // sehingga satu menu yang tidak sedang tersedia tidak menghentikan proses
         // import/sync Cloud.
-        // V202.12: FILTER-FIRST RENDER GUARD
+        // V202.13: FILTER-FIRST RENDER GUARD
         // The first Local-First paint can happen before transaction data arrives.
         // In that window the date inputs used by Catatan/Dashboard were empty, so
         // the renderer interpreted the state as "Semua" and briefly showed all rows.
@@ -5215,7 +5229,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
             localStorage.setItem('rekenan_active_tab', tabId);
             document.querySelector('.mobile-container')?.scrollTo({top: 0, behavior: 'auto'});
 
-            // V202.12: Kalkulator is a normal tab route. It never opens a fixed overlay.
+            // V202.13: Kalkulator is a normal tab route. It never opens a fixed overlay.
             if (tabId === 'kalkulator') {
                 try {
                     if (typeof window.renderV201CalculatorRoute === 'function') window.renderV201CalculatorRoute();
@@ -5572,7 +5586,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         function registerRekenanPWA_() {
             try {
                 if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-                navigator.serviceWorker.register('./sw.js?v=20212', {scope: './', updateViaCache: 'none'})
+                navigator.serviceWorker.register('./sw.js?v=20213', {scope: './', updateViaCache: 'none'})
                     .then(function (registration) {
                         console.info('[Rekenan PWA] Local Service Worker registered:', registration.scope);
                         try {registration.update();} catch (_) { }
@@ -5600,9 +5614,9 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
     if(modal) modal.style.display='none';
     const app=document.querySelector('.mobile-container');
     if(app){ app.style.visibility='visible'; app.style.opacity='1'; }
-    console.log('[Rekenan STARTUP] V202.12 LOGIN HANDOFF — waiting for UI style gate');
+    console.log('[Rekenan STARTUP] V202.13 LOGIN HANDOFF — waiting for UI style gate');
     if(window.__rkRevealAfterAuth_) window.__rkRevealAfterAuth_();
-  }catch(e){ console.error('[Rekenan STARTUP] V202.12 HANDOFF ERROR',e); }
+  }catch(e){ console.error('[Rekenan STARTUP] V202.13 HANDOFF ERROR',e); }
 }
 
         let rkStartupCloudRestoreInFlight_ = false;
@@ -5629,10 +5643,10 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         }
 
         async function rkPriorityStartupSync_() {
-  // V202.12: USER-FIRST startup. Admin is never a startup gate.
+  // V202.13: USER-FIRST startup. Admin is never a startup gate.
   window.__RK_STRICT_PRIORITY_STARTUP__ = false;
   window.__RK_STARTUP_V201_00__ = true;
-  console.info('[Rekenan STARTUP] V202.12 USER-FIRST — BELANJA/TRANSAKSI + PINJAMAN/CICILAN + LAINNYA FIRST; ADMIN BACKGROUND');
+  console.info('[Rekenan STARTUP] V202.13 USER-FIRST — BELANJA/TRANSAKSI + PINJAMAN/CICILAN + LAINNYA FIRST; ADMIN BACKGROUND');
 
   // Paint local state immediately.
   try { if (typeof rkLoadAllLocalData_ === 'function') rkLoadAllLocalData_(); } catch (_) {}
@@ -6132,7 +6146,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
         }
 
         function renderCatatanList() {
-            // V202.12: never interpret an uninitialized date range as "Semua".
+            // V202.13: never interpret an uninitialized date range as "Semua".
             try { rkEnsureInitialPeriodFilters_(); } catch (_) {}
             const searchInput = document.getElementById('catatanSearchInput');
             const searchKeyword = searchInput ? String(searchInput.value || '').toLowerCase() : '';
@@ -6251,7 +6265,7 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
 
         // Sinkronisasi mengambil snapshot agar request yang sedang berjalan
         // tidak membaca array yang sudah berubah oleh aksi berikutnya.
-        // V202.12: notify the sibling app after every verified Cloud mutation.
+        // V202.13: notify the sibling app after every verified Cloud mutation.
         // BroadcastChannel is instant when both apps are open; localStorage is the fallback.
         const RK_DUAL_APP_SYNC_CHANNEL_ = 'rekenan-dual-app-sync-v202';
         function rkBroadcastDualAppSync_(scope) {
@@ -6271,10 +6285,10 @@ body:not(.rk-authenticated) #authModal{display:flex!important;}
             try {
                 const fresh = await cloudRequest({action:'getData', username:activeCloudUser, token:cloudToken, forceRefresh:true}, 12000);
                 if (fresh?.success || fresh?.status === 'success') {
-                    applyCloudData(fresh.data || fresh.result?.data || fresh.result || fresh);
-                    console.info('[Rekenan V202.12] DUAL APP REFRESH OK', msg.scope);
+                    applyCloudData_(fresh.data || fresh.result?.data || fresh.result || fresh, true);
+                    console.info('[Rekenan V202.13] DUAL APP REFRESH OK', msg.scope);
                 }
-            } catch (e) { console.warn('[Rekenan V202.12] DUAL APP REFRESH DEFERRED', e?.message || e); }
+            } catch (e) { console.warn('[Rekenan V202.13] DUAL APP REFRESH DEFERRED', e?.message || e); }
         }
         try {
             if (window.BroadcastChannel) {
@@ -7684,6 +7698,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             if (!container) return;
             let html = '';
             ['pengeluaran', 'pemasukan'].forEach(type => {
+                catatanCategories = normalizeCatatanCategories_(catatanCategories);
                 let cats = catatanCategories[type] || [];
                 cats.forEach((cat, idx) => {
                     html += `
@@ -7698,24 +7713,60 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         }
 
         async function rkCommitCategoryCloud_(label) {
-            // Kategori: local-first, tetapi bila Cloud aktif/online langsung commit dan verifikasi.
-            // Jika offline/gagal, perubahan tetap lokal dan masuk antrean.
+            // V202.13 CATEGORY HARD COMMIT:
+            // Kategori tidak boleh hanya dianggap sukses karena worker sedang berjalan.
+            // Jika ada sync lain yang sedang in-flight, jalankan satu pass lagi setelahnya,
+            // lalu baca kembali Cloud dan cocokkan kategori yang benar-benar tersimpan.
             if (!navigator.onLine || !activeCloudUser || !cloudToken) {
                 rkMarkSyncPending_();
                 return {success:false, queued:true};
             }
-            const result = await syncDataToCloud(true, false, 'data');
-            if (!result || result.success !== true) {
+            let lastResult = null;
+            for (let attempt = 0; attempt < 2; attempt++) {
+                lastResult = await syncDataToCloud(true, false, 'data');
+                if (!lastResult || lastResult.success !== true) {
+                    rkMarkSyncPending_();
+                    throw (lastResult && lastResult.error) || new Error('Cloud belum menerima perubahan kategori.');
+                }
+                // Setelah worker selesai, jalankan pass kedua bila masih ada perubahan
+                // kategori yang tertinggal karena request sebelumnya sudah lebih dulu dibuat.
+                const fresh = await cloudRequest({action:'getData', username:activeCloudUser, token:cloudToken, forceRefresh:true}, 12000);
+                if (!(fresh?.success || fresh?.status === 'success')) {
+                    rkMarkSyncPending_();
+                    throw new Error(fresh?.message || 'Verifikasi kategori ke Cloud gagal.');
+                }
+                const d = fresh.data || fresh.result?.data || fresh.result || fresh;
+                const cloudShop = normalizeShoppingCategories_(d.shoppingCategories);
+                const cloudCat = (d.catatanCategories && typeof d.catatanCategories === 'object') ? normalizeCatatanCategories_(d.catatanCategories) : normalizeCatatanCategories_(null);
+                const localShop = normalizeShoppingCategories_(shoppingCategories);
+                const localCat = normalizeCatatanCategories_(catatanCategories);
+                const okShop = JSON.stringify(cloudShop) === JSON.stringify(localShop);
+                const okCat = JSON.stringify(cloudCat) === JSON.stringify(localCat);
+                if (okShop && okCat) {
+                    // Cloud verified. Merge the verified category snapshot without
+                    // allowing a null/legacy response to poison local state.
+                    shoppingCategories = cloudShop;
+                    catatanCategories = cloudCat;
+                    secureSave('rekenan_shopping_categories', shoppingCategories);
+                    secureSave('rekenan_catatan_categories', catatanCategories);
+                    return Object.assign({}, lastResult, {success:true, verified:true});
+                }
+                if (attempt === 0) {
+                    console.warn('[Rekenan CATEGORY] Cloud mismatch after first commit; retrying category commit.', {label, okShop, okCat});
+                    rkMarkSyncPending_();
+                    continue;
+                }
                 rkMarkSyncPending_();
-                throw (result && result.error) || new Error('Cloud belum menerima perubahan kategori.');
+                throw new Error('Kategori belum sama dengan Cloud setelah verifikasi. Perubahan tetap aman di perangkat dan akan dicoba ulang otomatis.');
             }
-            return result;
+            return lastResult || {success:false};
         }
 
         async function addNewCatatanCategory() {
             const type = document.getElementById('manageCatType').value;
             const name = document.getElementById('manageCatName').value.trim();
             if (!name) { showToast("Nama kategori wajib diisi", "error"); return; }
+            catatanCategories = normalizeCatatanCategories_(catatanCategories);
             if (!catatanCategories[type]) catatanCategories[type] = [];
             if (catatanCategories[type].includes(name)) { showToast("Kategori sudah ada", "error"); return; }
 
@@ -11132,7 +11183,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             let noteDeleteBusy = false; window.deleteV101Note = async function (id) {if (noteDeleteBusy) return; if (!confirm('Hapus Note ini?')) return; noteDeleteBusy = true; try {ensureNotes(); notesData = notesData.filter(x => String(x.id) !== String(id)); secureSave('rekenan_notes', notesData); rkMarkRecordDeleted_('NOTE', id); renderV101Notes(); rkMarkSyncPending_(); showToast('Note dihapus di perangkat. Sinkronisasi otomatis berjalan saat online tersedia.', 'success')} catch (e) {showToast(e?.message || 'Penghapusan Cloud belum terverifikasi.', 'error')} finally {noteDeleteBusy = false} };
             window.renderV201CalculatorRoute = function () {
                 try { renderV201CalcHistory_(); } catch (_) {}
-                console.info('[Rekenan CALC] V202.12 ROUTE READY — NORMAL APP SCROLL / NO FIXED OVERLAY');
+                console.info('[Rekenan CALC] V202.13 ROUTE READY — NORMAL APP SCROLL / NO FIXED OVERLAY');
                 try { rkReconcileCalculatorFromCloud_(true); } catch (_) {}
             };
             window.v201CalcKey_ = function (key) {
@@ -11178,7 +11229,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
                 const newest=ordered.slice(0,1),older=ordered.slice(1);el.innerHTML=newest.map(renderItem).join('')+(older.length?rkHistoryDropdownHtml_(older,renderItem,'Riwayat Kalkulator'):'');
             };
             window.openV101CalculatorModal = function () {const m = makeModal('v101CalculatorModal', '<i class="fa-solid fa-calculator text-blue-300 mr-2"></i>Kalkulator', `<div class="rk-calc-phone"><div class="rk-calc-display"><div id="v101CalcExpr" class="rk-calc-expression">0</div><div id="v101CalcResult" class="rk-calc-result">0</div></div><div class="rk-calc-grid"><button type="button" class="v106-calc-key v106-calc-action" onclick="v201CalcKey_('C')">AC</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v201CalcKey_('⌫')">⌫</button><button type="button" class="v106-calc-key v106-calc-action" onclick="v201CalcKey_('.')">.</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('÷')">÷</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('7')">7</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('8')">8</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('9')">9</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('×')">×</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('4')">4</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('5')">5</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('6')">6</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('−')">−</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('1')">1</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('2')">2</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('3')">3</button><button type="button" class="v106-calc-key v106-calc-op" onclick="v201CalcKey_('+')">+</button><button type="button" class="v106-calc-key v106-calc-num rk-calc-zero" onclick="v201CalcKey_('0')">0</button><button type="button" class="v106-calc-key v106-calc-num" onclick="v201CalcKey_('000')">000</button><button type="button" class="v106-calc-key v106-calc-eq" onclick="v201CalcKey_('=')">=</button></div>
-<div id="rkCalcHistorySection" class="mt-3"><div class="text-[10px] text-zinc-500 mb-2">Riwayat Kalkulator</div><div id="v101CalcHistory" class="space-y-2"></div></div><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v101CalcAttachment" type="file" accept="image/*" class="hidden"></label><div class="v101-proof-meta"><b>Foto Bukti</b><small id="v101CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" id="v101CalcSaveBtn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Calculator()">Simpan</button></div></div>`); m.classList.add('show'); currentActiveTab = 'kalkulator'; try { localStorage.setItem('rekenan_active_tab','kalkulator'); } catch(_){} rkSetCalculatorNavActive_(true); renderV101CalcHistory(); console.info('[Rekenan CALC] V202.12 LEGACY MODAL DISABLED — ROUTE ACTIVE'); try { rkReconcileCalculatorFromCloud_(true); setTimeout(function(){ try{ rkReconcileCalculatorFromCloud_(true); }catch(_){} }, 1800); } catch(_){}};
+<div id="rkCalcHistorySection" class="mt-3"><div class="text-[10px] text-zinc-500 mb-2">Riwayat Kalkulator</div><div id="v101CalcHistory" class="space-y-2"></div></div><div class="v101-proof mt-3"><label class="v101-upload-label" title="Upload foto kalkulator"><i class="fa-solid fa-camera"></i><input id="v101CalcAttachment" type="file" accept="image/*" class="hidden"></label><div class="v101-proof-meta"><b>Foto Bukti</b><small id="v101CalcAttachmentStatus">Opsional — boleh dikosongkan</small></div></div><div class="flex gap-2 mt-3"><button type="button" id="v101CalcSaveBtn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-xs font-bold" onclick="saveV101Calculator()">Simpan</button></div></div>`); m.classList.add('show'); currentActiveTab = 'kalkulator'; try { localStorage.setItem('rekenan_active_tab','kalkulator'); } catch(_){} rkSetCalculatorNavActive_(true); renderV101CalcHistory(); console.info('[Rekenan CALC] V202.13 LEGACY MODAL DISABLED — ROUTE ACTIVE'); try { rkReconcileCalculatorFromCloud_(true); setTimeout(function(){ try{ rkReconcileCalculatorFromCloud_(true); }catch(_){} }, 1800); } catch(_){}};
             window.saveV101Calculator = async function () {const btn = document.getElementById('v101CalcSaveBtn'); if (btn?.dataset.busy === '1') return; const expr = String((document.getElementById('v101CalcExpr')?.value ?? document.getElementById('v101CalcExpr')?.textContent) || '').trim(), out = document.getElementById('v101CalcResult')?.textContent || '0'; if (!expr || out === '...') return showToast('Perhitungan belum valid.', 'error'); if (btn) btn.dataset.busy = '1'; try {const id = 'calc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6), file = document.getElementById('v101CalcAttachment')?.files?.[0]; let resultValue = Number.NaN; try { resultValue = typeof window.rkCalcEval1984_ === 'function' ? window.rkCalcEval1984_(expr) : Number(out); } catch (_) { resultValue = Number(out); } if (!Number.isFinite(resultValue)) return showToast('Hasil kalkulator tidak valid.', 'error'); const item = {id, type: 'calculator', expression: expr, result: resultValue, date: rkLocalDateTimeYMD_(new Date()), createdAt: new Date().toISOString()}; calcHistory.unshift(item); let attachment = null; if (file) attachment = await rkQueueAttachmentFile_(file, 'Kalkulator', id, 'CALC_HISTORY', item); if (attachment) item.attachment = attachment; secureSave('rekenan_calc_history', calcHistory); renderV101CalcHistory(); rkMarkSyncPending_(); showToast('Kalkulator tersimpan di perangkat. Sinkronisasi otomatis berjalan saat internet tersedia.', 'success'); const exprEl = document.getElementById('v101CalcExpr'), fileEl = document.getElementById('v101CalcAttachment'), resEl = document.getElementById('v101CalcResult'); if (exprEl) exprEl.value = ''; if (fileEl) fileEl.value = ''; if (resEl) resEl.textContent = '0'; const stEl = document.getElementById('v101CalcAttachmentStatus'); if (stEl) stEl.textContent = 'Opsional — boleh dikosongkan';} catch (e) {showToast(e?.message || 'Kalkulator gagal disimpan.', 'error')} finally {if (btn) {delete btn.dataset.busy; btn.textContent = 'Simpan'} } };
             window.renderV101CalcHistoryCore_ = function () {
                 const el = document.getElementById('v101CalcHistory');
@@ -11278,7 +11329,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
     if(typeof openAttachmentUrl_==='function') openAttachmentUrl_(url);
     else window.open(url,'_blank','noopener,noreferrer');
   }
-  // V202.12: legacy global shopping/loan photo patch removed. Base render owns photo controls.
+  // V202.13: legacy global shopping/loan photo patch removed. Base render owns photo controls.
 
             let v106PdfBusyState_ = false;
             function v106PdfBusy_(label) {
@@ -11325,7 +11376,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
             };
             function initV101() {const nav = document.getElementById('nav-kalkulator'); if (nav) nav.style.display = 'flex'}
 
-            // V202.12 syntax repair: close the inner report IIFE before the outer initializer.
+            // V202.13 syntax repair: close the inner report IIFE before the outer initializer.
         })();
         })();
     </script>
@@ -12224,7 +12275,7 @@ const RK_SYNC_PENDING_KEY = 'rekenan_sync_pending_v197';
         (function () {
             const ui = 'V200.90';
             console.info('[Rekenan BUILD] UI V200.90 READY'); console.info('[Rekenan BUILD] EXPECTED CLIENT V200.90 / SERVER API COMPATIBLE');
-            window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); console.info('[Rekenan CLOUD] V202.12 INDICATOR FIX — orange only when offline; green when connected/idle'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
+            window.addEventListener('load', () => {console.info('[Rekenan BUILD] UI', ui, 'LOADED'); console.info('[Rekenan CLOUD] V202.13 INDICATOR FIX — orange only when offline; green when connected/idle'); rkUpdateSyncButton_(); if (rkIsSyncPending_() && navigator.onLine) setTimeout(() => rkQueueAutoSync_(250), 400);});
         })();
     </script>
 <style id="rekenan-v191-fixes">
@@ -13024,8 +13075,8 @@ window.rkRenderIncremental=function(items,render,batch){
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V202.12';
-window.REKENAN_SERVER_BUILD='V202.12';
+window.REKENAN_UI_BUILD='V202.13';
+window.REKENAN_SERVER_BUILD='V202.13';
 console.info('[Rekenan BUILD] FINAL CLIENT V200.90 / SERVER API COMPATIBLE');
 console.info('[Rekenan BUILD] Calculator auto-clear + save animation + Shopping/Loan photo viewer FIX');
 
@@ -13131,8 +13182,8 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
   'use strict';
   window.REKENAN_BUILD_VERSION='V200.90';
-  window.REKENAN_UI_BUILD='V202.12';
-  window.REKENAN_SERVER_BUILD='V202.12';
+  window.REKENAN_UI_BUILD='V202.13';
+  window.REKENAN_SERVER_BUILD='V202.13';
   console.info('[Rekenan BUILD] V200.90 TRANSACTION HISTORY SAFE RENDER');
 
   // Do not alter transaction data. Only restore the canonical local source when
@@ -13164,8 +13215,8 @@ window.rekenanV2008Health=function(){return {client:'V200.90',server:window.REKE
 (function(){
 'use strict';
 window.REKENAN_BUILD_VERSION='V200.90';
-window.REKENAN_UI_BUILD='V202.12';
-window.REKENAN_SERVER_BUILD='V202.12';
+window.REKENAN_UI_BUILD='V202.13';
+window.REKENAN_SERVER_BUILD='V202.13';
 console.info('[Rekenan AUDIT V200.90] ALL-MENU LOCAL-FIRST + ADMIN CRUD VERIFIED + ADMIN LOCAL AUTHORITY OVERLAY: TRANSACTION / BELANJA / CATATAN / KALKULATOR / PINJAMAN / CICILAN / ADMIN');
         console.info('[Rekenan BUILD] V200.90 FINAL CLIENT | ADMIN LOCAL AUTHORITY OVERLAY | UNIVERSAL LOCAL-FIRST MUTATIONS + VERIFIED ADMIN CRUD');
 
@@ -13195,7 +13246,7 @@ window.v101CalcKey=function(key){
 window.forceCalcHistoryBelowKeypad=function(){
   const modal=document.getElementById('v101CalculatorModal'); if(!modal)return;
   const phone=modal.querySelector('.rk-calc-phone'); if(!phone)return;
-  // V202.12: do not inject inline flex/column styles. The Calculator Pro CSS owns
+  // V202.13: do not inject inline flex/column styles. The Calculator Pro CSS owns
   // the desktop grid and mobile single-column layout. This prevents the old
   // V200.90 force-column helper from overriding the new two-column design.
   phone.style.removeProperty('display');
@@ -13316,7 +13367,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V202.12';
+  window.REKENAN_UI_BUILD='V202.13';
   console.info('[Rekenan BUILD] V200.90 LOAN/CALC PHOTO BUTTON AUDIT + LIGHT CALC SHEET READ');
 
   /* Calculator: replace the broad getData reconciliation with a lightweight
@@ -13487,7 +13538,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function bindAll_(){bindLoanPhotoButtons_();bindCalcPhotoButtons_();}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){setTimeout(bindAll_,100);setTimeout(bindAll_,800);},{once:true});
   else {setTimeout(bindAll_,100);setTimeout(bindAll_,800);}
-  // V202.12: global photo MutationObserver removed to prevent startup/render churn.
+  // V202.13: global photo MutationObserver removed to prevent startup/render churn.
 
   window.rekenanPhotoCalcAuditV20065=function(){
     const loanBtns=document.querySelectorAll('#loanCardList .v106-photo-check');
@@ -13510,8 +13561,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
   'use strict';
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V202.12';
-  window.REKENAN_SERVER_BUILD='V202.12';
+  window.REKENAN_UI_BUILD='V202.13';
+  window.REKENAN_SERVER_BUILD='V202.13';
   console.info('[Rekenan BUILD] V200.90 CALCULATOR HARD FIX | DIRECT CALC_HISTORY READ + MENU FORCE READ + VERSION ALIGNED');
 })();
 </script>
@@ -13519,7 +13570,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script>
 (function(){
   window.__REKENAN_BUILD__='V201.00';
-  window.REKENAN_UI_BUILD='V202.12';
+  window.REKENAN_UI_BUILD='V202.13';
   console.info('[Rekenan BUILD] V200.91 ADMIN SESSION-RENEW + ACC AUTH FIX');
 })();
 </script>
@@ -13673,7 +13724,7 @@ nav.fixed.bottom-0 {
 }
 </style>
 <style id="rekenan-v20104-calculator-authoritative-layout">
-/* REKENAN V202.12 — authoritative Calculator Pro layout.
+/* REKENAN V202.13 — authoritative Calculator Pro layout.
    Fixes the legacy force-column inline styles that made the result/history
    appear clipped or disappear. */
 #v101CalculatorModal .rk-calc-phone{
@@ -13713,15 +13764,15 @@ nav.fixed.bottom-0 {
 <script id="rekenan-v20103-calculator-design-runtime">
 (function(){
   'use strict';
-  window.REKENAN_UI_BUILD='V202.12';
-  // V202.12: quick nominal shortcuts removed; calculator is universal.
+  window.REKENAN_UI_BUILD='V202.13';
+  // V202.13: quick nominal shortcuts removed; calculator is universal.
   window.rkCalcQuickAmount_=function(){ return false; };
   function polish(){
     const m=document.getElementById('v101CalculatorModal'); if(!m) return;
     const phone=m.querySelector('.rk-calc-phone'); if(!phone) return;
     phone.classList.add('rk-v20103-ready');
     if(typeof window.forceCalcHistoryBelowKeypad==='function') window.forceCalcHistoryBelowKeypad();
-    console.info('[Rekenan CALC] V202.12 UNIVERSAL UI READY | NO CURRENCY | NO QUICK NOMINALS | DESKTOP TWO-COLUMN');
+    console.info('[Rekenan CALC] V202.13 UNIVERSAL UI READY | NO CURRENCY | NO QUICK NOMINALS | DESKTOP TWO-COLUMN');
   }
   const old=window.openV101CalculatorModal;
   if(typeof old==='function' && !old.__v20103){
@@ -13729,16 +13780,16 @@ nav.fixed.bottom-0 {
     wrapped.__v20103=true; window.openV101CalculatorModal=wrapped;
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(polish,120)); else setTimeout(polish,120);
-  console.info('[Rekenan BUILD] V202.12 CALCULATOR TRUE ROUTE LOADED | UNIVERSAL NUMBER FORMAT | QUICK NOMINALS REMOVED');
+  console.info('[Rekenan BUILD] V202.13 CALCULATOR TRUE ROUTE LOADED | UNIVERSAL NUMBER FORMAT | QUICK NOMINALS REMOVED');
 })();
 </script>
 <script id="rekenan-v20103-authoritative-build">
-window.REKENAN_UI_BUILD='V202.12';
-window.REKENAN_CALCULATOR_BUILD='V202.12';
-console.info('[Rekenan BUILD] UI V202.12 | CALCULATOR UNIVERSAL | NO CURRENCY | NO QUICK NOMINALS | DESKTOP 2-COLUMN | MOBILE SINGLE-COLUMN | LAYOUT FIX');
+window.REKENAN_UI_BUILD='V202.13';
+window.REKENAN_CALCULATOR_BUILD='V202.13';
+console.info('[Rekenan BUILD] UI V202.13 | CALCULATOR UNIVERSAL | NO CURRENCY | NO QUICK NOMINALS | DESKTOP 2-COLUMN | MOBILE SINGLE-COLUMN | LAYOUT FIX');
 </script>
 <style id="rekenan-v20112-calculator-single-source">
-/* V202.12: Calculator has ONE route. Legacy calculator modal is never visible. */
+/* V202.13: Calculator has ONE route. Legacy calculator modal is never visible. */
 #v101CalculatorModal,
 #v101CalculatorModal.show,
 #v101CalculatorModal.rk-calculator-shell,
@@ -13752,10 +13803,10 @@ console.info('[Rekenan BUILD] UI V202.12 | CALCULATOR UNIVERSAL | NO CURRENCY | 
 <script id="rekenan-v20112-single-calculator-authority">
 (function(){
   'use strict';
-  window.REKENAN_BUILD_VERSION='V202.12';
-  window.REKENAN_UI_BUILD='V202.12';
-  window.REKENAN_CALCULATOR_BUILD='V202.12';
-  window.__REKENAN_BUILD__='V202.12';
+  window.REKENAN_BUILD_VERSION='V202.13';
+  window.REKENAN_UI_BUILD='V202.13';
+  window.REKENAN_CALCULATOR_BUILD='V202.13';
+  window.__REKENAN_BUILD__='V202.13';
 
   function removeLegacyCalculator_(){
     try{
@@ -13796,7 +13847,7 @@ console.info('[Rekenan BUILD] UI V202.12 | CALCULATOR UNIVERSAL | NO CURRENCY | 
     normalizePhoto_();
     var tab=document.getElementById('tab-kalkulator');
     var row=tab?.querySelector('.rk-calc-photo-tools');
-    console.info('[Rekenan AUDIT] V202.12 CALCULATOR SINGLE SOURCE',{
+    console.info('[Rekenan AUDIT] V202.13 CALCULATOR SINGLE SOURCE',{
       route:!!tab,
       photoRows:tab?.querySelectorAll('.rk-calc-photo-tools').length||0,
       cameraButtons:row?.querySelectorAll('label.rk-calc-photo-btn').length||0,
@@ -13811,12 +13862,12 @@ console.info('[Rekenan BUILD] UI V202.12 | CALCULATOR UNIVERSAL | NO CURRENCY | 
     var hit=e.target.closest && e.target.closest('[data-cat-tool="calculator"],#nav-kalkulator');
     if(hit){ setTimeout(function(){removeLegacyCalculator_();audit_();},0); }
   },true);
-  // V202.12: no global legacy-calculator observer; single-route open function is authoritative.
-  console.info('[Rekenan BUILD] V202.12 | SINGLE CALCULATOR ROUTE | 1 CAMERA + 1 IMAGE | LEGACY MODAL REMOVED');
+  // V202.13: no global legacy-calculator observer; single-route open function is authoritative.
+  console.info('[Rekenan BUILD] V202.13 | SINGLE CALCULATOR ROUTE | 1 CAMERA + 1 IMAGE | LEGACY MODAL REMOVED');
 })();
 </script>
 
-<!-- V202.12 ADMIN USER LIST + ASSIST MODE -->
+<!-- V202.13 ADMIN USER LIST + ASSIST MODE -->
 <div id="adminAssistOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.45);padding:16px;overflow:auto">
   <div style="max-width:720px;margin:20px auto;background:#fff;border-radius:18px;padding:16px">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
@@ -13925,7 +13976,7 @@ console.info('[Rekenan BUILD] UI V202.12 | CALCULATOR UNIVERSAL | NO CURRENCY | 
 </script>
 
 
-<!-- V202.12 ADMIN USER BUTTON BINDING -->
+<!-- V202.13 ADMIN USER BUTTON BINDING -->
 <script>
 (function(){
   function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -14008,8 +14059,8 @@ console.info('[Rekenan BUILD] UI V202.12 | CALCULATOR UNIVERSAL | NO CURRENCY | 
 </script>
 
 
-<!-- V202.12 AUTHORITATIVE ADMIN USER CENTER + CROSS APP SYNC -->
-<style id="rekenan-v20212-admin-center">
+<!-- V202.13 AUTHORITATIVE ADMIN USER CENTER + CROSS APP SYNC -->
+<style id="rekenan-v20213-admin-center">
 #adminLimitList{display:flex!important;flex-direction:column!important;gap:12px!important}
 .rk-admin-user-card{background:linear-gradient(180deg,#17191f,#111318)!important;border:1px solid rgba(148,163,184,.15)!important}
 .rk-user-badge{font-size:9px;font-weight:900;letter-spacing:.08em;color:#a5b4fc;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);padding:6px 8px;border-radius:999px}
@@ -14024,10 +14075,10 @@ console.info('[Rekenan BUILD] UI V202.12 | CALCULATOR UNIVERSAL | NO CURRENCY | 
 #adminLoanList,#adminPaymentList{display:none!important}
 @media(max-width:380px){.rk-admin-user-actions{grid-template-columns:1fr!important}.rk-admin-limit-editor{flex-direction:column!important}.rk-admin-limit-save{min-height:42px!important}}
 </style>
-<script id="rekenan-v20212-admin-center">
+<script id="rekenan-v20213-admin-center">
 (function(){
 'use strict';
-const TARGET_KEY='rekenan_admin_target_user_v20212';
+const TARGET_KEY='rekenan_admin_target_user_v20213';
 function users(){
   return Array.isArray(window.embeddedAdminBorrowers)?window.embeddedAdminBorrowers:[];
 }
@@ -14089,19 +14140,19 @@ function patchListAfterRender(){
 function boot(){
   hideLegacyAdminRooms(); patchListAfterRender();
   const panel=document.getElementById('adminPanelContent');
-  if(panel&&!panel.__v20212Observer){
-    panel.__v20212Observer=new MutationObserver(()=>{hideLegacyAdminRooms();});
-    panel.__v20212Observer.observe(panel,{childList:true,subtree:true});
+  if(panel&&!panel.__v20213Observer){
+    panel.__v20213Observer=new MutationObserver(()=>{hideLegacyAdminRooms();});
+    panel.__v20213Observer.observe(panel,{childList:true,subtree:true});
   }
   setTimeout(patchListAfterRender,300);setTimeout(patchListAfterRender,1200);setTimeout(patchListAfterRender,2500);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 </script>
-<script id="rekenan-v20212-cross-app-sync">
+<script id="rekenan-v20213-cross-app-sync">
 (function(){
 'use strict';
-let last=Number(localStorage.getItem('rekenan_cross_app_sync_version_v20212')||0);
+let last=Number(localStorage.getItem('rekenan_cross_app_sync_version_v20213')||0);
 let busy=false;
 async function pulse(){
   if(busy||typeof window.cloudRequest!=='function')return;
@@ -14116,9 +14167,9 @@ async function pulse(){
     if(!(d&&(d.status==='success'||d.success)))return;
     const v=Number(d?.data?.version??d?.version??0);
     if(!v){return;}
-    if(!last){last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20212',String(v));return;}
+    if(!last){last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20213',String(v));return;}
     if(v===last)return;
-    last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20212',String(v));
+    last=v;localStorage.setItem('rekenan_cross_app_sync_version_v20213',String(v));
     if(admin){
       if(typeof window.loadAdminPanel==='function') window.loadAdminPanel(true).catch(()=>{});
     }else{
