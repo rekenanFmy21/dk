@@ -1,22 +1,20 @@
 {
-  "build": "V202.13",
+  "build": "V202.15",
   "entry": "index.html",
   "canonical": "./",
-  "updated": "2026-08-24",
+  "updated": "2026-08-26",
   "features": [
-    "bantuan-user-local-first",
-    "admin-snapshot-version-gate",
-    "cloud-sync-only-when-newer",
-    "cross-app-loan-limit-sync",
-    "incremental-reconciliation-pulse",
-    "shared-gas-api",
-    "pwa-cache-version-bump",
-    "admin-user-center-action-fix",
-    "service-worker-hard-version-alignment",
-    "admin-center-runtime-diagnostics",
+    "global-clean-audit-v20215",
+    "cloud-read-cache-invalidation",
+    "single-definition-server-functions",
+    "dual-app-version-alignment",
     "category-cloud-hard-commit",
     "category-null-safe-merge",
-    "dual-app-refresh-typo-fix",
-    "reset-cloud-verified"
+    "reset-cloud-verified",
+    "history-newest-top",
+    "local-first-auto-online-queue",
+    "delete-tombstones",
+    "loan-payment-authoritative-crud",
+    "attachment-drive-queue"
   ]
 }
