@@ -1,9 +1,9 @@
 {
-  "id": "rekenan-app2-v202.15",
-  "name": "Rekenan V202.15 — APP 2 USER",
+  "id": "rekenan-app2-v202.17",
+  "name": "Rekenan V202.17 — APP 2 USER",
   "short_name": "Rekenan User",
-  "description": "Rekenan V202.15 — APP 2 USER, Local-First + Cloud Reconciliation",
-  "start_url": "./index.html?v=20215",
+  "description": "Rekenan V202.17 — APP 2 USER, Local-First + Cloud Reconciliation",
+  "start_url": "./index.html?v=20217",
   "scope": "./",
   "display": "standalone",
   "display_override": [

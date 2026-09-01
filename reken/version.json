@@ -1,10 +1,10 @@
 {
-  "build": "V202.15",
+  "build": "V202.17",
   "entry": "index.html",
   "canonical": "./",
   "updated": "2026-08-26",
   "features": [
-    "global-clean-audit-v20215",
+    "global-clean-audit-v20217",
     "cloud-read-cache-invalidation",
     "single-definition-server-functions",
     "dual-app-version-alignment",
