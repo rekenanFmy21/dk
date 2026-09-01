@@ -1,9 +1,10 @@
 {
-  "build": "V202.18",
+  "build": "V202.19",
   "entry": "index.html",
   "canonical": "./",
-  "updated": "2026-08-26",
+  "updated": "2026-09-01",
   "features": [
+    "limit-admin-render-restored-v20219",
     "global-clean-audit-v20218",
     "cloud-read-cache-invalidation",
     "single-definition-server-functions",
