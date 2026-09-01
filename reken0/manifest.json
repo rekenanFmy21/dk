@@ -1,9 +1,9 @@
 {
   "id": "rekenan-app1-v202.17",
-  "name": "Rekenan V202.17 — APP 1 OWNER",
+  "name": "Rekenan V202.18 — APP 1 OWNER",
   "short_name": "Rekenan Admin",
-  "description": "Rekenan V202.17 — APP 1 OWNER, Local-First + Cloud Reconciliation",
-  "start_url": "./index.html?v=20217",
+  "description": "Rekenan V202.18 — APP 1 OWNER, Local-First + Cloud Reconciliation",
+  "start_url": "./index.html?v=20218",
   "scope": "./",
   "display": "standalone",
   "display_override": [
