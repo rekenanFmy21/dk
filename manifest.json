@@ -1,9 +1,9 @@
 {
-  "id": "rekenan-single-app-v202.26",
-  "name": "Rekenan V202.26 — CLEAN CORE",
+  "id": "rekenan-single-app-v202.27",
+  "name": "Rekenan V202.27 — MENU REORGANIZED",
   "short_name": "Rekenan",
-  "description": "Rekenan V202.26 — Single App, Local-First + Background Cloud Read",
-  "start_url": "./index.html?v=20226",
+  "description": "Rekenan V202.27 — Note and Budget in bottom bar; Pengaturan stays in top header",
+  "start_url": "./index.html?v=20227",
   "scope": "./",
   "display": "standalone",
   "display_override": [
