@@ -1,9 +1,9 @@
 {
-  "id": "reken-single-app-v202.24",
-  "name": "REKEN V202.24 — SINGLE APP",
-  "short_name": "REKEN",
-  "description": "Reken V202.22 — satu aplikasi untuk pencatatan, belanja, pinjaman, kalkulator, dashboard, dan sinkronisasi.",
-  "start_url": "./index.html?v=20224",
+  "id": "rekenan-single-app-v202.21",
+  "name": "Rekenan V202.25 — SINGLE APP",
+  "short_name": "Rekenan",
+  "description": "Rekenan V202.25 — Single App, Local-First + Cloud Reconciliation",
+  "start_url": "./index.html?v=20221",
   "scope": "./",
   "display": "standalone",
   "display_override": [
