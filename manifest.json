@@ -1,9 +1,9 @@
 {
-  "id": "rekenan-single-app-v202.20",
-  "name": "Rekenan V202.20",
-  "short_name": "Rekenan",
-  "description": "Rekenan V202.20 — Single App, Local-First + Cloud Reconciliation",
-  "start_url": "./index.html?v=20220",
+  "id": "reken-single-app-v202.22",
+  "name": "Reken — Single App",
+  "short_name": "Reken",
+  "description": "Reken V202.22 — satu aplikasi untuk pencatatan, belanja, pinjaman, kalkulator, dashboard, dan sinkronisasi.",
+  "start_url": "./index.html?v=20222",
   "scope": "./",
   "display": "standalone",
   "display_override": [
@@ -33,7 +33,7 @@
     {
       "name": "Belanja",
       "short_name": "Belanja",
-      "url": "./#belanja?v=20220",
+      "url": "./#belanja?v=20208",
       "icons": [
         {
           "src": "./icons/rekenan-admin-192.png",
@@ -45,7 +45,7 @@
     {
       "name": "Catatan",
       "short_name": "Catatan",
-      "url": "./#catatan?v=20220",
+      "url": "./#catatan?v=20208",
       "icons": [
         {
           "src": "./icons/rekenan-admin-192.png",
