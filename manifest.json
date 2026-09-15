@@ -1,9 +1,9 @@
 {
-  "id": "rekenan-single-app-v202.21",
-  "name": "Rekenan V202.25 — SINGLE APP",
+  "id": "rekenan-single-app-v202.26",
+  "name": "Rekenan V202.26 — CLEAN CORE",
   "short_name": "Rekenan",
-  "description": "Rekenan V202.25 — Single App, Local-First + Cloud Reconciliation",
-  "start_url": "./index.html?v=20221",
+  "description": "Rekenan V202.26 — Single App, Local-First + Background Cloud Read",
+  "start_url": "./index.html?v=20226",
   "scope": "./",
   "display": "standalone",
   "display_override": [
